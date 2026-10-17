@@ -409,10 +409,12 @@ export class Game {
       case 'switch':
         this.board.flashSwitch(ev.at);
         this.audio.click();
+        this.screens.toast(S.toast.switchOn);
         break;
       case 'fragile_broken':
         this.board.breakFragile(ev.at);
         this.audio.crack();
+        this.screens.toast(S.toast.fragile);
         break;
       case 'split':
         this.audio.split();
@@ -623,10 +625,10 @@ export class Game {
       case 'undo': return this.undo();
       case 'rotateLeft': return this.rig.rotateBy(-1);
       case 'rotateRight': return this.rig.rotateBy(1);
-      case 'camReset': return this.rig.reset();
+      case 'camReset': this.screens.toast(S.toast.cameraReset); return this.rig.reset();
       case 'hint': return this.hint();
       case 'escape': return this.openPause();
-      case 'mute': return this.onSetting('muted', !this.settings.muted);
+      case 'mute': return this.toggleMute();
       default: return undefined;
     }
   }
@@ -659,8 +661,8 @@ export class Game {
       case 'menu': return this.goMenu();
       case 'next': return this.nextLevel();
       case 'undo': return this.undo();
-      case 'camReset': return this.rig.reset();
-      case 'mute': return this.onSetting('muted', !this.settings.muted);
+      case 'camReset': this.screens.toast(S.toast.cameraReset); return this.rig.reset();
+      case 'mute': return this.toggleMute();
       case 'switch': return this.toggleCube();
       case 'hint': return this.hint();
       case 'retry': return this.boot();
@@ -679,6 +681,12 @@ export class Game {
       case 'ai-csv': return this.ai.exportCsv();
       default: return undefined;
     }
+  }
+
+  toggleMute() {
+    const muted = !this.settings.muted;
+    this.onSetting('muted', muted);
+    this.screens.toast(muted ? S.toast.audioOff : S.toast.audioOn);
   }
 
   // Nút AI chỉ dùng được trong màn chơi. Các kiểm tra đang bận nằm trong AIPanel.

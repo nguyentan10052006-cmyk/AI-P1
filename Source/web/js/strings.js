@@ -182,7 +182,6 @@ export const S = {
     cameraReset: 'Đã đặt lại camera',
     offline: 'Mất kết nối với server',
     busy: 'Đang chạy, vui lòng đợi',
-    stepLabel: (n) => `Bước ${n}`,
     audioOff: 'Âm thanh đang tắt',
     audioOn: 'Âm thanh đang bật',
   },
