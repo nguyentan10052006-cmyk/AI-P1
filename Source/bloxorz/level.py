@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, FrozenSet, List, Tuple
+from typing import Any, Dict, FrozenSet, List, Optional, Tuple
 
 from .state import Cell, Orient, State, to_cell
 
@@ -24,6 +24,7 @@ BRIDGE_CHARS = (BRIDGE_CLOSED, BRIDGE_OPEN)
 SWITCH_KIND = {SOFT: "soft", HEAVY: "heavy", SPLIT_SWITCH: "split"}
 TILE_CHARS = {FLOOR, START, GOAL, FRAGILE, BRIDGE_CLOSED, BRIDGE_OPEN, *SWITCH_KIND}
 EFFECTS = ("toggle", "open", "close")
+KINDS = ("main", "challenge", "bonus")
 
 
 class LevelError(ValueError):
@@ -50,6 +51,12 @@ class Level:
     goal: Cell
     switches: Dict[Cell, Switch]
     initial_open: FrozenSet[Cell]
+    chapter: int = 1
+    order: int = 1
+    kind: str = "main"        # "main" | "challenge" | "bonus"
+    par: int = 0              # số bước tối ưu, 0 nghĩa là chưa biết
+    intro: Optional[str] = None
+    unlock_stars: int = 0
 
     @property
     def rows(self) -> int:
@@ -127,20 +134,31 @@ def parse_level(data: Any, level_id: str, where: str = "") -> Level:
                 raise LevelError(f"{where}: công tắc tách {at} cần đúng 2 ô đích khác nhau")
             if any(_char(grid, t) == VOID for t in targets):
                 raise LevelError(f"{where}: ô đích của công tắc tách {at} không được là khoảng trống")
-            switches[at] = Switch(at, kind, targets=targets)
         else:
-            if effect not in EFFECTS:
-                raise LevelError(f"{where}: công tắc {at} có effect phải là một trong {EFFECTS}")
+            if targets:
+                raise LevelError(f"{where}: chỉ công tắc tách mới có 'targets' (ô {at})")
             if not bridges:
                 raise LevelError(f"{where}: công tắc {at} phải điều khiển ít nhất một cầu")
-            unknown = [b for b in bridges if b not in bridge_set]
-            if unknown:
-                raise LevelError(f"{where}: công tắc {at} trỏ tới ô không phải cầu: {unknown}")
-            switches[at] = Switch(at, kind, effect, bridges)
+        # Công tắc tách có thể nối cầu (tùy chọn), nên effect chỉ bắt buộc khi có cầu.
+        if bridges and effect not in EFFECTS:
+            raise LevelError(f"{where}: công tắc {at} có effect phải là một trong {EFFECTS}")
+        if effect and not bridges:
+            raise LevelError(f"{where}: công tắc {at} có effect nhưng không có cầu nào")
+        unknown = [b for b in bridges if b not in bridge_set]
+        if unknown:
+            raise LevelError(f"{where}: công tắc {at} trỏ tới ô không phải cầu: {unknown}")
+        switches[at] = Switch(at, kind, effect, bridges, targets)
 
     for cell, ch in _iter_cells(grid):
         if ch in SWITCH_KIND and cell not in switches:
             raise LevelError(f"{where}: thiếu cấu hình cho công tắc tại {cell}")
+
+    level_kind = str(data.get("kind", "main"))
+    if level_kind not in KINDS:
+        raise LevelError(f"{where}: 'kind' phải là một trong {KINDS}")
+    intro = data.get("intro")
+    if intro is not None and not isinstance(intro, str):
+        raise LevelError(f"{where}: 'intro' phải là chuỗi hoặc null")
 
     return Level(
         id=level_id,
@@ -152,7 +170,20 @@ def parse_level(data: Any, level_id: str, where: str = "") -> Level:
         goal=goals[0],
         switches=switches,
         initial_open=frozenset(_cells_of(grid, BRIDGE_OPEN)),
+        chapter=_int_field(data, "chapter", 1, where, minimum=1),
+        order=_int_field(data, "order", 1, where, minimum=1),
+        kind=level_kind,
+        par=_int_field(data, "par", 0, where, minimum=0),
+        intro=intro,
+        unlock_stars=_int_field(data, "unlock_stars", 0, where, minimum=0),
     )
+
+
+def _int_field(data: Dict[str, Any], key: str, default: int, where: str, minimum: int) -> int:
+    value = data.get(key, default)
+    if not isinstance(value, int) or isinstance(value, bool) or value < minimum:
+        raise LevelError(f"{where}: '{key}' phải là số nguyên >= {minimum}")
+    return value
 
 
 def _read_switch(raw: Any, where: str):

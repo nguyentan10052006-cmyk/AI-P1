@@ -44,7 +44,7 @@ Source/
 
 Luật theo đề bài (mục 2). Các điểm đề bài chưa nói rõ, nhóm đã chọn như sau:
 
-- **Khối con (sau khi tách) đứng trên ô giòn** thì ô vỡ và khối rơi, vì khối con không ở tư thế nằm.
+- **Khối con 1×1×1 không làm vỡ ô giòn.** Đề chỉ đặt luật này cho "the block" (khối 1×1×2), nên khối con đi qua ô giòn như nền thường. Mỗi câu luật có test trong `tests/test_spec.py`.
 - **Khối con chỉ kích hoạt công tắc mềm.** Công tắc nặng và công tắc tách chỉ kích hoạt khi khối đứng nguyên vẹn, theo đúng đề bài.
 - **Khối nằm ngang qua ô đích không thắng.** Khối con lăn vào ô đích cũng không thắng: khối phải được ghép lại rồi đứng lên ô đích.
 - **Công tắc kích hoạt mỗi lần khối lăn vào ô đó.** Với công tắc mềm, mọi phần của khối đều tính là chạm.
@@ -86,7 +86,7 @@ Ký hiệu trong `grid` (mỗi ký tự là một ô):
 Cấu hình công tắc trong `switches`:
 
 - Công tắc mềm và nặng: `effect` là `toggle` (đảo trạng thái), `open` hoặc `close` (cố định sau khi kích hoạt), và `bridges` là danh sách ô cầu bị điều khiển.
-- Công tắc tách: `targets` là hai ô đích của khối con.
+- Công tắc tách: `targets` là hai ô đích của khối con. Có thể thêm `effect` và `bridges` nếu công tắc tách cũng nối cầu (đề: "Each switch is linked to one or more bridge tiles").
 
 `level.py` kiểm tra file trước khi chạy: đúng một `S`, đúng một `G`, mỗi công tắc có cấu hình, cầu được tham chiếu tồn tại.
 

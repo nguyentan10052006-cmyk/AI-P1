@@ -47,6 +47,12 @@ def level_to_dict(level: Level) -> Dict[str, Any]:
         "group": level.group,
         "source": level.source,
         "grid": list(level.grid),
+        "chapter": level.chapter,
+        "order": level.order,
+        "kind": level.kind,
+        "par": level.par,
+        "intro": level.intro,
+        "unlock_stars": level.unlock_stars,
         "start": list(level.start),
         "goal": list(level.goal),
         "switches": [

@@ -89,11 +89,10 @@ def _fall_reason(level: Level, state: State) -> Optional[Tuple[str, Cell]]:
         problem = _support_problem(level, state.open_bridges, cell)
         if problem is not None:
             return problem, cell
-    # Khối đứng (và mọi khối con) đè lên ô giòn thì ô vỡ và khối rơi.
-    if state.orient in (Orient.STANDING, Orient.SPLIT):
-        for cell in state.cells():
-            if level.tile(cell) == FRAGILE:
-                return "fragile", cell
+    # Luật ô giòn của đề chỉ áp dụng cho khối 1×1×2 ("the block"): khối đứng thì ô vỡ và khối rơi.
+    # Khối con 1×1×1 không bị áp dụng luật này (xem README, mục "Luật chơi và các giả định").
+    if state.orient is Orient.STANDING and level.tile(state.pos) == FRAGILE:
+        return "fragile", state.pos
     return None
 
 
@@ -119,6 +118,9 @@ def _activate(level: Level, state: State, pressed: Tuple[Cell, ...], events: Lis
         if switch.kind != "soft" and not standing_here:
             continue
         if switch.kind == "split":
+            # Công tắc tách có thể nối cầu (tùy chọn): cầu đổi trước, rồi khối mới được dịch chuyển.
+            if switch.bridges:
+                state = _apply_switch(state, switch, events)
             a, b = switch.targets
             state = split_state(a, b, state.open_bridges)
             events.append({"type": "split", "from": cell, "targets": [a, b]})
