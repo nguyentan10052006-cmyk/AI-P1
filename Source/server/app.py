@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import json
+import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Mapping, Tuple
 
 from solvers import ALGORITHMS
+from solvers.base import SolveJob
 
 from . import api
 
@@ -21,6 +23,8 @@ class BloxorzServer(ThreadingHTTPServer):
         self.levels = levels
         self.timeout_s = timeout_s
         self.algorithms = algorithms
+        self.solve_lock = threading.Lock()   # chỉ một lời giải chạy tại một thời điểm
+        self.current_job = None
         super().__init__(address, partial(Handler, directory=str(web_dir)))
 
 
@@ -40,8 +44,14 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = self._path()
-        if path not in ("/api/step", "/api/solve"):
+        if path not in ("/api/step", "/api/solve", "/api/solve/cancel"):
             self._send((404, {"error": "không có API này"}))
+            return
+        if path == "/api/solve/cancel":
+            job = self.server.current_job
+            if job is not None:
+                job.cancel()
+            self._send((200, {"cancelled": job is not None}))
             return
         try:
             body = self._read_body()
@@ -52,12 +62,22 @@ class Handler(SimpleHTTPRequestHandler):
             if path == "/api/step":
                 response = api.step_level(self.server.levels, body)
             else:
-                response = api.solve_level(
-                    self.server.levels, body, self.server.algorithms, self.server.timeout_s
-                )
+                response = self._solve(body)
         except Exception as exc:  # lỗi bất ngờ: báo cho GUI thay vì đóng kết nối
             response = (500, {"error": f"{type(exc).__name__}: {exc}"})
         self._send(response)
+
+    def _solve(self, body: Any) -> Tuple[int, Mapping[str, Any]]:
+        if not self.server.solve_lock.acquire(blocking=False):
+            return 409, {"error": "Đang có lời giải chạy. Hãy hủy trước khi giải lại."}
+        job = SolveJob()
+        self.server.current_job = job
+        try:
+            return api.solve_level(self.server.levels, body, self.server.algorithms,
+                                   self.server.timeout_s, job=job)
+        finally:
+            self.server.current_job = None
+            self.server.solve_lock.release()
 
     def end_headers(self) -> None:
         # Không cache: sửa JS/CSS rồi tải lại trang là thấy ngay

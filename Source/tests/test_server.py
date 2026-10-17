@@ -2,6 +2,7 @@
 import json
 import tempfile
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
@@ -10,6 +11,7 @@ from pathlib import Path
 from bloxorz.serialize import state_to_dict
 from server import api
 from server.app import make_server
+from solvers.base import SolveJob
 from tests import fakes
 from tests.helpers import make_level
 
@@ -86,6 +88,20 @@ class ApiSolveTests(unittest.TestCase):
     def test_unknown_algorithm_is_400(self):
         code, _ = self.solve({"fake": fakes.fake_solver}, name="xyz")
         self.assertEqual(code, 400)
+
+
+    def test_cancel_stops_running_solver(self):
+        job = SolveJob()
+        result = {}
+        body = {"level": "t1", "state": START, "algorithm": "slow"}
+        worker = threading.Thread(target=lambda: result.update(api.solve_level(
+            LEVELS, body, algorithms={"slow": fakes.sleepy_solver}, timeout_s=20, job=job)[1]))
+        worker.start()
+        time.sleep(1.0)
+        job.cancel()
+        worker.join(timeout=15)
+        self.assertFalse(worker.is_alive())
+        self.assertTrue(result["cancelled"])
 
 
 class HttpTests(unittest.TestCase):

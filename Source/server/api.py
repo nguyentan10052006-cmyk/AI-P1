@@ -15,9 +15,12 @@ from bloxorz.serialize import (
 )
 from bloxorz.state import Action
 from solvers import ALGORITHMS
-from solvers.base import run_solver
+from solvers.base import SolveJob, run_solver
 
 Response = Tuple[int, Dict[str, Any]]
+
+# Ký hiệu của các ô đặc biệt, để thẻ chọn màn hiện biểu tượng tương ứng
+FEATURE_CHARS = set("FBbox@")
 
 
 class BadRequest(Exception):
@@ -25,8 +28,22 @@ class BadRequest(Exception):
 
 
 def list_levels(levels: Mapping[str, Level]) -> Response:
+    ordered = sorted(levels.values(), key=lambda lv: (lv.chapter, lv.order, lv.id))
     return 200, {
-        "levels": [{"id": lv.id, "name": lv.name, "group": lv.group} for lv in levels.values()],
+        "levels": [
+            {
+                "id": lv.id,
+                "name": lv.name,
+                "group": lv.group,
+                "kind": lv.kind,
+                "chapter": lv.chapter,
+                "order": lv.order,
+                "par": lv.par,
+                "unlock_stars": lv.unlock_stars,
+                "features": sorted({ch for row in lv.grid for ch in row if ch in FEATURE_CHARS}),
+            }
+            for lv in ordered
+        ],
     }
 
 
@@ -60,6 +77,7 @@ def solve_level(
     body: Any,
     algorithms: Mapping[str, Any] = ALGORITHMS,
     timeout_s: float = 60.0,
+    job: Optional[SolveJob] = None,
 ) -> Response:
     try:
         level = _level_from(levels, body)
@@ -73,9 +91,9 @@ def solve_level(
         return 400, {"error": f"Thuật toán không hợp lệ: {name!r}"}
 
     problem = Problem(level, start)
-    outcome = run_solver(solve_fn, problem, timeout_s)
+    outcome = run_solver(solve_fn, problem, timeout_s, job=job)
     if not outcome["ok"]:
-        return 200, {"algorithm": name, "error": outcome["error"]}
+        return 200, {"algorithm": name, "error": outcome["error"], "cancelled": bool(outcome.get("cancelled"))}
 
     stats: Dict[str, Any] = {
         "time_ms": round(outcome["time_ms"], 3),
