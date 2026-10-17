@@ -8,7 +8,7 @@ Yêu cầu: Python 3.10 trở lên. Không cần cài thêm thư viện, chỉ d
 
 ```bash
 cd Source
-python main.py
+python3 main.py      # Windows: python main.py
 ```
 
 Chương trình khởi động server cục bộ tại `http://localhost:8000` và tự mở trình duyệt. Tùy chọn:
@@ -102,7 +102,7 @@ Cấu hình công tắc trong `switches`:
 
 ```bash
 cd Source
-python -m unittest -v
+python3 -m unittest -v   # Windows: python -m unittest -v
 ```
 
 Bộ test gồm: bảng chuyển tư thế, rơi, thắng, các loại công tắc, tách và ghép khối, kiểm tra định dạng màn, API và server HTTP.
