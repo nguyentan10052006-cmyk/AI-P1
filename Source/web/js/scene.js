@@ -1,33 +1,44 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../vendor/OrbitControls.js';
 
-// Tạo renderer, camera, ánh sáng và vòng lặp vẽ. Trả về các đối tượng cần dùng chung.
-export function createView(container) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Tạo renderer, ánh sáng và vòng lặp vẽ. Các hàm "ticker" đăng ký ở view.tickers được gọi mỗi khung hình.
+export function createView(container, { shadows = true } = {}) {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = shadows;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0f172a);
+  scene.fog = new THREE.Fog(0x0f172a, 28, 70);
 
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.maxPolarAngle = Math.PI * 0.48; // không cho xoay xuống dưới mặt bàn
+  controls.enablePan = false;
+  controls.minDistance = 4;
+  controls.maxDistance = 60;
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x334155, 1.1));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.4);
-  sun.position.set(6, 12, 8);
+  scene.add(new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 1.15));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.35);
+  sun.position.set(6, 14, 8);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0005;
   scene.add(sun);
+  scene.add(sun.target);
 
-  // Nền tối phía dưới: các ô trống (void) trông như khoảng không.
+  // Mặt đất tối: các ô trống (void) trông như khoảng không.
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(400, 400),
-    new THREE.MeshStandardMaterial({ color: 0x111827 }),
+    new THREE.CircleGeometry(120, 64),
+    new THREE.MeshStandardMaterial({ color: 0x0b1224, roughness: 1 }),
   );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -3;
+  ground.receiveShadow = true;
   scene.add(ground);
+
+  const view = { renderer, scene, camera, controls, sun, tickers: [] };
 
   const resize = () => {
     const width = Math.max(1, container.clientWidth);
@@ -39,20 +50,18 @@ export function createView(container) {
   window.addEventListener('resize', resize);
   resize();
 
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop((now) => {
     controls.update();
+    view.tickers = view.tickers.filter((fn) => fn(now) !== false);
     renderer.render(scene, camera);
   });
 
-  return { renderer, scene, camera, controls };
+  return view;
 }
 
-// Đặt camera nhìn cả bảng từ phía trước, hơi nghiêng xuống.
-export function frameBoard(view, rows, cols) {
-  const cx = cols / 2;
-  const cz = rows / 2;
-  const dist = Math.max(rows, cols) * 1.1 + 4;
-  view.controls.target.set(cx, 0, cz);
-  view.camera.position.set(cx, dist * 0.8, cz + dist * 0.9);
-  view.controls.update();
+export function setShadows(view, enabled) {
+  view.renderer.shadowMap.enabled = enabled;
+  view.scene.traverse((obj) => {
+    if (obj.material) obj.material.needsUpdate = true;
+  });
 }

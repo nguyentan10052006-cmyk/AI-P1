@@ -1,45 +1,27 @@
+// Bảng 3D: dựng các ô từ lưới của server, đồng bộ trạng thái cầu, vẽ vệt đường đi.
 import * as THREE from 'three';
-import { tween } from './anim.js';
-
-const TILE_THICK = 0.2;
-const TILE_TOP = 0;   // mặt trên của ô nền nằm ở y = 0
-const SUNK = -0.6;    // độ hạ của cầu đang đóng
-
-const COLOR = {
-  floor: 0xcbd5e1,
-  start: 0x86efac,
-  fragile: 0xfb923c,
-  bridge: 0xa78bfa,
-  soft: 0xf472b6,
-  heavy: 0xef4444,
-  split: 0x38bdf8,
-  ring: 0xfacc15,
-  hole: 0x020617,
-  target: 0x22d3ee,
-};
+import { tween, easeIn, getMotionScale } from './anim.js';
+import { buildBridge, buildTargetMarker, buildTile, LINK_PALETTE } from './tiles.js';
+import { linkFlash } from './effects.js';
 
 const key = (r, c) => `${r},${c}`;
+const cellXZ = (r, c) => [c + 0.5, r + 0.5];
 
-function tileColor(ch) {
-  if (ch === 'S') return COLOR.start;
-  if (ch === 'F') return COLOR.fragile;
-  if (ch === 'b' || ch === 'B') return COLOR.bridge;
-  return COLOR.floor;
-}
-
-// Bảng 3D: mỗi ô là một khối hộp mỏng, cộng thêm lỗ đích, công tắc và điểm đến.
 export class Board {
-  constructor(scene) {
-    this.scene = scene;
+  constructor(view) {
+    this.view = view;
     this.group = null;
-    this.bridges = new Map();   // key -> mesh của cầu
-    this.fragile = new Map();   // key -> mesh của ô giòn
-    this.switches = new Map();  // key -> nhóm hình vẽ của công tắc
+    this.bridges = new Map();   // key -> {open, closed, isOpen, color, links}
+    this.fragile = new Map();   // key -> nhóm hình của ô giòn
+    this.switches = new Map();  // key -> {group, color, links: [[r, c]...], owners}
+    this.trail = null;
+    this.rows = 0;
+    this.cols = 0;
   }
 
   clear() {
     if (!this.group) return;
-    this.scene.remove(this.group);
+    this.view.scene.remove(this.group);
     this.group.traverse((obj) => {
       if (obj.geometry) obj.geometry.dispose();
       if (obj.material) obj.material.dispose();
@@ -50,132 +32,200 @@ export class Board {
     this.switches.clear();
   }
 
-  build(level) {
+  // Dựng bảng cho màn. Các ô hiện dần từ điểm xuất phát ra ngoài.
+  build(level, { animate = true } = {}) {
     this.clear();
+    this.rows = level.grid.length;
+    this.cols = level.grid[0].length;
     this.group = new THREE.Group();
-    this.scene.add(this.group);
+    this.view.scene.add(this.group);
+    const links = this.linkColors(level);
+    const [sr, sc] = level.start.pos;
+    const pops = [];
 
-    const tileGeo = new THREE.BoxGeometry(0.96, TILE_THICK, 0.96);
     level.grid.forEach((row, r) => {
       [...row].forEach((ch, c) => {
         if (ch === '.') return;
-        const x = c + 0.5;
-        const z = r + 0.5;
         const k = key(r, c);
-        const material = new THREE.MeshStandardMaterial({ color: tileColor(ch), roughness: 0.7 });
-        const tile = new THREE.Mesh(tileGeo, material);
-        tile.position.set(x, TILE_TOP - TILE_THICK / 2, z);
-        this.group.add(tile);
-
-        if (ch === 'b' || ch === 'B') this.bridges.set(k, tile);
-        if (ch === 'F') this.fragile.set(k, tile);
-        if (ch === 'G') this.addGoal(x, z);
+        let obj;
+        if (ch === 'b' || ch === 'B') {
+          const color = links.bridgeColor.get(k) ?? LINK_PALETTE[0];
+          const bridge = buildBridge(color);
+          const isOpen = ch === 'B';
+          bridge.open.visible = isOpen;
+          bridge.closed.visible = !isOpen;
+          this.bridges.set(k, { open: bridge.open, closed: bridge.closed, isOpen, color, owners: links.bridgeOwners.get(k) ?? [] });
+          obj = bridge.group;
+        } else if (ch === 'F') {
+          obj = buildTile('F');
+          this.fragile.set(k, obj);
+        } else if (ch === 'o' || ch === 'x' || ch === '@') {
+          const color = links.switchColor.get(k) ?? LINK_PALETTE[0];
+          obj = buildTile(ch, color);
+          this.switches.set(k, { group: obj, color, links: links.switchLinks.get(k) ?? [] });
+          obj.userData.switchKey = k;
+        } else {
+          obj = buildTile(ch);
+        }
+        const [x, z] = cellXZ(r, c);
+        obj.position.set(x, 0, z);
+        this.group.add(obj);
+        pops.push({ obj, dist: Math.abs(r - sr) + Math.abs(c - sc) });
       });
     });
 
     for (const sw of level.switches) {
-      const [r, c] = sw.at;
-      const marker = this.addSwitch(sw.kind, c + 0.5, r + 0.5);
-      this.switches.set(key(r, c), marker);
-      if (sw.kind === 'split') {
-        for (const [tr, tc] of sw.targets) this.addTarget(tc + 0.5, tr + 0.5);
+      if (sw.kind !== 'split') continue;
+      for (const [tr, tc] of sw.targets) {
+        const marker = buildTargetMarker();
+        marker.position.set(tc + 0.5, 0, tr + 0.5);
+        this.group.add(marker);
       }
+    }
+    this.animateIn(pops, animate);
+  }
+
+  // Màu nối: mỗi công tắc một màu, cầu lấy màu của công tắc đầu tiên điều khiển nó.
+  linkColors(level) {
+    const bridgeColor = new Map();
+    const bridgeOwners = new Map();
+    const switchColor = new Map();
+    const switchLinks = new Map();
+    const ordered = [...level.switches].sort((a, b) => a.at[0] - b.at[0] || a.at[1] - b.at[1]);
+    ordered.forEach((sw, i) => {
+      const color = LINK_PALETTE[i % LINK_PALETTE.length];
+      const k = key(sw.at[0], sw.at[1]);
+      switchColor.set(k, color);
+      switchLinks.set(k, sw.bridges ?? []);
+      for (const [br, bc] of sw.bridges ?? []) {
+        const bk = key(br, bc);
+        if (!bridgeColor.has(bk)) bridgeColor.set(bk, color);
+        bridgeOwners.set(bk, [...(bridgeOwners.get(bk) ?? []), k]);
+      }
+    });
+    return { bridgeColor, bridgeOwners, switchColor, switchLinks };
+  }
+
+  animateIn(pops, animate) {
+    if (!animate) return;
+    const scale = getMotionScale();
+    for (const p of pops) {
+      p.obj.position.y = -1.2;
+      setTimeout(() => {
+        tween(380, (t) => { p.obj.position.y = -1.2 * (1 - t); });
+      }, p.dist * 60 * scale);
     }
   }
 
-  // Đưa mỗi cầu về trạng thái trong danh sách open. Có thể chạy hoạt ảnh hoặc đặt ngay.
+  // Đưa mọi cầu về trạng thái trong openList. instant = true thì đặt ngay, không có hoạt ảnh.
   syncBridges(openList, instant = false) {
     const open = new Set(openList.map(([r, c]) => key(r, c)));
     const jobs = [];
-    for (const [k, tile] of this.bridges) {
-      const y = (open.has(k) ? TILE_TOP : SUNK) - TILE_THICK / 2;
+    for (const [k, e] of this.bridges) {
+      const on = open.has(k);
       if (instant) {
-        tile.position.y = y;
+        e.isOpen = on;
+        e.open.visible = on;
+        e.closed.visible = !on;
+        e.open.position.y = on ? 0 : -0.5;
         continue;
       }
-      const y0 = tile.position.y;
-      if (Math.abs(y0 - y) < 1e-3) continue;
-      jobs.push(tween(320, (t) => { tile.position.y = y0 + (y - y0) * t; }));
+      if (on === e.isOpen) continue;
+      e.isOpen = on;
+      if (on) {
+        e.open.visible = true;
+        e.closed.visible = false;
+        jobs.push(tween(300, (t) => { e.open.position.y = -0.5 * (1 - t); }));
+      } else {
+        e.closed.visible = true;
+        jobs.push(tween(300, (t) => { e.open.position.y = -0.5 * t; }).then(() => {
+          if (!e.isOpen) e.open.visible = false;
+        }));
+      }
     }
     return Promise.all(jobs);
   }
 
   // Ô giòn vỡ: tấm nền rơi xuống và nghiêng.
   breakFragile([r, c]) {
-    const tile = this.fragile.get(key(r, c));
-    if (!tile) return Promise.resolve();
-    const y0 = tile.position.y;
-    return tween(450, (t) => {
-      tile.position.y = y0 - 2 * t;
-      tile.rotation.x = 0.4 * t;
-    }, (t) => t * t);
+    const obj = this.fragile.get(key(r, c));
+    if (!obj) return Promise.resolve();
+    const y0 = obj.position.y;
+    return tween(420, (t) => {
+      obj.position.y = y0 - 1.6 * t;
+      obj.rotation.x = 0.5 * t;
+    }, easeIn).then(() => { obj.visible = false; });
   }
 
-  // Công tắc vừa được kích hoạt: phóng to nhẹ rồi trở lại.
+  // Công tắc vừa kích hoạt: phóng to nhẹ và vẽ tia sáng tới các cầu nó điều khiển.
   flashSwitch([r, c]) {
-    const marker = this.switches.get(key(r, c));
-    if (!marker) return Promise.resolve();
+    const sw = this.switches.get(key(r, c));
+    if (!sw) return Promise.resolve();
+    linkFlash(this.view, cellXZ(r, c), sw.links.map(([br, bc]) => cellXZ(br, bc)), sw.color);
     return tween(260, (t) => {
-      marker.scale.setScalar(1 + 0.25 * Math.sin(Math.PI * t));
-    }, (t) => t);
+      sw.group.scale.setScalar(1 + 0.18 * Math.sin(Math.PI * t));
+    }, (t) => t).then(() => sw.group.scale.setScalar(1));
   }
 
-  addGoal(x, z) {
-    const hole = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.3, 0.3, 0.02, 32),
-      new THREE.MeshStandardMaterial({ color: COLOR.hole }),
-    );
-    hole.position.set(x, 0.011, z);
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(0.36, 0.04, 8, 40),
-      new THREE.MeshStandardMaterial({ color: COLOR.ring, emissive: COLOR.ring, emissiveIntensity: 0.4 }),
-    );
-    ring.rotation.x = Math.PI / 2;
-    ring.position.set(x, 0.02, z);
-    this.group.add(hole, ring);
-  }
-
-  addSwitch(kind, x, z) {
-    const marker = new THREE.Group();
-    marker.position.set(x, 0.02, z);
-    if (kind === 'soft') {
-      // Công tắc mềm: đĩa bát giác
-      const disc = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.26, 0.26, 0.06, 8),
-        new THREE.MeshStandardMaterial({ color: COLOR.soft }),
-      );
-      disc.position.y = 0.03;
-      marker.add(disc);
-    } else if (kind === 'heavy') {
-      // Công tắc nặng: chữ X
-      const mat = new THREE.MeshStandardMaterial({ color: COLOR.heavy });
-      for (const angle of [Math.PI / 4, -Math.PI / 4]) {
-        const bar = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.06, 0.12), mat);
-        bar.position.y = 0.04;
-        bar.rotation.y = angle;
-        marker.add(bar);
-      }
-    } else {
-      // Công tắc tách: hai cung tròn tạo thành "( )"
-      const mat = new THREE.MeshStandardMaterial({ color: COLOR.split });
-      for (const [offset, angle] of [[-0.1, Math.PI / 2], [0.1, -Math.PI / 2]]) {
-        const arc = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.04, 8, 24, Math.PI), mat);
-        arc.rotation.set(-Math.PI / 2, 0, angle);
-        arc.position.set(offset, 0.04, 0);
-        marker.add(arc);
-      }
+  // Làm sáng công tắc và các cầu nó điều khiển (khi rê chuột tới).
+  highlightSwitch(cell, on) {
+    const sw = cell ? this.switches.get(key(cell[0], cell[1])) : null;
+    for (const [k, e] of this.bridges) {
+      const linked = sw && sw.links.some(([br, bc]) => key(br, bc) === k);
+      setEmissive(e.open, linked && on ? 0.8 : 0);
+      setEmissive(e.closed, linked && on ? 0.8 : 0);
     }
-    this.group.add(marker);
-    return marker;
+    for (const s of this.switches.values()) setEmissive(s.group, sw === s && on ? 0.8 : 0.25);
   }
 
-  addTarget(x, z) {
-    const mark = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.5, 0.5),
-      new THREE.MeshBasicMaterial({ color: COLOR.target, transparent: true, opacity: 0.35, depthWrite: false }),
-    );
-    mark.rotation.x = -Math.PI / 2;
-    mark.position.set(x, 0.015, z);
-    this.group.add(mark);
+  // Tìm công tắc dưới con trỏ. ndc là tọa độ chuẩn hóa [-1, 1].
+  pick(ndc, camera, raycaster) {
+    raycaster.setFromCamera(new THREE.Vector2(ndc[0], ndc[1]), camera);
+    const groups = [...this.switches.values()].map((s) => s.group);
+    const hits = raycaster.intersectObjects(groups, true);
+    if (hits.length === 0) return null;
+    let obj = hits[0].object;
+    while (obj && !obj.userData.switchKey) obj = obj.parent;
+    return obj ? obj.userData.switchKey.split(',').map(Number) : null;
   }
+
+  // Vệt đường đi của lời giải: chấm tại mỗi bước nối với nhau.
+  drawTrail(cells, color) {
+    this.clearTrail();
+    const group = new THREE.Group();
+    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.85 });
+    const geo = new THREE.SphereGeometry(0.07, 10, 8);
+    cells.forEach(([r, c]) => {
+      const dot = new THREE.Mesh(geo, mat);
+      dot.position.set(c + 0.5, 0.12, r + 0.5);
+      group.add(dot);
+    });
+    if (cells.length > 1) {
+      const pts = cells.map(([r, c]) => new THREE.Vector3(c + 0.5, 0.12, r + 0.5));
+      group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 })));
+    }
+    this.view.scene.add(group);
+    this.trail = group;
+  }
+
+  clearTrail() {
+    if (!this.trail) return;
+    this.view.scene.remove(this.trail);
+    this.trail.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) obj.material.dispose();
+    });
+    this.trail = null;
+  }
+}
+
+// Chỉnh độ sáng phát xạ của mọi vật liệu trong nhóm (không đổi nếu nhóm không có vật liệu).
+function setEmissive(group, value) {
+  if (!group) return;
+  group.traverse((obj) => {
+    if (obj.material && obj.material.emissiveIntensity !== undefined) {
+      obj.material.emissiveIntensity = value;
+    }
+  });
 }
