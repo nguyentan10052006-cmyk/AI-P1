@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bloxorz 3D</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <aside class="panel">
+    <header>
+      <h1>Bloxorz</h1>
+      <p class="muted">Giao diện 3D · Three.js 0.160.0</p>
+    </header>
+
+    <section>
+      <h2>Màn chơi</h2>
+      <select id="level" aria-label="Chọn màn chơi"></select>
+      <div class="row">
+        <button id="btn-new">Màn mới</button>
+        <button id="btn-restart">Chơi lại</button>
+        <button id="btn-undo">Hoàn tác</button>
+      </div>
+      <button id="btn-next" class="primary hidden">Màn tiếp theo ▶</button>
+    </section>
+
+    <section>
+      <h2>Giải tự động</h2>
+      <div class="row">
+        <button class="solve" data-algo="bfs">BFS</button>
+        <button class="solve" data-algo="dfs">DFS</button>
+        <button class="solve" data-algo="ucs">UCS</button>
+        <button class="solve" data-algo="astar">A*</button>
+      </div>
+      <div class="row speed">
+        <button id="btn-stop" disabled>Dừng</button>
+        <label>Tốc độ
+          <input id="speed" type="range" min="1" max="5" value="3" aria-label="Tốc độ phát lại">
+        </label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Trạng thái</h2>
+      <p id="status" class="status">Đang tải...</p>
+    </section>
+
+    <section>
+      <h2>Chú thích ô</h2>
+      <ul class="legend">
+        <li><span class="sw sw-floor"></span>Nền</li>
+        <li><span class="sw sw-start"></span>Xuất phát (S)</li>
+        <li><span class="sw sw-goal"></span>Lỗ đích (G)</li>
+        <li><span class="sw sw-fragile"></span>Ô giòn (F): đứng lên là vỡ</li>
+        <li><span class="sw sw-bridge"></span>Cầu (mờ = đang đóng)</li>
+        <li><span class="sw sw-soft"></span>Công tắc mềm: chạm bằng mọi tư thế</li>
+        <li><span class="sw sw-heavy"></span>Công tắc nặng: chỉ khi đứng</li>
+        <li><span class="sw sw-split"></span>Công tắc tách: chỉ khi đứng</li>
+        <li><span class="sw sw-target"></span>Điểm đến của khối con</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Điều khiển</h2>
+      <ul class="keys">
+        <li><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> hoặc <kbd>W A S D</kbd>: lăn khối</li>
+        <li><kbd>Space</kbd>: đổi khối con (khi đã tách)</li>
+        <li><kbd>R</kbd>: chơi lại · <kbd>Z</kbd>: hoàn tác</li>
+        <li>Kéo chuột để xoay, cuộn để phóng to</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Kết quả giải</h2>
+      <div class="table-wrap">
+        <table id="results">
+          <thead>
+            <tr>
+              <th>Màn</th><th>Thuật toán</th><th>Thời gian (ms)</th><th>Bộ nhớ (KB)</th>
+              <th>Node mở rộng</th><th>Độ dài</th><th>Chi phí</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </aside>
+
+  <main id="stage"></main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
