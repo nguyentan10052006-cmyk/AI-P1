@@ -1,9 +1,0 @@
-{
-  "name": "Công tắc và ô giòn",
-  "group": "combined",
-  "source": "Tự thiết kế cho đồ án",
-  "grid": ["S#o#", "#b##", "#F#G"],
-  "switches": [
-    {"at": [0, 2], "type": "soft", "effect": "toggle", "bridges": [[1, 1]]}
-  ]
-}

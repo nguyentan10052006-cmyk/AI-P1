@@ -1,9 +1,0 @@
-{
-  "name": "Tách khối và ô giòn",
-  "group": "combined",
-  "source": "Tự thiết kế cho đồ án",
-  "grid": ["S##@", "#..#", "####", ".FFG"],
-  "switches": [
-    {"at": [0, 3], "type": "split", "targets": [[2, 0], [2, 2]]}
-  ]
-}

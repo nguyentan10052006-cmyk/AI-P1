@@ -1,0 +1,19 @@
+{
+  "name": "Mê cung nhỏ",
+  "group": "basic",
+  "chapter": 1,
+  "order": 3,
+  "kind": "main",
+  "par": 13,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    ".####",
+    "..##S",
+    "#####",
+    ".##..",
+    "#G..#"
+  ],
+  "switches": []
+}

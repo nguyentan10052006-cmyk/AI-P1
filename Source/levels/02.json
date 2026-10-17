@@ -1,7 +1,0 @@
-{
-  "name": "Góc vuông",
-  "group": "basic",
-  "source": "Tự thiết kế cho đồ án",
-  "grid": ["S##", "###", "##G"],
-  "switches": []
-}

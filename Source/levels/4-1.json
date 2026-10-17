@@ -1,0 +1,37 @@
+{
+  "name": "Tách đôi",
+  "group": "switch",
+  "chapter": 4,
+  "order": 1,
+  "kind": "main",
+  "par": 12,
+  "intro": "Khi khối đứng trên công tắc tách, khối được dịch tới hai ô đích và tách thành hai khối nhỏ. Bấm Space để đổi khối đang điều khiển. Hai khối nhỏ kề nhau sẽ tự ghép lại.",
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "G##.#",
+    ".#.##",
+    "#####",
+    "#..S@",
+    "#####"
+  ],
+  "switches": [
+    {
+      "at": [
+        3,
+        4
+      ],
+      "type": "split",
+      "targets": [
+        [
+          4,
+          4
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    }
+  ]
+}

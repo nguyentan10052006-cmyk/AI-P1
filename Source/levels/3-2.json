@@ -1,0 +1,34 @@
+{
+  "name": "Công tắc nặng",
+  "group": "switch",
+  "chapter": 3,
+  "order": 2,
+  "kind": "main",
+  "par": 16,
+  "intro": "Công tắc nặng chỉ kích hoạt khi khối đứng thẳng trên nó. Khối nằm lên thì không kích hoạt. Cầu của nó sẽ mở vĩnh viễn.",
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    ".###.",
+    ".###.",
+    "Gb###",
+    "#.x##",
+    "##.#S"
+  ],
+  "switches": [
+    {
+      "at": [
+        3,
+        2
+      ],
+      "type": "heavy",
+      "bridges": [
+        [
+          2,
+          1
+        ]
+      ],
+      "effect": "open"
+    }
+  ]
+}

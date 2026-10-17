@@ -1,7 +1,0 @@
-{
-  "name": "Phòng nhỏ",
-  "group": "basic",
-  "source": "Tự thiết kế cho đồ án",
-  "grid": ["S###", "####", "###G"],
-  "switches": []
-}
