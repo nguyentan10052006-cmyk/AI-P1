@@ -13,4 +13,4 @@ from .base import SearchResult
 
 
 def dfs(problem: Problem) -> SearchResult:
-    raise NotImplementedError("DFS chưa được cài đặt (solvers/dfs.py)")
+    raise NotImplementedError("Chưa cài đặt (xem solvers/dfs.py)")

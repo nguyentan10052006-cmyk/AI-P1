@@ -15,4 +15,4 @@ from .base import SearchResult
 
 
 def ucs(problem: Problem) -> SearchResult:
-    raise NotImplementedError("UCS chưa được cài đặt (solvers/ucs.py)")
+    raise NotImplementedError("Chưa cài đặt (xem solvers/ucs.py)")

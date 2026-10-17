@@ -16,4 +16,4 @@ from .base import SearchResult
 
 
 def astar(problem: Problem) -> SearchResult:
-    raise NotImplementedError("A* chưa được cài đặt (solvers/astar.py)")
+    raise NotImplementedError("Chưa cài đặt (xem solvers/astar.py)")

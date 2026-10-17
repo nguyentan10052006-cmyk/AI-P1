@@ -68,7 +68,9 @@ def _worker(conn, solve_fn: SolveFn, problem: Problem) -> None:
             "time_ms": elapsed * 1000,
             "peak_kb": peak / 1024,
         })
-    except Exception as exc:  # solver chưa cài đặt hoặc bị lỗi
+    except NotImplementedError as exc:  # solver chưa cài đặt: thông báo đã nói rõ file cần viết
+        conn.send({"ok": False, "error": str(exc)})
+    except Exception as exc:  # solver bị lỗi: giữ tên lỗi để sinh viên dễ tìm nguyên nhân
         message = str(exc) or type(exc).__name__
         conn.send({"ok": False, "error": f"{type(exc).__name__}: {message}"})
     finally:

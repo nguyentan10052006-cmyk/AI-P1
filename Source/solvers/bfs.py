@@ -15,4 +15,4 @@ from .base import SearchResult
 
 
 def bfs(problem: Problem) -> SearchResult:
-    raise NotImplementedError("BFS chưa được cài đặt (solvers/bfs.py)")
+    raise NotImplementedError("Chưa cài đặt (xem solvers/bfs.py)")
