@@ -1,0 +1,9 @@
+{
+  "name": "Công tắc mềm",
+  "group": "switch",
+  "source": "Tự thiết kế cho đồ án",
+  "grid": ["S#o#", "#b#G"],
+  "switches": [
+    {"at": [0, 2], "type": "soft", "effect": "toggle", "bridges": [[1, 1]]}
+  ]
+}

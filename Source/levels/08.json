@@ -1,0 +1,9 @@
+{
+  "name": "Tách khối",
+  "group": "switch",
+  "source": "Tự thiết kế cho đồ án",
+  "grid": ["S##@", "#..#", "###G"],
+  "switches": [
+    {"at": [0, 3], "type": "split", "targets": [[2, 0], [2, 2]]}
+  ]
+}

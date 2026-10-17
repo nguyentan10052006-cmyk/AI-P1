@@ -1,0 +1,9 @@
+{
+  "name": "Công tắc nặng",
+  "group": "switch",
+  "source": "Tự thiết kế cho đồ án",
+  "grid": ["S##x", "...b", "...#", "...G"],
+  "switches": [
+    {"at": [0, 3], "type": "heavy", "effect": "open", "bridges": [[1, 3]]}
+  ]
+}
