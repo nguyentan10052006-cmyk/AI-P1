@@ -1,0 +1,6 @@
+Mã,Vai trò,Họ tên,MSSV,Thuật toán,Phần chung phụ trách,Chương báo cáo,Đọc chéo cho,% hoàn thành
+TV1,BFS và engine lõi,,,BFS,"NV1: hợp đồng chung, engine lõi, bộ nạp màn, ghép module",2. Mô hình hóa; 3.1 BFS,TV2,
+TV2,DFS; màn chơi và thực nghiệm,,,DFS hoặc IDS,NV4: 33 màn gốc; NV10: thực nghiệm,3.2 DFS; 5. Thực nghiệm,TV5,
+TV3,UCS và ô đặc biệt,,,UCS,"NV2: ô dễ vỡ, công tắc, cầu; hàm chi phí; kiểm thử cài đặt; đóng gói",3.3 UCS,TV1,
+TV4,A*; tách khối và ghép báo cáo,,,A*,NV3: tách và ghép khối; heuristic; ghép báo cáo,3.4 A*; 1. Phân công; 6. Kết luận,TV3,
+TV5,GUI và video,,,(không),"NV9: GUI 3D, README; NV12: video",4. Cài đặt và giao diện,TV4,
