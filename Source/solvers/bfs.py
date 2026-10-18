@@ -15,4 +15,10 @@ from .base import SearchResult
 
 
 def bfs(problem: Problem) -> SearchResult:
-    raise NotImplementedError("Chưa cài đặt (xem solvers/bfs.py)")
+    # raise NotImplementedError("Chưa cài đặt (xem solvers/bfs.py)")
+    state = problem.initial_state()
+    deque = [state]
+    visited = {state}
+    parent = {state: (None, None)}
+    expanded = 0
+    # while deque:
