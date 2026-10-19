@@ -1,0 +1,8 @@
+#,Nguồn,Tác giả,Năm,Link,Phiên bản hoặc commit,Giấy phép,Dùng vào đâu,Người thêm,Đã vào báo cáo
+1,CSC14003 Project 1: Bloxorz Solver (đề bài),Khoa CNTT ĐH KHTN – ĐHQG-HCM,,docs/AI - Project 1.pdf,,,Yêu cầu và luật chơi,,
+2,Bloxorz (game gốc),Damien Clarke,2007,https://www.coolmathgames.com/0-bloxorz,,Bản quyền của tác giả,Luật chơi; thiết kế 33 màn,,
+3,bloxorz_gba (port Game Boy Advance của Bloxorz),Jacob Coughenour,2026,https://github.com/jacobcoughenour/bloxorz_gba,f57ebb6,GPL-3.0,Dữ liệu 33 màn (game/levels.json); đối chiếu luật ở chỗ đề chưa rõ,,
+4,quick_bloxorz,Jeffrey Gordon,2021,https://github.com/jgordon510/quick_bloxorz,07821f5,CC BY (theo README),Đối chiếu dữ liệu màn,,
+5,cs109: Bloxorz levels,Otfried Cheong,2015,https://github.com/otfried/cs109/tree/master/bloxorz/levels,0097f4a,Không ghi,Đối chiếu màn 1–13,,
+6,BloxorzSolver,Luan Pham và cộng sự,2018,https://github.com/phamquiluan/BloxorzSolver,cd9c142,Không ghi,Đối chiếu dữ liệu màn,,
+7,Artificial Intelligence: A Modern Approach (4th ed.),S. Russell và P. Norvig,2020,,,,"BFS, DFS, UCS, A*, heuristic",,
