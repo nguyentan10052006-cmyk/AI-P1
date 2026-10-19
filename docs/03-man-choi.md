@@ -100,7 +100,7 @@ Các màn gốc khá nhỏ: bộ giải tham khảo giải mỗi màn dưới 50
 
 ## 6. Định dạng file màn của nhóm
 
-Đây là đề xuất; TV2 và TV1 chốt trong ngày 19/10. Mỗi màn là một file `Source/levels/NN.json`. Ví dụ màn 2:
+Đây là đề xuất; TV2, TV1 và TV3 (người viết bộ nạp màn) chốt trong ngày 19/10. Mỗi màn là một file `Source/levels/NN.json`. Ví dụ màn 2:
 
 ```json
 {

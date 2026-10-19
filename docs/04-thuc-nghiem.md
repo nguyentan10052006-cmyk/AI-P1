@@ -1,6 +1,6 @@
 # Thực nghiệm: đo gì, đo thế nào, trình bày ra sao
 
-Phần thực nghiệm chiếm 20/100 điểm. TV2 chủ trì: viết script, chạy, vẽ biểu đồ. Chủ của 4 thuật toán phải đếm chỉ số đúng quy ước ở mục 3 và viết nhận xét cho thuật toán của mình.
+Phần thực nghiệm chiếm 20/100 điểm. TV2 chủ trì: viết script, chạy, vẽ biểu đồ. TV3 làm bộ màn tự sinh (§8). Chủ của 4 thuật toán phải đếm chỉ số đúng quy ước ở mục 3 và viết nhận xét cho thuật toán của mình.
 
 ## 1. Thực nghiệm phải trả lời được
 
@@ -92,7 +92,7 @@ Lần chạy có `measure_memory=True` chỉ lấy `peak_kb`, bỏ số đo th�
 ## 5. File kết quả
 
 - `Source/experiments/raw.csv`: một dòng cho mỗi lần chạy, để kiểm tra lại khi cần. Có thêm cột `path` (dãy hành động, cách nhau bởi dấu cách) để phát lại lời giải và gỡ lỗi.
-- `Source/experiments/summary.csv`: một dòng cho mỗi cặp (màn, thuật toán), đã lấy trung vị. File này được nhập vào tab ThucNghiem của Google Sheet và dùng để vẽ biểu đồ.
+- `Source/experiments/summary.csv`: một dòng cho mỗi cặp (màn, thuật toán), đã lấy trung vị. File này được nhập vào tab thuc-nghiem của Google Sheet và dùng để vẽ biểu đồ.
 
 Cột của `summary.csv`:
 
@@ -186,6 +186,6 @@ Câu hỏi gợi ý cho từng chủ thuật toán (mục 5.4 của báo cáo):
 | S2 Cầu | Sân 8 × 12 cố định, rải k công tắc mềm; mỗi công tắc đảo một ô cầu riêng ở mép sân, không nằm trên đường tới đích | k = 0, 2, 4, 6, 8, 10 | Câu 3: trạng thái cầu nhân số trạng thái lên tới 2^k, dù lời giải không đổi |
 | S3 Không lời giải | Hai vùng sàn ngăn bởi một cột ô trống; xuất phát ở vùng trái, đích ở vùng phải. Khối không qua được khe rộng 1 ô, vì lăn về phía khe thì luôn có một phần khối trên ô trống | Vùng trái 10 × 10 và 50 × 50 | Câu 5: chi phí tìm kiếm vét cạn |
 
-- Script `Source/experiments/gen_levels.py`, tham số cố định, ghi ra `Source/levels/gen/`. Cùng định dạng file màn ở [03 §6](03-man-choi.md#6-định-dạng-file-màn-của-nhóm); `source` ghi "tự sinh bằng gen_levels.py", `group` là S1, S2 hoặc S3. Chạy lại script phải ra đúng các file cũ.
+- Script `Source/experiments/gen_levels.py` (TV3 viết, việc V40), tham số cố định, ghi ra `Source/levels/gen/`. Cùng định dạng file màn ở [03 §6](03-man-choi.md#6-định-dạng-file-màn-của-nhóm); `source` ghi "tự sinh bằng gen_levels.py", `group` là S1, S2 hoặc S3. Chạy lại script phải ra đúng các file cũ.
 - Khi sinh, dùng BFS kiểm tra: màn S1 và S2 giải được, màn S3 không có lời giải.
 - Timeout vẫn là 60 giây. Ở S1 với N lớn, DFS cho lời giải rất dài và IDS sẽ hết giờ. Đó là kết quả để nhận xét, không phải lỗi.
