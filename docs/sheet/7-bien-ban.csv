@@ -1,0 +1,15 @@
+#,Ngày,Vấn đề,Quyết định,Lý do hoặc căn cứ,Người chốt,Ghi chú
+1,2026-10-18,Cách chia việc,PA2: mỗi người một thuật toán; một người làm GUI,,Cả nhóm,Phần chung chia thành nhóm việc có chủ (docs/01)
+2,2026-10-18,Người cho từng vai trò TV1–TV5,,,,Điền tên vào tab phan-cong
+3,2026-10-18,GUI 3D làm bằng gì,,,,
+4,2026-10-18,Nguồn và số màn,33 màn của game gốc,Đánh giá chuẩn nhất; vượt mức tối thiểu 10 màn,Cả nhóm,Dữ liệu và đối chiếu: docs/03
+5,2026-10-18,Các điểm luật đề chưa rõ,Theo luật chuẩn của game gốc,,Cả nhóm,Bảng chốt: docs/02 mục 5
+6,2026-10-18,Ngôn ngữ và công cụ viết báo cáo,,,,
+7,2026-10-18,Git và cách liên lạc,,,,
+8,2026-10-18,Công cụ theo dõi tiến độ,Google Sheets,,Cả nhóm,Cách dựng: docs/05
+9,2026-10-18,Ngày ba mốc,M1 21/10; M2 25/10; M3 28/10; nộp 30/10,,,Xác nhận lại
+10,2026-10-18,Người kiểm thử cài đặt,TV1,Cân bằng lại phân công ngày 19/10 (dòng #12),,docs/01 NV13
+11,2026-10-18,Chỉ số thực nghiệm,"Số bước, chi phí, số nút mở rộng, frontier, bộ nhớ, thời gian tìm kiếm, tổng thời gian",,Cả nhóm,Định nghĩa: docs/04
+12,2026-10-19,Cân bằng lại khối lượng giữa 5 thành viên,"Tách và ghép khối (V06): TV4 sang TV1. Bộ nạp màn (V03): TV1 sang TV3. Kiểm thử cài đặt, đóng gói (V37, V38): TV3 sang TV1. Bộ màn tự sinh (V40): TV2 sang TV3. Video (V36): TV5 sang TV3. Module chạy solver nền và So sánh (V39): TV5 sang TV4","Trước khi chỉnh, TV5 (GUI) và TV2 (thực nghiệm) nhiều việc nhất, TV3 ít nhất; TV4 vừa làm phần luật khó nhất vừa làm heuristic và ghép báo cáo",,"Chi tiết: docs/01 mục 2, 3, 5, 6; tab task"
+13,2026-10-19,Cách tính % hoàn thành,"Mỗi việc tính theo Trạng thái: Chưa bắt đầu 0%, Đã bắt đầu 50%, Hoàn thành 100%. % của một người là trung bình các việc của người đó. Chỉ chọn Hoàn thành khi người đọc chéo đã xem và test qua","Bỏ cỡ, trọng số và cột % xong cho gọn",,Công thức ở tab phan-cong cột I; bảng mức ở K1:L4; docs/05 mục 3
+14,2026-10-19,Đối chiếu hợp đồng chung với code có sẵn,"Giữ theo code: thư mục bloxorz/, luật chung trong rules.py (chia phần sở hữu), State dataclass + frozenset, Action(dir, cube), actions() trả mọi hành động (result() = None thì bỏ, không đếm generated), Level/Switch, ký hiệu ô . # o x @, run_solver + SolveJob. Theo tài liệu: SearchResult đủ 7 trường, lớp Solver có prepare(), GridMaze. Cần mở rộng: links theo từng cầu (màn 29, TV3). Bộ màn: levels/original/, levels/gen/","Code đã chạy và có test; đổi theo đề xuất phải sửa engine, server, GUI. Ký hiệu ô hai bộ xung đột nên chỉ giữ một",,"Chi tiết: docs/01 mục 4.1; cả nhóm xác nhận ở buổi M1"

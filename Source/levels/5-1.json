@@ -1,0 +1,35 @@
+{
+  "name": "Cam và công tắc",
+  "group": "combined",
+  "chapter": 5,
+  "order": 1,
+  "kind": "main",
+  "par": 25,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "###xFG",
+    "##.###",
+    "####.#",
+    "####FF",
+    "S#.#b#",
+    ".#####"
+  ],
+  "switches": [
+    {
+      "at": [
+        0,
+        3
+      ],
+      "type": "heavy",
+      "bridges": [
+        [
+          4,
+          4
+        ]
+      ],
+      "effect": "open"
+    }
+  ]
+}

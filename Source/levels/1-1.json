@@ -1,0 +1,15 @@
+{
+  "name": "Đường thẳng",
+  "group": "basic",
+  "chapter": 1,
+  "order": 1,
+  "kind": "main",
+  "par": 4,
+  "intro": "Khối đứng trên một ô. Lăn nó để đổ xuống nằm, hoặc đứng thẳng lên. Đích là lỗ vuông: đứng thẳng trên lỗ để thắng.",
+  "unlock_stars": 0,
+  "source": "Tự thiết kế cho đồ án",
+  "grid": [
+    "S#####G"
+  ],
+  "switches": []
+}

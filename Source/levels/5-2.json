@@ -1,0 +1,52 @@
+{
+  "name": "Tách trên ô cam",
+  "group": "combined",
+  "chapter": 5,
+  "order": 2,
+  "kind": "main",
+  "par": 28,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "####..#",
+    "#S@#.b#",
+    ".####F.",
+    "#.####.",
+    "#.#o..#",
+    "F#.F##G"
+  ],
+  "switches": [
+    {
+      "at": [
+        1,
+        2
+      ],
+      "type": "split",
+      "targets": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          6
+        ]
+      ]
+    },
+    {
+      "at": [
+        4,
+        3
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          1,
+          5
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Đổi tư thế",
+  "group": "basic",
+  "chapter": 1,
+  "order": 2,
+  "kind": "main",
+  "par": 8,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế cho đồ án",
+  "grid": [
+    "S##",
+    "###",
+    "##G"
+  ],
+  "switches": []
+}

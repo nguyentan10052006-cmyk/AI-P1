@@ -1,0 +1,53 @@
+{
+  "name": "Đường dài",
+  "group": "combined",
+  "chapter": 7,
+  "order": 1,
+  "kind": "bonus",
+  "par": 39,
+  "intro": null,
+  "unlock_stars": 36,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "##.#.###G",
+    "#####..##",
+    "###..####",
+    "Fob.##F.#",
+    "#.#.#.##.",
+    "##@##...#",
+    "S##.#####"
+  ],
+  "switches": [
+    {
+      "at": [
+        5,
+        2
+      ],
+      "type": "split",
+      "targets": [
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          8
+        ]
+      ]
+    },
+    {
+      "at": [
+        3,
+        1
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          3,
+          2
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}

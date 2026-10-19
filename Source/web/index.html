@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bloxorz 3D</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+<div id="app">
+  <div id="stage" class="stage"></div>
+
+  <!-- Thanh điều khiển trong màn chơi (HUD) -->
+  <div id="hud" class="hud hidden">
+    <div class="hud-top">
+      <div class="hud-left">
+        <button class="btn ghost" data-action="pause" title="Tạm dừng (Esc)">☰ Menu</button>
+        <div class="hud-title">
+          <span id="hud-chapter" class="hud-chapter"></span>
+          <strong id="hud-name"></strong>
+        </div>
+      </div>
+      <div class="hud-stats" aria-live="polite">
+        <span id="hud-steps" class="chip">Bước 0</span>
+        <span id="hud-par" class="chip">Tối ưu ?</span>
+        <span id="hud-time" class="chip">00:00</span>
+      </div>
+      <div class="hud-tools">
+        <button class="btn" data-action="chapters" title="Chọn màn khác">Màn mới</button>
+        <button class="btn" data-action="restart" title="Chơi lại (R)">Chơi lại</button>
+        <button class="btn" data-action="undo" title="Hoàn tác (Z)">Hoàn tác</button>
+        <button class="btn" data-action="camReset" title="Đặt lại camera (C)">Camera</button>
+        <button class="btn icon" id="btn-mute" data-action="mute" aria-label="Tắt tiếng (M)">🔊</button>
+      </div>
+    </div>
+
+    <div class="hud-pad" aria-label="Nút điều khiển">
+      <button class="pad pad-up" data-action="move" data-dir="up" aria-label="Lăn lên">↑</button>
+      <button class="pad pad-left" data-action="move" data-dir="left" aria-label="Lăn trái">←</button>
+      <button class="pad pad-right" data-action="move" data-dir="right" aria-label="Lăn phải">→</button>
+      <button class="pad pad-down" data-action="move" data-dir="down" aria-label="Lăn xuống">↓</button>
+      <button class="btn pad-action" id="btn-switch" data-action="switch" hidden>Đổi khối (Space)</button>
+      <button class="btn pad-action" id="btn-hint" data-action="hint">Gợi ý (H)</button>
+    </div>
+
+    <div id="ai" class="ai">
+      <div class="ai-bar">
+        <span class="ai-label">AI giải</span>
+        <button class="btn solve" data-action="ai-solve" data-algo="bfs">BFS</button>
+        <button class="btn solve" data-action="ai-solve" data-algo="dfs">DFS</button>
+        <button class="btn solve" data-action="ai-solve" data-algo="ucs">UCS</button>
+        <button class="btn solve" data-action="ai-solve" data-algo="astar">A*</button>
+        <button class="btn ghost" id="ai-toggle" data-action="ai-toggle" aria-expanded="false" aria-controls="ai-body" title="Mở bảng chi tiết">▾</button>
+      </div>
+      <div id="ai-body" class="ai-body hidden">
+        <div class="ai-row">
+          <span class="ai-label">Giải từ</span>
+          <label class="radio"><input type="radio" name="from" value="start" checked> Đầu màn</label>
+          <label class="radio"><input type="radio" name="from" value="current"> Vị trí hiện tại</label>
+        </div>
+        <div class="ai-row">
+          <button class="btn" data-action="ai-runall">Chạy cả 4</button>
+          <button class="btn" id="ai-cancel" data-action="ai-cancel" disabled>Hủy</button>
+        </div>
+        <div class="ai-row">
+          <button class="btn icon" data-action="ai-restart" title="Phát lại từ đầu">⏮</button>
+          <button class="btn" id="ai-playpause" data-action="ai-playpause" disabled>▶ Phát</button>
+          <button class="btn icon" data-action="ai-step" title="Đi một bước">⏭</button>
+          <div class="seg" role="group" aria-label="Tốc độ phát lời giải">
+            <button class="btn" data-action="ai-speed" data-speed="1">Chậm</button>
+            <button class="btn on" data-action="ai-speed" data-speed="2">Vừa</button>
+            <button class="btn" data-action="ai-speed" data-speed="3">Nhanh</button>
+          </div>
+        </div>
+        <div class="progress" aria-hidden="true"><div id="ai-progress"></div></div>
+        <p id="ai-status" class="ai-status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table id="ai-table">
+            <thead>
+              <tr>
+                <th>Thuật toán</th><th>Thời gian (ms)</th><th>Bộ nhớ (KB)</th>
+                <th>Node mở rộng</th><th>Độ dài</th><th>Chi phí</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button class="btn ghost" data-action="ai-csv">Xuất CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Các màn hình phủ lên (menu, chọn màn, thắng, rơi, tạm dừng...) -->
+  <div id="overlay" class="overlay hidden">
+    <section class="screen" data-screen="loading">
+      <p class="muted" id="loading-text">Đang tải...</p>
+    </section>
+
+    <section class="screen" data-screen="error">
+      <h2 id="error-title"></h2>
+      <p id="error-detail" class="muted"></p>
+      <code class="cmd" id="error-cmd"></code>
+      <button class="btn primary" data-action="retry">Thử lại</button>
+    </section>
+
+    <section class="screen menu" data-screen="menu">
+      <h1 class="title">Bloxorz</h1>
+      <p class="subtitle" id="menu-subtitle"></p>
+      <div class="menu-buttons">
+        <button class="btn primary big" data-action="menu-play" id="btn-menu-play">Chơi tiếp</button>
+        <button class="btn big" data-action="menu-levels">Chọn màn</button>
+        <button class="btn big" data-action="menu-help">Hướng dẫn</button>
+        <button class="btn big" data-action="menu-settings">Cài đặt</button>
+      </div>
+      <p class="muted small" id="menu-footer"></p>
+    </section>
+
+    <section class="screen wide" data-screen="chapters">
+      <header class="screen-head">
+        <h2>Chọn màn</h2>
+        <span class="chip" id="chapters-stars"></span>
+      </header>
+      <div id="chapter-list" class="chapter-list"></div>
+      <footer class="screen-foot">
+        <button class="btn" data-action="back">Quay lại</button>
+      </footer>
+    </section>
+
+    <section class="screen wide" data-screen="help">
+      <header class="screen-head"><h2>Hướng dẫn</h2></header>
+      <div id="help-body" class="help-body"></div>
+      <footer class="screen-foot">
+        <button class="btn" data-action="back">Quay lại</button>
+      </footer>
+    </section>
+
+    <section class="screen" data-screen="settings">
+      <header class="screen-head"><h2>Cài đặt</h2></header>
+      <div class="form">
+        <label class="field"><span>Âm lượng nhạc</span>
+          <input id="set-music" type="range" min="0" max="1" step="0.05"></label>
+        <label class="field"><span>Âm lượng hiệu ứng</span>
+          <input id="set-sfx" type="range" min="0" max="1" step="0.05"></label>
+        <label class="field check"><input id="set-mute" type="checkbox"> <span>Tắt tiếng (M)</span></label>
+        <label class="field check"><input id="set-shadows" type="checkbox"> <span>Đổ bóng</span></label>
+        <label class="field check"><input id="set-camkeys" type="checkbox"> <span>Phím theo hướng camera</span></label>
+        <p class="muted small">Bật: ↑ đi theo hướng nhìn. Tắt: ↑ luôn là lên trên màn hình.</p>
+        <label class="field check"><input id="set-reduce" type="checkbox"> <span>Giảm chuyển động</span></label>
+        <div class="field"><span>Tốc độ hoạt ảnh</span>
+          <div class="seg" role="group" aria-label="Tốc độ hoạt ảnh">
+            <button class="btn" data-action="set-speed" data-speed="1">Chậm</button>
+            <button class="btn" data-action="set-speed" data-speed="2">Vừa</button>
+            <button class="btn" data-action="set-speed" data-speed="3">Nhanh</button>
+          </div>
+        </div>
+      </div>
+      <div class="screen-foot wrap">
+        <button class="btn" data-action="unlock-all">Mở khóa tất cả màn</button>
+        <button class="btn danger" data-action="clear-progress">Xóa tiến trình</button>
+        <button class="btn" data-action="back">Quay lại</button>
+      </div>
+      <p id="settings-note" class="muted small"></p>
+    </section>
+
+    <section class="screen" data-screen="pause">
+      <h2>Tạm dừng</h2>
+      <div class="menu-buttons">
+        <button class="btn primary big" data-action="resume">Tiếp tục</button>
+        <button class="btn big" data-action="restart">Chơi lại</button>
+        <button class="btn big" data-action="chapters">Chọn màn</button>
+        <button class="btn big" data-action="help">Hướng dẫn</button>
+        <button class="btn big" data-action="settings">Cài đặt</button>
+        <button class="btn big" data-action="menu">Về menu chính</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="win">
+      <h2 class="win-title" id="win-title">Hoàn thành!</h2>
+      <div class="stars" id="win-stars" aria-label="Số sao"><span>★</span><span>★</span><span>★</span></div>
+      <p class="chip gold hidden" id="win-record">Kỷ lục mới!</p>
+      <dl class="stats">
+        <div><dt>Bước</dt><dd id="win-steps"></dd></div>
+        <div><dt>Tối ưu</dt><dd id="win-par"></dd></div>
+        <div><dt>Thời gian</dt><dd id="win-time"></dd></div>
+        <div><dt>Số lần rơi</dt><dd id="win-falls"></dd></div>
+      </dl>
+      <div class="menu-buttons">
+        <button class="btn primary big" data-action="next" id="btn-next">Màn tiếp theo ▶</button>
+        <button class="btn big" data-action="replay">Chơi lại</button>
+        <button class="btn big" data-action="chapters">Chọn màn</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="fall">
+      <h2>Rơi rồi!</h2>
+      <p id="fall-reason" class="fall-reason"></p>
+      <div class="menu-buttons">
+        <button class="btn primary big" data-action="undo">Quay lại bước trước</button>
+        <button class="btn big" data-action="restart">Chơi lại từ đầu</button>
+      </div>
+      <p class="muted small">Enter hoặc Z: quay lại · R: chơi lại</p>
+    </section>
+
+    <section class="screen" data-screen="intro">
+      <h2 id="intro-title">Mới gặp ô này</h2>
+      <div id="intro-visual" class="intro-visual"></div>
+      <p id="intro-text" class="intro-text"></p>
+      <div class="menu-buttons">
+        <button class="btn primary big" data-action="dismiss-intro">Đã hiểu</button>
+      </div>
+    </section>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

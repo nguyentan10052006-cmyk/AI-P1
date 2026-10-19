@@ -1,0 +1,76 @@
+{
+  "name": "Mạng công tắc",
+  "group": "combined",
+  "chapter": 6,
+  "order": 2,
+  "kind": "challenge",
+  "par": 40,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "S#..b#B",
+    "#######",
+    "###.#.#",
+    ".###Bb.",
+    "#B#.o#G",
+    "#.#.o..",
+    "o.###b#"
+  ],
+  "switches": [
+    {
+      "at": [
+        5,
+        4
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          0,
+          6
+        ],
+        [
+          0,
+          4
+        ]
+      ],
+      "effect": "open"
+    },
+    {
+      "at": [
+        4,
+        4
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          1
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        6,
+        0
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          3,
+          5
+        ],
+        [
+          6,
+          5
+        ]
+      ],
+      "effect": "open"
+    }
+  ]
+}

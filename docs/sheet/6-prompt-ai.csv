@@ -1,0 +1,3 @@
+Ngày,Người,Công cụ,Mục đích,Prompt (tóm tắt hoặc nguyên văn),Kết quả dùng vào đâu,Đã kiểm tra lại thế nào
+2026-10-19,,Claude Code (Anthropic),Soạn tài liệu phân công PA2; tra luật và dữ liệu 33 màn gốc; đối chiếu 4 nguồn dữ liệu màn; tính số bước tối ưu tham khảo,(dán prompt gốc vào đây),docs/ và docs/sheet/,(ghi cách nhóm kiểm tra lại; ví dụ BFS của nhóm khớp cột Bước tối ưu)
+2026-10-19,,Claude Code (Anthropic),Đánh giá độ khó từng phân công; cân bằng lại việc giữa 5 thành viên; đổi cách tính % hoàn thành theo trạng thái,(dán prompt gốc vào đây),"Tab task, phan-cong, bien-ban, cite; docs/01–06 và docs/sheet/",(ghi cách nhóm kiểm tra lại)

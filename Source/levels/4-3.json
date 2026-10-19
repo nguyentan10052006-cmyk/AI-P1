@@ -1,0 +1,52 @@
+{
+  "name": "Ghép đúng chỗ",
+  "group": "switch",
+  "chapter": 4,
+  "order": 3,
+  "kind": "main",
+  "par": 23,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "G#####",
+    ".##..o",
+    ".##.##",
+    ".#.###",
+    "@#b#S#",
+    ".####."
+  ],
+  "switches": [
+    {
+      "at": [
+        4,
+        0
+      ],
+      "type": "split",
+      "targets": [
+        [
+          3,
+          3
+        ],
+        [
+          2,
+          2
+        ]
+      ]
+    },
+    {
+      "at": [
+        1,
+        5
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          4,
+          2
+        ]
+      ],
+      "effect": "open"
+    }
+  ]
+}

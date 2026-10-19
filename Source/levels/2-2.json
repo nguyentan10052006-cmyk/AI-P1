@@ -1,0 +1,19 @@
+{
+  "name": "Lăn nằm qua dải cam",
+  "group": "fragile",
+  "chapter": 2,
+  "order": 2,
+  "kind": "main",
+  "par": 14,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "S##.##",
+    "#####F",
+    "###.F#",
+    ".F###F",
+    "###.G."
+  ],
+  "switches": []
+}

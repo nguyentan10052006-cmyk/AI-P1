@@ -1,0 +1,38 @@
+{
+  "name": "Bật rồi tắt",
+  "group": "switch",
+  "chapter": 3,
+  "order": 3,
+  "kind": "main",
+  "par": 19,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "##.##G",
+    "#####.",
+    "##.#bb",
+    "S##.#o",
+    "######"
+  ],
+  "switches": [
+    {
+      "at": [
+        3,
+        5
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}

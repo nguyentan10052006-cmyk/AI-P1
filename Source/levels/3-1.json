@@ -1,0 +1,33 @@
+{
+  "name": "Công tắc mềm",
+  "group": "switch",
+  "chapter": 3,
+  "order": 1,
+  "kind": "main",
+  "par": 9,
+  "intro": "Bất kỳ phần nào của khối chạm vào công tắc mềm đều kích hoạt, và cầu nó điều khiển sẽ đổi trạng thái. Di chuột lên công tắc để xem nó nối với cầu nào.",
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "#G##.",
+    "#b.#o",
+    "#####",
+    "##.S#"
+  ],
+  "switches": [
+    {
+      "at": [
+        1,
+        4
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}

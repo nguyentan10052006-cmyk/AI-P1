@@ -1,0 +1,77 @@
+{
+  "name": "Đủ mọi thứ",
+  "group": "combined",
+  "chapter": 5,
+  "order": 3,
+  "kind": "main",
+  "par": 32,
+  "intro": null,
+  "unlock_stars": 0,
+  "source": "Tự thiết kế (sinh ngẫu nhiên, kiểm chứng bằng BFS)",
+  "grid": [
+    "##.B#@.",
+    "###.o#S",
+    "b.####F",
+    "B#..#b#",
+    "GF.####",
+    "#.####x"
+  ],
+  "switches": [
+    {
+      "at": [
+        0,
+        5
+      ],
+      "type": "split",
+      "targets": [
+        [
+          5,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "bridges": [
+        [
+          0,
+          3
+        ]
+      ],
+      "effect": "close"
+    },
+    {
+      "at": [
+        5,
+        6
+      ],
+      "type": "heavy",
+      "bridges": [
+        [
+          2,
+          0
+        ]
+      ],
+      "effect": "open"
+    },
+    {
+      "at": [
+        1,
+        4
+      ],
+      "type": "soft",
+      "bridges": [
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}
