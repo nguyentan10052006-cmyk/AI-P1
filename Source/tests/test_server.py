@@ -11,7 +11,7 @@ from pathlib import Path
 from bloxorz.serialize import state_to_dict
 from server import api
 from server.app import make_server
-from solvers.base import SolveJob
+from solvers.runner import SolveJob
 from tests import fakes
 from tests.helpers import make_level
 
@@ -55,38 +55,47 @@ class ApiSolveTests(unittest.TestCase):
         return api.solve_level(LEVELS, body, algorithms=algorithms, timeout_s=timeout_s)
 
     def test_valid_solution_is_replayed(self):
-        code, data = self.solve({"fake": fakes.fake_solver})
+        code, data = self.solve({"fake": fakes.FakeSolver})
         self.assertEqual(code, 200)
         self.assertTrue(data["found"])
         self.assertEqual(data["stats"]["length"], 2)
         self.assertEqual(data["stats"]["cost"], 2)
         self.assertEqual(data["steps"][-1]["status"], "won")
         self.assertIn("time_ms", data["stats"])
+        self.assertIn("prepare_ms", data["stats"])
         self.assertIn("peak_kb", data["stats"])
+        for key, value in {"expanded": 3, "generated": 4, "max_frontier": 2, "visited": 4}.items():
+            self.assertEqual(data["stats"][key], value)
 
     def test_no_solution(self):
-        code, data = self.solve({"fake": fakes.empty_solver})
+        code, data = self.solve({"fake": fakes.EmptySolver})
         self.assertFalse(data["found"])
         self.assertEqual(data["stats"]["expanded"], 7)
+        self.assertEqual(data["stats"]["generated"], 9)
+
+    def test_wrong_return_type_is_reported(self):
+        code, data = self.solve({"fake": fakes.WrongReturnSolver})
+        self.assertIn("SearchResult", data["error"])
 
     def test_illegal_solution_is_reported(self):
-        code, data = self.solve({"fake": fakes.illegal_solver})
+        code, data = self.solve({"fake": fakes.IllegalSolver})
         self.assertIn("làm khối rơi", data["error"])
 
     def test_solver_exception_is_reported(self):
-        code, data = self.solve({"fake": fakes.crashing_solver})
+        code, data = self.solve({"fake": fakes.CrashingSolver})
         self.assertEqual(data["error"], "RuntimeError: boom")
 
     def test_not_implemented_is_reported(self):
-        code, data = self.solve({"fake": fakes.not_implemented_solver})
+        code, data = self.solve({"fake": fakes.NotImplementedSolver})
         self.assertIn("chưa được cài đặt", data["error"])
 
     def test_timeout_stops_solver(self):
-        code, data = self.solve({"fake": fakes.sleepy_solver}, timeout_s=3)
+        code, data = self.solve({"fake": fakes.SleepySolver}, timeout_s=3)
         self.assertIn("Quá 3 giây", data["error"])
+        self.assertTrue(data["timeout"])
 
     def test_unknown_algorithm_is_400(self):
-        code, _ = self.solve({"fake": fakes.fake_solver}, name="xyz")
+        code, _ = self.solve({"fake": fakes.FakeSolver}, name="xyz")
         self.assertEqual(code, 400)
 
 
@@ -95,7 +104,7 @@ class ApiSolveTests(unittest.TestCase):
         result = {}
         body = {"level": "t1", "state": START, "algorithm": "slow"}
         worker = threading.Thread(target=lambda: result.update(api.solve_level(
-            LEVELS, body, algorithms={"slow": fakes.sleepy_solver}, timeout_s=20, job=job)[1]))
+            LEVELS, body, algorithms={"slow": fakes.SleepySolver}, timeout_s=20, job=job)[1]))
         worker.start()
         time.sleep(1.0)
         job.cancel()
@@ -110,7 +119,7 @@ class HttpTests(unittest.TestCase):
         cls._tmp = tempfile.TemporaryDirectory()
         Path(cls._tmp.name, "index.html").write_text("<!doctype html><p>ok</p>", encoding="utf-8")
         cls.server = make_server(LEVELS, Path(cls._tmp.name), port=0, timeout_s=20,
-                                 algorithms={"fake": fakes.fake_solver})
+                                 algorithms={"fake": fakes.FakeSolver})
         cls.base = f"http://127.0.0.1:{cls.server.server_address[1]}"
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()

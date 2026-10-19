@@ -15,7 +15,8 @@ from bloxorz.serialize import (
 )
 from bloxorz.state import Action
 from solvers import ALGORITHMS
-from solvers.base import SolveJob, run_solver
+from solvers.base import NO_SOLUTION
+from solvers.runner import SolveJob, run_solver
 
 Response = Tuple[int, Dict[str, Any]]
 
@@ -86,24 +87,29 @@ def solve_level(
     except (BadRequest, KeyError, ValueError, TypeError) as exc:
         return 400, {"error": f"Yêu cầu không hợp lệ: {exc}"}
 
-    solve_fn = algorithms.get(name)
-    if solve_fn is None:
+    solver_cls = algorithms.get(name)
+    if solver_cls is None:
         return 400, {"error": f"Thuật toán không hợp lệ: {name!r}"}
 
     problem = Problem(level, start)
-    outcome = run_solver(solve_fn, problem, timeout_s, job=job)
+    outcome = run_solver(solver_cls, problem, timeout_s, job=job)
     if not outcome["ok"]:
-        return 200, {"algorithm": name, "error": outcome["error"], "cancelled": bool(outcome.get("cancelled"))}
+        return 200, {"algorithm": name, "error": outcome["error"],
+                     "cancelled": bool(outcome.get("cancelled")), "timeout": bool(outcome.get("timeout"))}
 
     stats: Dict[str, Any] = {
         "time_ms": round(outcome["time_ms"], 3),
+        "prepare_ms": round(outcome["prepare_ms"], 3),
         "peak_kb": round(outcome["peak_kb"], 1),
         "expanded": outcome["expanded"],
+        "generated": outcome["generated"],
+        "max_frontier": outcome["max_frontier"],
+        "visited": outcome["visited"],
     }
-    actions: Optional[List[Action]] = outcome["actions"]
-    if actions is None:
+    if outcome["status"] == NO_SOLUTION:
         stats.update(length=0, cost=0)
         return 200, {"algorithm": name, "found": False, "stats": stats}
+    actions: List[Action] = outcome["path"]
 
     try:
         steps, cost, error = _replay(problem, start, actions)

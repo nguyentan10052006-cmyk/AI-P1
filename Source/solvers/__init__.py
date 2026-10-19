@@ -1,12 +1,12 @@
-"""Các thuật toán tìm kiếm. Mỗi file là một solver, cùng giao diện SolveFn."""
-from .astar import astar
-from .bfs import bfs
-from .dfs import dfs
-from .ucs import ucs
+"""Các thuật toán tìm kiếm. Mỗi file là một lớp con của Solver (solvers/base.py)."""
+from .astar import AStar
+from .bfs import BFS
+from .dfs import DFS
+from .ucs import UCS
 
 ALGORITHMS = {
-    "bfs": bfs,
-    "dfs": dfs,
-    "ucs": ucs,
-    "astar": astar,
+    "bfs": BFS,
+    "dfs": DFS,
+    "ucs": UCS,
+    "astar": AStar,
 }

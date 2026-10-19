@@ -2,33 +2,51 @@
 import time
 
 from bloxorz.state import Action, Dir
-from solvers.base import SearchResult
+from solvers.base import NO_SOLUTION, SOLVED, SearchResult, Solver
 
 
-def fake_solver(problem):
+class FakeSolver(Solver):
     """Lời giải đúng cho màn "S##G": lăn phải hai lần."""
-    return SearchResult([Action(Dir.RIGHT), Action(Dir.RIGHT)], expanded=3)
+
+    def search(self, problem):
+        return SearchResult(SOLVED, [Action(Dir.RIGHT), Action(Dir.RIGHT)], path_cost=2,
+                            expanded=3, generated=4, max_frontier=2, visited=4)
 
 
-def empty_solver(problem):
+class EmptySolver(Solver):
     """Không tìm thấy lời giải."""
-    return SearchResult(None, expanded=7)
+
+    def search(self, problem):
+        return SearchResult(NO_SOLUTION, expanded=7, generated=9, max_frontier=3, visited=8)
 
 
-def illegal_solver(problem):
+class IllegalSolver(Solver):
     """Lời giải sai: lăn trái ra khỏi bảng ngay từ đầu."""
-    return SearchResult([Action(Dir.LEFT)], expanded=1)
+
+    def search(self, problem):
+        return SearchResult(SOLVED, [Action(Dir.LEFT)], path_cost=1, expanded=1)
 
 
-def sleepy_solver(problem):
+class SleepySolver(Solver):
     """Chạy quá lâu để kiểm tra giới hạn thời gian."""
-    time.sleep(30)
-    return SearchResult(None)
+
+    def search(self, problem):
+        time.sleep(30)
+        return SearchResult(NO_SOLUTION)
 
 
-def crashing_solver(problem):
-    raise RuntimeError("boom")
+class CrashingSolver(Solver):
+    def search(self, problem):
+        raise RuntimeError("boom")
 
 
-def not_implemented_solver(problem):
-    raise NotImplementedError("BFS chưa được cài đặt (test)")
+class NotImplementedSolver(Solver):
+    def search(self, problem):
+        raise NotImplementedError("BFS chưa được cài đặt (test)")
+
+
+class WrongReturnSolver(Solver):
+    """Quên đổi sang SearchResult: trả về list."""
+
+    def search(self, problem):
+        return [Action(Dir.RIGHT)]

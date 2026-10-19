@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Tuple
 
 from solvers import ALGORITHMS
-from solvers.base import SolveJob
+from solvers.runner import SolveJob
 
 from . import api
 

@@ -21,25 +21,25 @@ Khối 1×1×2 bắt đầu ở tư thế **đứng** trên ô xuất phát.
 
 | Loại ô | Ký hiệu trong file màn | Khối nguyên đứng | Khối nguyên nằm | Khối con 1×1×1 |
 |---|---|---|---|---|
-| Trống hoặc ngoài bàn | `-` | rơi | rơi, kể cả khi chỉ một nửa khối ở trên | rơi |
-| Sàn | `o` | được | được | được |
+| Trống hoặc ngoài bàn | `.` | rơi | rơi, kể cả khi chỉ một nửa khối ở trên | rơi |
+| Sàn | `#` | được | được | được |
 | Xuất phát | `S` | như sàn | như sàn | như sàn |
 | Đích | `G` | **thắng** | được, không thắng | được, không thắng, không rơi |
 | Ô dễ vỡ (màu cam) | `F` | **vỡ, khối rơi** | được | được, không vỡ |
 | Cầu đang đóng | `b` (đóng lúc đầu) | rơi | rơi | rơi |
 | Cầu đang mở | `B` (mở lúc đầu) | được | được | được |
-| Công tắc mềm (tròn) | `@` | kích hoạt | kích hoạt | kích hoạt |
-| Công tắc nặng (hình X) | `X` | kích hoạt | không kích hoạt | không kích hoạt |
-| Công tắc tách (hình "( )") | `T` | tách khối | không có tác dụng | không có tác dụng |
+| Công tắc mềm (tròn) | `o` | kích hoạt | kích hoạt | kích hoạt |
+| Công tắc nặng (hình X) | `x` | kích hoạt | không kích hoạt | không kích hoạt |
+| Công tắc tách (hình "( )") | `@` | tách khối | không có tác dụng | không có tác dụng |
 
-Mọi loại công tắc và ô đích đều đỡ được khối như sàn. Cầu có hai trạng thái, đổi được trong lúc chơi; `b` và `B` trong file màn chỉ là trạng thái lúc đầu.
+Ký hiệu trên là ký hiệu code đang dùng (`bloxorz/level.py`), chốt ngày 19/10 thay cho bộ `-` `o` `@` `X` `T` đề xuất ban đầu (01 mục 4.1). Mọi loại công tắc và ô đích đều đỡ được khối như sàn. Cầu có hai trạng thái, đổi được trong lúc chơi; `b` và `B` trong file màn chỉ là trạng thái lúc đầu.
 
 **Ba kiểu tác động của công tắc lên cầu.** Mỗi liên kết công tắc → ô cầu có một kiểu:
 - `toggle` (đảo): mỗi lần kích hoạt thì đổi mở ↔ đóng.
-- `on` (chỉ mở): sau khi kích hoạt, cầu mở; bấm lại không đổi gì.
-- `off` (chỉ đóng): sau khi kích hoạt, cầu đóng; bấm lại không đổi gì.
+- `open` (chỉ mở): sau khi kích hoạt, cầu mở; bấm lại không đổi gì.
+- `close` (chỉ đóng): sau khi kích hoạt, cầu đóng; bấm lại không đổi gì.
 
-Đề gọi `on` và `off` chung là "permanent". Một công tắc có thể nối nhiều ô cầu với các kiểu khác nhau (ví dụ màn 29).
+Đề gọi `open` và `close` chung là "permanent". Bản GBA ghi `on`, `off`. Một công tắc có thể nối nhiều ô cầu với các kiểu khác nhau (ví dụ màn 29).
 
 ## 3. Bảng chuyển hướng và vị trí
 
@@ -92,7 +92,7 @@ Bảy dòng đầu là bảy câu hỏi ở slide 12 của buổi họp. Nhóm �
 | 6 | Công tắc kích hoạt khi nào | Mỗi lần khối hoặc khối con lăn tới ô công tắc; không cần đứng lại trên đó | Hướng dẫn gốc; bản GBA kích hoạt sau mỗi bước lăn tới |
 | 7 | Đổi khối con đang điều khiển có tính bước không | Không tính; trong tìm kiếm, đây không phải một hành động | Game gốc chỉ đếm số lần lăn; đề định nghĩa độ dài lời giải là số lần lăn |
 | 8 | Khối nằm đè lên hai công tắc | Kích hoạt cả hai; ô trên hoặc ô trái trước | Bản GBA |
-| 9 | Bấm `on` khi cầu đã mở, hoặc `off` khi cầu đã đóng | Không đổi gì | Đề 2.5 (permanent) |
+| 9 | Bấm `open` khi cầu đã mở, hoặc `close` khi cầu đã đóng | Không đổi gì | Đề 2.5 (permanent) |
 | 10 | Khối con vừa tách ra đáp xuống ô công tắc | Không kích hoạt | Bản GBA. Trong 33 màn, chỉ xảy ra với công tắc tách và công tắc nặng, vốn khối con không kích hoạt được |
 
 Ví dụ thật cho dòng 4: ở màn 20, công tắc mềm tại (6, 12) đảo ô cầu kề nó tại (6, 11). Khối nằm ngang đè lên cả hai ô sẽ tự đóng cầu dưới mình và rơi.
@@ -127,7 +127,7 @@ Mỗi luật có ít nhất một test. Chủ module viết test của module m�
 | T10 | Công tắc mềm kích hoạt khi khối đứng và khi khối nằm | TV3 |
 | T11 | Công tắc nặng: đứng thì kích hoạt, nằm thì không | TV3 |
 | T12 | Kiểu `toggle`: bấm hai lần thì cầu trở về như cũ | TV3 |
-| T13 | Kiểu `on` và `off`: bấm lại không đổi gì | TV3 |
+| T13 | Kiểu `open` và `close`: bấm lại không đổi gì | TV3 |
 | T14 | Một công tắc nối nhiều ô cầu với kiểu khác nhau | TV3 |
 | T15 | Cầu đóng ngay dưới khối: bị loại | TV3 |
 | T16 | Hai trạng thái cùng vị trí khối, khác trạng thái cầu: khác nhau khi so sánh và hash | TV3 |

@@ -34,7 +34,7 @@ Chỉ số dùng cho bảng T5 (so sánh heuristic): hệ số phân nhánh hi�
 ## 3. Quy ước đếm (bắt buộc giống nhau ở 4 thuật toán)
 
 - `expanded += 1` ngay sau khi lấy một trạng thái ra khỏi frontier và chuẩn bị sinh con của nó. Mục bị bỏ qua thì không tính: ở UCS và A* là mục cũ có g lớn hơn `best_g`; ở DFS là trạng thái đã thăm.
-- `generated += 1` cho mỗi trạng thái con hợp lệ (đã loại hành động làm khối rơi), đếm trước khi kiểm tra tập đã thăm.
+- `generated += 1` cho mỗi trạng thái con hợp lệ, đếm trước khi kiểm tra tập đã thăm. `problem.actions()` trả về mọi hành động; hành động nào có `problem.result()` là `None` (khối rơi, hoặc đâm tường trong `GridMaze`) thì bỏ qua và **không** đếm.
 - `max_frontier = max(max_frontier, len(frontier))` sau mỗi lần thêm vào frontier. UCS và A* dùng lazy deletion nên `len(heap)` tính cả mục cũ; ghi rõ điều này trong báo cáo.
 - Thời điểm kiểm tra đích:
   - BFS: khi sinh nút (early goal test).

@@ -1,101 +1,45 @@
-"""Khung chạy solver: đo thời gian, bộ nhớ, giới hạn thời gian và cho phép hủy giữa chừng.
-
-Mỗi solver chạy trong một tiến trình riêng. Nếu chạy quá lâu (ví dụ DFS đi sâu vô tận)
-hoặc người dùng bấm Hủy, tiến trình bị dừng và server vẫn phản hồi bình thường.
-"""
+"""Hợp đồng chung của các solver: kết quả trả về và lớp cơ sở (docs/01 mục 4)."""
 from __future__ import annotations
 
-import multiprocessing as mp
-import threading
-import time
-import tracemalloc
-from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional
+from dataclasses import dataclass, field
+from typing import List
 
 from bloxorz.problem import Problem
 from bloxorz.state import Action
 
+SOLVED = "solved"
+NO_SOLUTION = "no_solution"
+TIMEOUT = "timeout"  # do khung chạy solver gán khi quá giờ, solver không tự trả về
+
 
 @dataclass
 class SearchResult:
-    """Kết quả solver trả về. actions = None nghĩa là không có lời giải."""
+    """Kết quả một lần tìm kiếm. Cách đếm các chỉ số theo docs/04 mục 3.
 
-    actions: Optional[List[Action]]
+    path      : dãy hành động từ trạng thái đầu tới đích; rỗng khi không có lời giải
+    path_cost : tổng step_cost dọc path
+    expanded  : số nút lấy ra khỏi frontier để sinh con
+    generated : số trạng thái con hợp lệ (result() khác None), đếm trước khi xét tập đã thăm
+    max_frontier : kích thước frontier lớn nhất
+    visited   : số trạng thái khác nhau đã gặp
+    """
+
+    status: str
+    path: List[Action] = field(default_factory=list)
+    path_cost: float = 0.0
     expanded: int = 0
+    generated: int = 0
+    max_frontier: int = 0
+    visited: int = 0
 
 
-SolveFn = Callable[[Problem], SearchResult]
+class Solver:
+    """Lớp cơ sở. Mỗi thuật toán là một lớp con, đăng ký trong solvers/__init__.py."""
 
-# "spawn" để không copy trạng thái của server (có nhiều luồng) sang tiến trình con.
-_CONTEXT = mp.get_context("spawn")
+    name = "BASE"
 
+    def prepare(self, problem: Problem) -> None:
+        """Tiền xử lý trước khi tìm (ví dụ bảng heuristic của A*). Mặc định không làm gì."""
 
-class SolveJob:
-    """Một lần giải đang chạy. cancel() dừng tiến trình solver ngay lập tức."""
-
-    def __init__(self) -> None:
-        self._lock = threading.Lock()
-        self._process = None
-        self.cancelled = False
-
-    def attach(self, process) -> None:
-        with self._lock:
-            self._process = process
-            if self.cancelled:
-                process.terminate()
-
-    def cancel(self) -> None:
-        with self._lock:
-            self.cancelled = True
-            if self._process is not None and self._process.is_alive():
-                self._process.terminate()
-
-
-def _worker(conn, solve_fn: SolveFn, problem: Problem) -> None:
-    try:
-        tracemalloc.start()
-        try:
-            started = time.perf_counter()
-            result = solve_fn(problem)
-            elapsed = time.perf_counter() - started
-            _, peak = tracemalloc.get_traced_memory()
-        finally:
-            tracemalloc.stop()
-        conn.send({
-            "ok": True,
-            "actions": result.actions,
-            "expanded": result.expanded,
-            "time_ms": elapsed * 1000,
-            "peak_kb": peak / 1024,
-        })
-    except NotImplementedError as exc:  # solver chưa cài đặt: thông báo đã nói rõ file cần viết
-        conn.send({"ok": False, "error": str(exc)})
-    except Exception as exc:  # solver bị lỗi: giữ tên lỗi để sinh viên dễ tìm nguyên nhân
-        message = str(exc) or type(exc).__name__
-        conn.send({"ok": False, "error": f"{type(exc).__name__}: {message}"})
-    finally:
-        conn.close()
-
-
-def run_solver(solve_fn: SolveFn, problem: Problem, timeout_s: float = 60.0,
-               job: Optional[SolveJob] = None) -> Dict[str, Any]:
-    """Chạy solve_fn(problem) trong tiến trình con, trả về dict kết quả, lỗi hoặc đã hủy."""
-    parent_conn, child_conn = _CONTEXT.Pipe(duplex=False)
-    process = _CONTEXT.Process(target=_worker, args=(child_conn, solve_fn, problem), daemon=True)
-    process.start()
-    if job is not None:
-        job.attach(process)
-    child_conn.close()
-    try:
-        if not parent_conn.poll(timeout_s):
-            return {"ok": False, "error": f"Quá {timeout_s:g} giây, đã dừng solver"}
-        return parent_conn.recv()
-    except EOFError:
-        if job is not None and job.cancelled:
-            return {"ok": False, "cancelled": True, "error": "Đã hủy"}
-        return {"ok": False, "error": "Solver bị dừng bất thường (có thể hết bộ nhớ)"}
-    finally:
-        if process.is_alive():
-            process.terminate()
-        process.join(timeout=5)
-        parent_conn.close()
+    def search(self, problem: Problem) -> SearchResult:
+        raise NotImplementedError(f"{self.name} chưa cài đặt")

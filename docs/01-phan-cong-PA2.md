@@ -61,11 +61,11 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
 2. Viết test cho 12 trường hợp của bảng chuyển ([02-luat-choi.md §3](02-luat-choi.md#3-bảng-chuyển-hướng-và-vị-trí)) trước, rồi mới cài. Cài bảng chuyển dưới dạng bảng tra (`dict`), không viết if-else rải rác.
 3. Kiểm tra hợp lệ phần lõi: ô khối chiếm nằm ngoài bàn hoặc là ô trống thì hành động bị loại.
 4. `is_goal(s)`: khối nguyên, đang đứng, trên ô đích.
-5. Viết `result(s, a)` theo đúng thứ tự xử lý một lượt ở [02 §4](02-luat-choi.md#4-một-lượt-đi-được-xử-lý-theo-thứ-tự). Chừa sẵn chỗ gọi các hàm của TV3 (`is_open`, `fragile_breaks`, `apply_switches`, NV2) và của chính TV1 (`apply_split`, `try_merge`, NV3); lúc đầu các hàm này không làm gì. Chữ ký ở mục 4.
+5. Viết `result(s, a)` theo đúng thứ tự xử lý một lượt ở [02 §4](02-luat-choi.md#4-một-lượt-đi-được-xử-lý-theo-thứ-tự). Phần ô đặc biệt (TV3, NV2) và tách khối (TV1, NV3) đã nằm sẵn trong `rules.py`; mục 4 ghi rõ hàm nào thuộc phần nào.
 6. Bộ nạp màn (V03, **TV3 làm**): đọc file màn theo định dạng ở [03 §6](03-man-choi.md#6-định-dạng-file-màn-của-nhóm) thành đối tượng `Level` (lưới, ô xuất phát, công tắc, cầu, công tắc tách) theo chữ ký ở mục 4. Báo lỗi rõ ràng nếu file sai. Trong lúc chờ, TV1 gõ tay màn 1 ngay trong test.
 7. Từ 22/10 đến 24/10: ghép module ô đặc biệt của TV3 với lõi và phần tách khối, chạy lại toàn bộ test. Sau đó chạy BFS trên 33 màn; màn nào lệch cột "Bước tối ưu" ở [03 §4](03-man-choi.md#4-danh-sách-33-màn) thì báo chủ module liên quan.
 
-**Đầu ra:** thư mục `Source/engine/`, test T01–T06, `GridMaze`.
+**Đầu ra:** thư mục `Source/bloxorz/` (phần lõi của `rules.py`, `state.py`, `problem.py`), test T01–T06, `GridMaze` (đã có ở `bloxorz/maze.py`).
 
 **Xong khi**
 - [ ] Test T01–T06 qua.
@@ -85,13 +85,13 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
 **Cách làm**
 1. Viết test T07–T16 ([02 §7](02-luat-choi.md#7-bộ-kiểm-thử-luật)) trước, dựng trạng thái bằng tay, không cần chờ engine lõi xong.
 2. Ô dễ vỡ: khối nguyên đứng trên ô dễ vỡ thì hành động bị loại (khối rơi). Khối nằm và khối con thì an toàn.
-3. Trạng thái cầu: khi nạp màn, đánh số các ô cầu từ 0 đến n−1. Trạng thái cầu là một số nguyên (bitmask), bit i bằng 1 nghĩa là ô cầu i đang mở. Đưa số này vào `State`.
+3. Trạng thái cầu là tập các ô cầu đang mở (`State.open_bridges`, kiểu `frozenset`), đã có trong `State` (mục 4.1).
 4. Cầu đóng xử lý như ô trống, cầu mở như sàn.
-5. Kích hoạt công tắc sau khi khối tới nơi. Công tắc mềm kích hoạt khi bất kỳ phần nào của khối nằm trên nó (kể cả khối con). Công tắc nặng chỉ kích hoạt khi khối nguyên đứng trên nó. Một công tắc có thể nối nhiều ô cầu, mỗi liên kết có kiểu riêng: `toggle` (đảo), `on` (chỉ mở), `off` (chỉ đóng). Phần tách khối của TV1 (NV3) gọi lại chính `apply_switches` cho khối con, nên hàm phải nhận cả trạng thái đã tách (chữ ký ở mục 4).
+5. Kích hoạt công tắc sau khi khối tới nơi. Công tắc mềm kích hoạt khi bất kỳ phần nào của khối nằm trên nó (kể cả khối con). Công tắc nặng chỉ kích hoạt khi khối nguyên đứng trên nó. Một công tắc có thể nối nhiều ô cầu, mỗi liên kết có kiểu riêng: `toggle` (đảo), `open` (chỉ mở), `close` (chỉ đóng). Code hiện chỉ cho một kiểu chung cho cả công tắc; phải mở rộng theo định dạng `links` ở [03 §6](03-man-choi.md#6-định-dạng-file-màn-của-nhóm) vì màn 29 cần. Khối con cũng đi qua cùng `_activate()`, nên phần này dùng chung cho cả trạng thái đã tách.
 6. Sau khi đổi cầu: nếu có phần khối đang nằm trên ô cầu vừa đóng thì hành động bị loại. Khi đã tách, kiểm tra cả hai khối con.
 7. Đưa cho TV1 ghép, rồi kiểm tra bằng BFS: màn 2, 5, 7, 11 phải ra 17, 33, 44, 47 bước; màn 4, 13 (ô dễ vỡ) phải ra 28, 46 bước.
 
-**Đầu ra:** `Source/engine/tiles.py` và test T07–T16.
+**Đầu ra:** phần ô đặc biệt trong `Source/bloxorz/rules.py` (mục 4), `links` trong bộ nạp màn, và test T07–T16.
 
 **Xong khi**
 - [ ] Test T07–T16 qua.
@@ -112,10 +112,10 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
 4. Khối nguyên đứng trên công tắc tách thì hai khối con xuất hiện tại hai ô ghi trong file màn. Ô đáp không kích hoạt gì.
 5. Khối con lăn 1 ô. Ô mới phải nằm trong bàn, không trống, không phải cầu đóng. Khối con không làm vỡ ô dễ vỡ, không thắng ở ô đích, kích hoạt được công tắc mềm, không kích hoạt công tắc nặng hay công tắc tách.
 6. Sau mỗi bước của khối con: nếu hai khối con kề cạnh (chung cạnh, kề chéo không tính) thì ghép thành khối nằm. Cùng hàng thì nằm ngang, neo ở ô bên trái; cùng cột thì nằm dọc, neo ở ô bên trên.
-7. Khối con bấm công tắc và kiểm tra cầu đóng bằng `apply_switches` của TV3; không viết lại luật công tắc. Khi cầu đóng, phải kiểm tra cả hai khối con, vì khối kia có thể đang đứng trên cầu. Trước khi TV3 xong (23/10), tạm cho khối con không kích hoạt gì.
+7. Khối con bấm công tắc và kiểm tra cầu đóng bằng chính phần công tắc của TV3 trong `rules.py`; không viết lại luật công tắc. Khi cầu đóng, phải kiểm tra cả hai khối con, vì khối kia có thể đang đứng trên cầu. Trước khi TV3 xong (23/10), tạm cho khối con không kích hoạt gì.
 8. Ghép vào `result()` cùng lúc với module của TV3 (NV1 bước 7), rồi kiểm tra bằng BFS: màn 8, 9, 16 phải ra 10, 24, 28 bước.
 
-**Đầu ra:** `Source/engine/split.py` và test T17–T23.
+**Đầu ra:** phần tách khối trong `Source/bloxorz/rules.py` (mục 4) và test T17–T23.
 
 **Xong khi**
 - [ ] Test T17–T23 qua.
@@ -134,7 +134,7 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
 3. Viết script chuyển đổi theo bảng ánh xạ ở 03 §6. Bản GBA dùng (x, y) = (cột, hàng), khóa công tắc bằng x × 10 + y, và passcode bị mất số 0 ở đầu.
 4. Sửa màn 3: thêm 4 ô sàn tại (6, 11), (7, 12), (7, 13), (7, 14) ([03 §3](03-man-choi.md#3-kết-quả-đối-chiếu)).
 5. Kiểm tra tự động: mỗi màn có đúng 1 ô xuất phát và 1 ô đích; số ô từng loại khớp bảng ở 03 §4.
-6. Đẩy 33 file vào `Source/levels/` và báo TV1, TV3, TV5.
+6. Đẩy 33 file vào `Source/levels/original/` (ký hiệu ô theo 02 §2) và báo TV1, TV3, TV5.
 7. Khi BFS chạy được: so số bước với cột "Bước tối ưu" ở 03 §4. Màn nào lệch thì kiểm tra file màn trước, rồi mới nghi engine.
 
 **Xong khi**
@@ -232,7 +232,7 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
 4. Các nút: New Game (chọn màn 1–33), Restart, Solve BFS, Solve DFS, Solve UCS, Solve A*. Bấm Solve thì gọi solver, khối tự lăn theo lời giải (hoạt ảnh từng bước), và hiện số bước, số nút mở rộng, thời gian tìm kiếm (không tính thời gian hoạt ảnh).
 5. Trước khi có solver thật: nút Solve phát lại lời giải có sẵn của màn 1 là `R D D R R D R`.
 6. Hiện số màn, passcode và số bước đã đi.
-7. **TV4 viết module chạy nền** (V39, `Source/solvers/runner.py`, chữ ký ở mục 4); TV5 gọi module này từ GUI. Trước 23/10, TV5 gọi solver trực tiếp để thử nút Solve. Solver chạy trong **tiến trình riêng** (`multiprocessing`), không chạy trong luồng giao diện. Trong lúc chờ, GUI hiện "Đang tìm…" và nút Hủy; quá 60 giây thì module dừng và GUI báo hết giờ. Repo khóa trước gọi solver ngay trong luồng giao diện, nên cửa sổ đơ suốt lúc tìm. Dùng tiến trình chứ không dùng luồng (thread), vì Python không dừng ngang được một luồng. Trên Windows, `main.py` phải có `if __name__ == "__main__":`.
+7. **Module chạy nền** (V39, `Source/solvers/runner.py`, chữ ký ở mục 4) đã có bản chạy được: server gọi `run_solver`, GUI gọi server. TV4 giữ và mở rộng module này (hiện đủ chỉ số mới, So sánh trên 33 màn). Solver chạy trong **tiến trình riêng** (`multiprocessing`), không chạy trong luồng giao diện. Trong lúc chờ, GUI hiện "Đang tìm…" và nút Hủy; quá 60 giây thì module dừng và GUI báo hết giờ. Repo khóa trước gọi solver ngay trong luồng giao diện, nên cửa sổ đơ suốt lúc tìm. Dùng tiến trình chứ không dùng luồng (thread), vì Python không dừng ngang được một luồng. Trên Windows, `main.py` phải có `if __name__ == "__main__":`.
 8. Thông báo riêng cho 4 kết quả: thắng, rơi (thua), không có lời giải, hết giờ. Thử bằng màn không lời giải S3 ở [04 §8](04-thuc-nghiem.md#8-bộ-màn-tự-sinh).
 9. Nút **So sánh**: module của TV4 chạy cả 4 thuật toán trên màn đang mở; GUI hiện kết quả thành một bảng gồm số bước, tổng chi phí, số nút mở rộng, thời gian. Ý tưởng lấy từ danh sách việc dự định trong README của repo khóa trước, nên ghi nguồn khi dùng.
 10. Camera tự căn theo kích thước bàn; chỉnh được tốc độ phát lại lời giải và tạm dừng. Có màn hướng dẫn: chú giải 9 loại ô và các phím.
@@ -299,56 +299,74 @@ Viết kịch bản theo [06 §5](06-bao-cao-video.md#5-video-10-điểm) từ 2
 
 ## 4. Hợp đồng chung
 
-TV1 tạo khung code này ngày 19/10, gồm cả chữ ký các hàm mà người khác cài (TV3, TV4). Ai muốn đổi chữ ký hàm thì báo nhóm và ghi vào tab bien-ban trước.
+Khung code đã có sẵn (nhánh `test`, ghép vào `feature/triet/structure` ngày 19/10). Hợp đồng dưới đây mô tả **đúng code hiện có**. Bản đề xuất ban đầu (tuple `(kind, a, b, bridges)`, thư mục `engine/`, các file `tiles.py` và `split.py`) đã được thay bằng bản này ngày 19/10 (tab bien-ban, #14; lý do ở mục 4.1). Ai muốn đổi chữ ký hàm thì báo nhóm và ghi vào tab bien-ban trước.
 
 ```python
-# Source/engine/state.py  (TV1)
-# Trạng thái là tuple bất biến, hash được, dùng làm khóa của dict và set.
-#   kind    : 'S' đứng | 'H' nằm ngang | 'V' nằm dọc | 'X' đã tách
-#   a       : (hàng, cột). Ô của khối đứng; ô trái (H); ô trên (V); khối con thứ nhất (X)
-#   b       : None, hoặc khối con thứ hai khi kind == 'X' (luôn có a < b)
-#   bridges : int (bitmask), bit i = 1 nghĩa là ô cầu thứ i đang mở
-State = tuple  # (kind, a, b, bridges)
+# Source/bloxorz/state.py  (TV1)
+class Orient(str, Enum): STANDING, HORIZONTAL, VERTICAL, SPLIT    # đứng | nằm ngang | nằm dọc | đã tách
+class Dir(str, Enum):    UP, DOWN, LEFT, RIGHT                     # thứ tự này là thứ tự hành động
 
-Action = str   # 'U' 'D' 'L' 'R'; khi đã tách: 'U1' ... 'R2' (khối con ở ô a là 1, ô b là 2)
+@dataclass(frozen=True)
+class State:                       # bất biến, hash được, dùng làm khóa của dict và set
+    orient: Orient
+    pos: Cell                      # (hàng, cột). Ô đứng; ô trái (HORIZONTAL); ô trên (VERTICAL); khối con thứ nhất (SPLIT)
+    pos2: Cell | None              # khối con thứ hai khi SPLIT, luôn có pos < pos2; còn lại là None
+    open_bridges: frozenset[Cell]  # tập các ô cầu đang mở
+    def cells(self) -> tuple[Cell, ...]: ...   # các ô khối đang chiếm
 
-# Source/engine/problem.py  (TV1)
+@dataclass(frozen=True)
+class Action:
+    dir: Dir
+    cube: int | None = None        # None khi chưa tách; 0 hoặc 1 khi đã tách (khối con ở pos là 0, ở pos2 là 1)
+#   Cách viết tắt trong tài liệu: U = Action(Dir.UP); U1 = Action(Dir.UP, 0); U2 = Action(Dir.UP, 1)
+
+# Source/bloxorz/problem.py  (TV1)
 class Problem:
-    def __init__(self, level): ...
+    def __init__(self, level: Level, start: State | None = None): ...
+    goal: Cell                                            # ô đích (thuộc tính)
     def initial_state(self) -> State: ...
-    def actions(self, s: State) -> list[Action]: ...     # chỉ hành động hợp lệ (không rơi), thứ tự cố định
-    def result(self, s: State, a: Action) -> State: ...
-    def is_goal(self, s: State) -> bool: ...             # khối nguyên đứng trên ô đích
-    def step_cost(self, s: State, a: Action, s2: State) -> float: ...  # TV3 cài; mặc định 1
+    def actions(self, s: State) -> list[Action]: ...      # MỌI hành động, thứ tự cố định: U, D, L, R; khi đã tách U1, D1, L1, R1, U2, D2, L2, R2
+    def result(self, s: State, a: Action) -> State | None: ...   # None nếu hành động làm khối rơi
+    def is_goal(self, s: State) -> bool: ...              # khối nguyên đứng trên ô đích
+    def step_cost(self, s: State, a: Action, s2: State) -> float: ...  # TV3 cài hàm chi phí; mặc định 1
 
-# Source/engine/level.py  (TV3: bộ nạp màn, V03)
-@dataclass
+# Source/bloxorz/maze.py  (TV1): bài toán thử, cùng giao diện Problem
+class GridMaze: ...                # trạng thái là (hàng, cột); ô chữ số 1..9 tốn đúng số đó
+MAZES: dict[str, MazeCase]         # mê cung mẫu kèm đáp án (số bước ít nhất, chi phí nhỏ nhất)
+
+# Source/bloxorz/level.py  (TV3: bộ nạp màn, V03)
+@dataclass(frozen=True)
+class Switch:
+    at: Cell
+    kind: str                      # 'soft' | 'heavy' | 'split'
+    effect: str                    # 'toggle' | 'open' | 'close', áp dụng cho mọi cầu của công tắc
+    bridges: tuple[Cell, ...]      # các ô cầu bị điều khiển
+    targets: tuple[Cell, ...]      # chỉ công tắc tách: hai ô đáp
+
+@dataclass(frozen=True)
 class Level:
-    grid: list[str]                  # mỗi chuỗi là một hàng; ký hiệu ô như 02 §2; kích thước đọc từ file
-    start: tuple[int, int]
-    goal: tuple[int, int]
-    bridges: list[tuple[int, int]]   # ô cầu thứ i ứng với bit i của State.bridges
-    bridges_open: int                # trạng thái cầu lúc đầu (bitmask, ô B là 1)
-    switches: dict[tuple[int, int], list[tuple[int, str]]]  # ô công tắc → [(số thứ tự ô cầu, 'toggle' | 'on' | 'off')]
-    splits: dict[tuple[int, int], tuple[tuple[int, int], tuple[int, int]]]  # ô công tắc tách → hai ô đáp
-def load_level(path: str) -> Level: ...           # đọc file JSON ở 03 §6; file sai thì báo lỗi rõ ràng
+    id: str; name: str; group: str; source: str
+    grid: tuple[str, ...]          # ký hiệu ô ở 02 §2; kích thước đọc từ file
+    start: Cell; goal: Cell
+    switches: dict[Cell, Switch]
+    initial_open: frozenset[Cell]  # các ô cầu mở lúc đầu (ký tự B)
+    # cùng vài trường cho GUI: chapter, order, kind, par, intro, unlock_stars
+    def tile(self, cell) -> str: ...
 
-# Source/engine/tiles.py  (TV3)
-def is_open(level: Level, s: State, cell) -> bool: ...          # False nếu cell là ô cầu đang đóng
-def fragile_breaks(level: Level, s: State) -> bool: ...         # True nếu khối nguyên đứng trên ô dễ vỡ
-def apply_switches(level: Level, s: State, cells: list) -> State | None: ...
-#   cells: các ô mà khối (hoặc khối con) vừa lăn tới; khối nằm thì ô trên hoặc ô trái trước
-#   Trả về trạng thái sau khi đổi cầu; None nếu cầu vừa đóng dưới khối hoặc dưới một khối con
+def load_level(path: Path, level_id: str) -> Level: ...      # file sai thì raise LevelError, nói rõ file và ô
+def load_levels(directory: Path) -> dict[str, Level]: ...
 
-# Source/engine/split.py  (TV1)
-def apply_split(level: Level, s: State) -> State: ...           # khối đứng trên công tắc tách thì trả về trạng thái 'X'; không thì trả về s
-def try_merge(s: State) -> State: ...                           # hai khối con kề cạnh thì ghép thành 'H' hoặc 'V'; không thì trả về s
+# Source/bloxorz/rules.py: luật một lượt đi. GUI, server và Problem.result() đều gọi step()
+def step(level, s: State, a: Action) -> StepResult: ...      # StepResult(state, status 'ok' | 'fell' | 'won', events, moved)
+#   Phần của TV1 (lõi, NV1):         BLOCK_MOVES (bảng chuyển), step(), _settle(), _support_problem()
+#   Phần của TV3 (ô đặc biệt, NV2):  _fall_reason() (ô dễ vỡ, cầu đóng), _activate() với công tắc mềm/nặng, _apply_switch()
+#   Phần của TV1 (tách khối, NV3):   nhánh SPLIT của step(), nhánh công tắc tách trong _activate(), _merge()
 
 # Source/solvers/base.py  (TV1)
 @dataclass
 class SearchResult:
-    status: str          # 'solved' | 'no_solution' | 'timeout'
-    path: list[Action]   # dãy hành động từ trạng thái đầu tới đích
+    status: str          # 'solved' | 'no_solution'  ('timeout' do khung chạy gán, solver không tự trả về)
+    path: list[Action]   # dãy hành động từ trạng thái đầu tới đích; rỗng khi không có lời giải
     path_cost: float
     expanded: int
     generated: int
@@ -357,38 +375,61 @@ class SearchResult:
 
 class Solver:
     name = "BASE"
-    def prepare(self, problem: Problem) -> None: ...     # tiền xử lý (ví dụ bảng heuristic của A*); mặc định không làm gì
-    def search(self, problem: Problem) -> SearchResult: ...
+    def prepare(self, problem) -> None: ...     # tiền xử lý (ví dụ bảng heuristic của A*); mặc định không làm gì
+    def search(self, problem) -> SearchResult: ...
+#   Đăng ký trong solvers/__init__.py: ALGORITHMS = {'bfs': BFS, 'dfs': DFS, 'ucs': UCS, 'astar': AStar}
 
-# Source/solvers/runner.py  (TV4, V39): GUI gọi để chạy solver ở tiến trình riêng
-class SolverRunner:
-    def start(self, level_path: str, algos: list[str], timeout_s: float = 60) -> None: ...
-    #   algos: ['BFS'] cho một nút Solve; ['BFS', 'DFS', 'UCS', 'A*'] cho nút So sánh
-    def poll(self) -> list[tuple[str, SearchResult, float]] | None: ...
-    #   None khi còn đang tìm; xong thì mỗi thuật toán một bộ (tên, kết quả, thời gian tìm kiếm tính bằng ms)
-    #   thuật toán nào quá timeout_s giây thì kết quả có status 'timeout'
-    def cancel(self) -> None: ...                               # dừng tiến trình con ngay
+# Source/solvers/runner.py  (TV4, V39): chạy solver ở tiến trình riêng cho GUI (đã có bản chạy được)
+class SolveJob:
+    def cancel(self) -> None: ...               # dừng tiến trình con ngay
+def run_solver(solver_cls, problem, timeout_s=60.0, job: SolveJob | None = None) -> dict: ...
+#   Gọi prepare() rồi search() trong tiến trình con. Trả về các trường của SearchResult
+#   cùng prepare_ms, time_ms (chỉ search), peak_kb; hoặc {'ok': False, 'error', 'timeout' | 'cancelled'}
 ```
 
-Ba quy ước đi kèm:
+Bốn quy ước đi kèm:
 - Tọa độ luôn là **(hàng, cột)**; hàng tăng xuống dưới, cột tăng sang phải.
 - Không hàm nào được sửa trạng thái truyền vào; luôn trả về trạng thái mới.
+- `actions()` trả về mọi hành động, kể cả hành động làm khối rơi. Solver gọi `result()`; kết quả `None` thì **bỏ qua và không tính vào `generated`** ([04 §3](04-thuc-nghiem.md#3-quy-ước-đếm-bắt-buộc-giống-nhau-ở-4-thuật-toán)). `GridMaze` làm giống hệt: hướng đâm vào tường cho `None`.
 - Thời gian và bộ nhớ do script thực nghiệm đo bên ngoài. Solver chỉ tự đếm `expanded`, `generated`, `max_frontier`, `visited`.
 
-Cấu trúc thư mục đề xuất (theo mẫu nộp bài ở mục 4 của đề):
+Kiểm tra nhanh trên mê cung: `python -m unittest tests.test_solvers -v` (chạy trong `Source/`) chạy cả 4 solver trên các mê cung mẫu; solver nào chưa cài thì được bỏ qua.
+
+### 4.1. Đối chiếu bản đề xuất với code (chốt 19/10)
+
+| Đầu mục | Bản đề xuất | Chốt | Lý do |
+|---|---|---|---|
+| Thư mục engine | `Source/engine/` | **Giữ code**: `Source/bloxorz/` | Đổi tên chỉ tốn công sửa import ở server, solver, test |
+| `tiles.py`, `split.py` riêng | Hai file, hàm `is_open`, `fragile_breaks`, `apply_switches`, `apply_split`, `try_merge` | **Giữ code**: luật nằm chung trong `rules.py`, chia phần sở hữu như ghi chú ở trên | Luật đã viết xong và có test; TV3 và TV1 nhận phần tương ứng, đọc lại và viết test T07–T23 |
+| `State` | tuple `(kind, a, b, bridges)`, cầu là bitmask | **Giữ code**: dataclass, `Orient`, `frozenset` ô cầu mở | Hash được như nhau, dễ đọc, dễ giải thích khi vấn đáp; đổi thì phải sửa engine, server, GUI |
+| `Action` | chuỗi `'U'`, `'U1'` … `'R2'` | **Giữ code**: `Action(dir, cube)`, `cube` 0 hoặc 1 | Như trên. `U1`/`U2` trong tài liệu ứng với `cube` 0/1 |
+| `actions()` | chỉ hành động hợp lệ | **Giữ code**: mọi hành động, `result()` trả `None` khi rơi | Lọc trước thì mỗi hành động phải tính luật hai lần. Đổi lại phải theo quy ước đếm ở trên |
+| `Level` | trường `bridges`, `bridges_open` (bitmask), `splits` riêng | **Giữ code**: `Switch` gộp cả công tắc tách, `initial_open` | Bộ nạp xử lý đồng nhất; cho phép công tắc tách nối cầu |
+| Kiểu tác động theo từng liên kết | `links: [{cell, mode}]` | **Cần mở rộng code** (TV3, V03 và NV2) | Màn 29 có một công tắc nối nhiều cầu với kiểu khác nhau. Định dạng ở [03 §6](03-man-choi.md#6-định-dạng-file-màn-của-nhóm) |
+| Ký hiệu ô | `-` `o` `@` `X` `T` | **Giữ code**: `.` `#` `o` `x` `@` | Code, GUI, test và 18 màn đã dùng. Hai bộ xung đột (`o`, `@` mang nghĩa khác nhau) nên chỉ được dùng một bộ. Bảng ở [02 §2](02-luat-choi.md#2-bàn-chơi-và-các-loại-ô) |
+| `SearchResult` | đủ 7 trường | **Theo tài liệu**: đã sửa code | Thực nghiệm cần đủ chỉ số |
+| `Solver` có `prepare()` | lớp `Solver` | **Theo tài liệu**: đã sửa code, 4 file solver là lớp con | Tổng thời gian và bộ nhớ đo cả `prepare()` ([04 §2](04-thuc-nghiem.md)) |
+| `GridMaze` | có | **Theo tài liệu**: đã thêm `bloxorz/maze.py` và test | Để TV2, TV3, TV4 thử thuật toán ngay |
+| Module chạy nền | `SolverRunner` có `start`, `poll`, `cancel` | **Giữ code**: `run_solver` và `SolveJob` trong `solvers/runner.py` | GUI web gọi qua server HTTP nên không cần `poll`; đã có hủy và hết giờ. V39 còn lại: nút So sánh hiện đủ chỉ số mới, kiểm thử trên 33 màn |
+| Bộ màn | `levels/01.json … 33.json` | 33 màn gốc ở `Source/levels/original/NN.json`; màn tự sinh ở `levels/gen/`; 18 màn tự thiết kế giữ ở `levels/` cho GUI | Script thực nghiệm chỉ đọc `original/` và `gen/`, không lẫn với màn hướng dẫn. GUI nạp thêm `original/` là việc của TV5 |
+
+Cấu trúc thư mục:
 
 ```
 Source/
-├── main.py                 # TV5: mở GUI
+├── main.py                 # TV5: mở GUI (server + trình duyệt)
 ├── README.md               # TV5: cài đặt và chạy
 ├── requirements.txt
-├── levels/01.json … 33.json            # TV2 · levels/gen/: TV3 (màn tự sinh)
-├── engine/                 # TV1: state.py, rules.py, problem.py, split.py
-│                           # TV3: tiles.py, level.py (bộ nạp màn)
+├── levels/                 # 18 màn tự thiết kế cho GUI
+│   ├── original/01.json … 33.json   # TV2: 33 màn gốc
+│   └── gen/                # TV3: màn tự sinh
+├── bloxorz/                # TV1: state.py, rules.py (phần lõi, tách khối), problem.py, maze.py, serialize.py
+│                           # TV3: level.py (bộ nạp màn), rules.py (phần ô đặc biệt)
 ├── solvers/                # base.py (TV1), bfs.py (TV1), dfs.py (TV2),
 │                           # ucs.py + costs.py (TV3), astar.py + heuristics.py + runner.py (TV4)
+├── server/                 # TV5: API HTTP cho GUI
 ├── experiments/            # TV2: run.py, charts.py, kết quả CSV · TV3: gen_levels.py
-├── gui/                    # TV5
+├── web/                    # TV5: GUI 3D (Three.js)
 └── tests/                  # mỗi người viết test cho phần mình
 ```
 
@@ -411,7 +452,7 @@ Từ M2 trở đi chỉ sửa lỗi, không thêm tính năng.
 | TV1, TV3 | Định dạng file màn và 3 màn đầu (1, 3, 6) | TV2 | 20/10 | TV1 gõ tay màn 1 ngay trong test; TV3 viết bộ nạp màn theo bản đề xuất ở 03 §6 |
 | TV1, TV5 | Bộ nạp màn | TV3 | 21/10 | TV1 gõ tay màn 1 trong test; TV5 đọc thẳng file JSON để vẽ bàn |
 | TV3 | Engine lõi | TV1 | 20/10 | Viết test cho luật của mình, dựng trạng thái bằng tay |
-| TV1 (tách khối) | `apply_switches` dùng được cho khối con | TV3 | 23/10 | Viết test T19, T23 trước; tạm cho khối con không kích hoạt gì |
+| TV1 (tách khối) | Phần công tắc trong `rules.py` đã rà xong cho khối con | TV3 | 23/10 | Viết test T19, T23 trước; phần này đã chạy sẵn trong code |
 | TV4 | Hàm chi phí | TV3 | 22/10 | Tạm dùng chi phí 1 cho mọi bước |
 | TV5 | Engine lõi; BFS | TV1 | 20/10; 21/10 | Vẽ bàn từ file; Solve phát lại `R D D R R D R` |
 | TV5 | Module chạy solver nền (V39) | TV4 | 23/10 | Gọi solver trực tiếp để thử nút Solve (GUI tạm đơ lúc tìm) |

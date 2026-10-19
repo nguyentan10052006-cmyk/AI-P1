@@ -100,62 +100,65 @@ Các màn gốc khá nhỏ: bộ giải tham khảo giải mỗi màn dưới 50
 
 ## 6. Định dạng file màn của nhóm
 
-Đây là đề xuất; TV2, TV1 và TV3 (người viết bộ nạp màn) chốt trong ngày 19/10. Mỗi màn là một file `Source/levels/NN.json`. Ví dụ màn 2:
+Chốt ngày 19/10 (tab bien-ban, #14): dùng định dạng mà bộ nạp màn hiện có (`Source/bloxorz/level.py`) đang đọc, thay cho bản đề xuất ban đầu (ký hiệu `-` `o` `@` `X` `T`, mục `splits` riêng). Mỗi màn gốc là một file `Source/levels/original/NN.json`. Ví dụ màn 2:
 
 ```json
 {
-  "id": 2,
+  "name": "Màn 2",
   "passcode": "290299",
   "group": "G3",
   "source": "Bloxorz (D. Clarke, 2007), màn 2; dữ liệu: jacobcoughenour/bloxorz_gba (GPL-3.0), commit f57ebb6",
+  "par": 17,
   "grid": [
-    "---------------",
-    "------oooo--ooo",
-    "oooo--ooXo--oGo",
-    "oo@o--oooo--ooo",
-    "oooo--oooo--ooo",
-    "oSoobboooobbooo",
-    "oooo--oooo-----",
-    "---------------",
-    "---------------",
-    "---------------"
+    "...............",
+    "......####..###",
+    "####..##x#..#G#",
+    "##o#..####..###",
+    "####..####..###",
+    "#S##bb####bb###",
+    "####..####.....",
+    "...............",
+    "...............",
+    "..............."
   ],
   "switches": [
-    {"at": [3, 2], "links": [{"cell": [5, 4], "mode": "toggle"}, {"cell": [5, 5], "mode": "toggle"}]},
-    {"at": [2, 8], "links": [{"cell": [5, 10], "mode": "toggle"}, {"cell": [5, 11], "mode": "toggle"}]}
-  ],
-  "splits": []
+    {"at": [3, 2], "bridges": [[5, 4], [5, 5]], "effect": "toggle"},
+    {"at": [2, 8], "bridges": [[5, 10], [5, 11]], "effect": "toggle"}
+  ]
 }
 ```
 
-- `grid`: 10 hàng × 15 cột, giữ nguyên khung bàn của game gốc. Ký hiệu theo bảng ở [02 §2](02-luat-choi.md#2-bàn-chơi-và-các-loại-ô). Màn tự sinh có kích thước khác, nên bộ nạp phải đọc kích thước từ file, không cố định 10 × 15.
-- `switches`: `at` là ô công tắc (hàng, cột). Loại công tắc (mềm `@` hay nặng `X`) đọc từ `grid`. `links` là danh sách ô cầu cùng kiểu tác động.
-- `splits`: mỗi phần tử có dạng `{"at": [r, c], "to": [[r1, c1], [r2, c2]]}`, trong đó `at` là ô công tắc tách và `to` là hai ô đáp của hai khối con.
+- `grid`: 10 hàng × 15 cột, giữ nguyên khung bàn của game gốc. Ký hiệu theo bảng ở [02 §2](02-luat-choi.md#2-bàn-chơi-và-các-loại-ô). Màn tự sinh có kích thước khác; bộ nạp đọc kích thước từ file.
+- Tên file (không có đuôi) là mã màn. `name`, `group`, `source`, `par` (bước tối ưu) là thông tin cho GUI và thực nghiệm. `passcode` hiện bộ nạp chưa đọc; TV3 thêm vào `Level` khi GUI cần hiện passcode.
+- `switches`: `at` là ô công tắc (hàng, cột). Loại công tắc (mềm `o`, nặng `x`, tách `@`) đọc từ `grid`.
+  - Công tắc mềm và nặng: `bridges` là danh sách ô cầu, `effect` là kiểu tác động chung: `toggle`, `open` hoặc `close`.
+  - Công tắc tách: `targets` là hai ô đáp của hai khối con. Có thể có thêm `bridges` và `effect` nếu công tắc tách cũng nối cầu.
+  - **Cần mở rộng (TV3, trước khi chuyển màn 29):** một công tắc nối nhiều cầu với kiểu khác nhau thì ghi `"links": [{"cell": [r, c], "effect": "toggle"}, …]` thay cho `bridges` + `effect`. Bộ nạp màn và `_apply_switch` trong `rules.py` hiện chưa đọc `links`.
 
 **Bảng chuyển đổi từ bản GBA**
 
 | Bản GBA | Nghĩa | File của nhóm |
 |---|---|---|
-| `' '` | trống | `-` |
-| `'b'` | sàn; ô `spawn` thì thành `S` | `o` |
+| `' '` | trống | `.` |
+| `'b'` | sàn; ô `spawn` thì thành `S` | `#` |
 | `'e'` | đích | `G` |
 | `'f'` | ô dễ vỡ | `F` |
-| `'s'` | công tắc mềm | `@` |
-| `'h'` | công tắc nặng | `X` |
-| `'v'` | công tắc tách | `T` |
+| `'s'` | công tắc mềm | `o` |
+| `'h'` | công tắc nặng | `x` |
+| `'v'` | công tắc tách | `@` |
 | `'l'`, `'r'` | ô cầu, đóng lúc đầu (hai nửa của hình cây cầu) | `b` |
 | `'k'`, `'q'` | ô cầu, mở lúc đầu | `B` |
 | `"spawn": [x, y]` | ô xuất phát | `S` tại hàng y, cột x |
-| `"switches": {"K": [[bx, by, mode], …]}` | công tắc tại cột K // 10, hàng K % 10 | `{"at": [K % 10, K // 10], "links": [{"cell": [by, bx], "mode": …}]}` |
-| `mode`: `onoff` / `on` / `off` | kiểu tác động | `toggle` / `on` / `off` |
-| `"splits": {"K": [x1, y1, x2, y2]}` | công tắc tách tại cột K // 10, hàng K % 10 | `{"at": [K % 10, K // 10], "to": [[y1, x1], [y2, x2]]}` |
+| `"switches": {"K": [[bx, by, mode], …]}` | công tắc tại cột K // 10, hàng K % 10 | `{"at": [K % 10, K // 10], "links": [{"cell": [by, bx], "effect": …}]}` (hoặc `bridges` + `effect` nếu mọi liên kết cùng kiểu) |
+| `mode`: `onoff` / `on` / `off` | kiểu tác động | `toggle` / `open` / `close` |
+| `"splits": {"K": [x1, y1, x2, y2]}` | công tắc tách tại cột K // 10, hàng K % 10 | `{"at": [K % 10, K // 10], "targets": [[y1, x1], [y2, x2]]}` trong `switches` |
 | `"code": 28431` | passcode, bị mất số 0 đầu | `"028431"`: chuỗi đủ 6 chữ số |
 
 **Ba bẫy khi chuyển đổi:** bản GBA dùng (x, y) = (cột, hàng); khóa công tắc là x × 10 + y, không phải hàng × 15 + cột; passcode phải giữ số 0 ở đầu.
 
 **Kiểm tra tự động sau khi chuyển:**
 - Mỗi màn gốc có lưới 10 × 15 (màn tự sinh thì tùy kích thước), đúng 1 ô `S` và 1 ô `G`.
-- Mọi `at` của `switches` trỏ vào ô `@` hoặc `X`. Mọi `cell` trỏ vào ô `b` hoặc `B`. Mọi `at` của `splits` trỏ vào ô `T`. Mọi ô trong `to` không phải ô trống.
+- Mọi `at` của `switches` trỏ vào ô `o`, `x` hoặc `@`. Mọi ô cầu trỏ vào ô `b` hoặc `B`. Mọi ô trong `targets` không phải ô trống. Bộ nạp màn đã tự kiểm tra các điều này khi đọc file.
 - Số ô từng loại khớp bảng ở mục 4.
 - Khi BFS chạy được: số bước khớp cột "Bước tối ưu".
 
