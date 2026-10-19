@@ -96,6 +96,8 @@ Các màn gốc khá nhỏ: bộ giải tham khảo giải mỗi màn dưới 50
 
 **Dự phòng khi thiếu thời gian** (nhóm phải quyết trước M2): dùng bộ rút gọn 12 màn, vẫn đủ 5 nhóm: 1, 3, 6 · 4, 13 · 2, 5, 11 · 27, 30 · 8, 9.
 
+**Bộ màn tự sinh.** Ngoài 33 màn, thực nghiệm dùng thêm ba nhóm màn sinh bằng script, S1–S3 ([04 §8](04-thuc-nghiem.md#8-bộ-màn-tự-sinh)): sân trống lớn dần, sân có số cầu tăng dần, và màn không có lời giải. Các màn này nằm riêng trong `Source/levels/gen/`, không tính vào 33 màn và không cần hiện trong danh sách chọn màn của GUI. Riêng màn không lời giải nên mở được trong GUI để demo thông báo.
+
 ## 6. Định dạng file màn của nhóm
 
 Đây là đề xuất; TV2 và TV1 chốt trong ngày 19/10. Mỗi màn là một file `Source/levels/NN.json`. Ví dụ màn 2:
@@ -126,7 +128,7 @@ Các màn gốc khá nhỏ: bộ giải tham khảo giải mỗi màn dưới 50
 }
 ```
 
-- `grid`: 10 hàng × 15 cột, giữ nguyên khung bàn của game gốc. Ký hiệu theo bảng ở [02 §2](02-luat-choi.md#2-bàn-chơi-và-các-loại-ô).
+- `grid`: 10 hàng × 15 cột, giữ nguyên khung bàn của game gốc. Ký hiệu theo bảng ở [02 §2](02-luat-choi.md#2-bàn-chơi-và-các-loại-ô). Màn tự sinh có kích thước khác, nên bộ nạp phải đọc kích thước từ file, không cố định 10 × 15.
 - `switches`: `at` là ô công tắc (hàng, cột). Loại công tắc (mềm `@` hay nặng `X`) đọc từ `grid`. `links` là danh sách ô cầu cùng kiểu tác động.
 - `splits`: mỗi phần tử có dạng `{"at": [r, c], "to": [[r1, c1], [r2, c2]]}`, trong đó `at` là ô công tắc tách và `to` là hai ô đáp của hai khối con.
 
@@ -152,7 +154,7 @@ Các màn gốc khá nhỏ: bộ giải tham khảo giải mỗi màn dưới 50
 **Ba bẫy khi chuyển đổi:** bản GBA dùng (x, y) = (cột, hàng); khóa công tắc là x × 10 + y, không phải hàng × 15 + cột; passcode phải giữ số 0 ở đầu.
 
 **Kiểm tra tự động sau khi chuyển:**
-- Mỗi màn có lưới 10 × 15, đúng 1 ô `S` và 1 ô `G`.
+- Mỗi màn gốc có lưới 10 × 15 (màn tự sinh thì tùy kích thước), đúng 1 ô `S` và 1 ô `G`.
 - Mọi `at` của `switches` trỏ vào ô `@` hoặc `X`. Mọi `cell` trỏ vào ô `b` hoặc `B`. Mọi `at` của `splits` trỏ vào ô `T`. Mọi ô trong `to` không phải ô trống.
 - Số ô từng loại khớp bảng ở mục 4.
 - Khi BFS chạy được: số bước khớp cột "Bước tối ưu".

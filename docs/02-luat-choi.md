@@ -11,6 +11,8 @@ Luật dùng chung cho engine, 4 thuật toán, GUI và bộ test. Ai thấy ch�
 
 Hai repo được gợi ý trong buổi họp, [supersaiyanmode/Bloxorz](https://github.com/supersaiyanmode/Bloxorz) và [chaitanya100100/Bloxorz](https://github.com/chaitanya100100/Bloxorz), đã được xem nhưng không dùng. Lý do: chỉ có 1–2 màn tự chế, không có công tắc tách, và không có giấy phép.
 
+Repo [TranTai35/bloxorz-game](https://github.com/TranTai35/bloxorz-game) (commit `4f3afeb`, không có giấy phép) là bài của một nhóm khóa trước cùng môn. Nhóm chỉ tham khảo bài học về thực nghiệm và GUI (01 NV6–NV10, 04), không dùng làm căn cứ luật: họ dùng 10 màn tự chế, và coi việc đổi khối con là một hành động tốn 0,5, trái với dòng 7 ở mục 5. Vì cùng môn, tuyệt đối không chép code, asset hay dữ liệu màn của họ.
+
 ## 2. Bàn chơi và các loại ô
 
 Tọa độ là **(hàng, cột)**, viết (r, c). Hàng tăng xuống dưới, cột tăng sang phải. Các hướng: U lên (r − 1), D xuống (r + 1), L trái (c − 1), R phải (c + 1).
@@ -105,7 +107,7 @@ Ví dụ thật cho dòng 4: ở màn 20, công tắc mềm tại (6, 12) đảo
 **Không cần:**
 - "Ô dễ vỡ đã vỡ": đứng lên là rơi ngay, nên không có trạng thái ô đã vỡ mà khối vẫn còn trên bàn.
 - "Công tắc đã bấm": công tắc không có trạng thái riêng, chỉ cầu có.
-- "Khối con nào đang được điều khiển": thuật toán chọn thẳng khối con trong hành động (`U1` … `R2`).
+- "Khối con nào đang được điều khiển": thuật toán chọn thẳng khối con trong hành động (`U1` … `R2`). Nếu lưu thêm thông tin này, số trạng thái khi đã tách tăng gấp đôi, và phải có thêm hành động "đổi khối" không lăn. Cho hành động đó chi phí nhỏ hơn 1 thì phá quy tắc mọi bước ≥ 1, nên heuristic theo số bước không còn chấp nhận được; tính nó là 1 bước thì sai định nghĩa độ dài lời giải (dòng 7, mục 5).
 
 ## 7. Bộ kiểm thử luật
 

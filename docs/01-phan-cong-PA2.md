@@ -160,6 +160,8 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, cỡ (S nhỏ, M 
 - [ ] Lời giải phát lại tới đích.
 - [ ] Số bước không nhỏ hơn BFS. Nếu nhỏ hơn BFS là có lỗi.
 
+**Lỗi hay gặp:** IDS dùng bảng nhớ toàn cục (nhớ mọi trạng thái đã duyệt qua các vòng) thì mất ưu điểm bộ nhớ của IDS: ở repo khóa trước ([06 §3](06-bao-cao-video.md#3-tài-liệu-tham-khảo-đã-có) mục 8), IDS tốn 30,7 MB trong khi BFS chỉ 5,6 MB. Dùng đệ quy rồi nâng `sys.setrecursionlimit` thì dễ tràn ngăn xếp, chương trình tắt mà không báo lỗi. Ở màn không có lời giải, IDS chỉ chặn lặp trên đường đi thì không tự dừng được; khi đó `timeout` là kết quả đúng.
+
 ### NV7 · UCS và hàm chi phí
 
 **Chủ:** TV3 · **Đọc chéo:** TV4 · **Cỡ:** M · **Hạn:** mê cung 21/10, hàm chi phí 22/10, 33 màn 25/10 · **Việc:** V12–V14
@@ -168,7 +170,9 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, cỡ (S nhỏ, M 
 1. Dùng hàng đợi ưu tiên `heapq` với mục `(g, thứ_tự, trạng_thái)`. `thứ_tự` là bộ đếm tăng dần, để Python không phải so sánh hai trạng thái khi `g` bằng nhau.
 2. Giữ bảng `best_g`. Khi lấy ra một mục có `g` lớn hơn `best_g` của trạng thái đó thì bỏ qua (lazy deletion).
 3. Kiểm tra đích khi **lấy ra** khỏi hàng đợi. Điều này bắt buộc để UCS cho lời giải tối ưu.
-4. Thiết kế hàm chi phí không đồng nhất (đề mục 3.4), ví dụ: lăn thường tốn 1, lăn lên ô dễ vỡ tốn thêm vì rủi ro. Quy tắc bắt buộc: **mọi bước có chi phí ≥ 1**, để heuristic của TV4 vẫn chấp nhận được. Thầy cho phép dùng ML đơn giản để học trọng số nếu giải thích rõ trong báo cáo.
+4. Thiết kế hàm chi phí không đồng nhất (đề mục 3.4). Quy tắc bắt buộc: **mọi bước có chi phí ≥ 1**, để heuristic của TV4 vẫn chấp nhận được. Hàm chi phí phải tạo ra lựa chọn thật: nếu không màn nào UCS chọn đường khác BFS thì chương UCS không có gì để phân tích. Repo khóa trước ([06 §3](06-bao-cao-video.md#3-tài-liệu-tham-khảo-đã-có) mục 8) chỉ cộng thêm rất ít (ô dễ vỡ +1, công tắc +0,25), và UCS ra y hệt BFS ở 9/10 màn. Hai hướng có lý do rõ:
+   - **Theo năng lượng:** chi phí = 1 (một lần lăn) + công nâng trọng tâm khi lật, đơn vị là cạnh khối × trọng lượng khối nguyên. Đứng → nằm: 1 + (√5/2 − 1) ≈ 1,12. Nằm → đứng: 1 + (√5/2 − 1/2) ≈ 1,62. Nằm → nằm (lăn quanh cạnh dài): 1 + (√2/2 − 1/2) ≈ 1,21. Khối con nặng bằng nửa khối: 1 + (√2/2 − 1/2)/2 ≈ 1,10. UCS sẽ tránh dựng khối lên khi không cần. Mỗi con số tính lại được bằng hình học, nên dễ bảo vệ khi vấn đáp.
+   - **Theo rủi ro:** ví dụ lăn lên ô dễ vỡ tốn thêm. Thầy cho phép dùng ML đơn giản để học trọng số nếu giải thích rõ trong báo cáo.
 5. Chốt hàm chi phí trước 22/10 và gửi TV4, vì A* phải dùng cùng một hàm chi phí. Cài vào `Problem.step_cost`.
 6. Kiểm tra cài đặt: đặt mọi chi phí bằng 1 thì số bước của UCS phải bằng BFS ở mọi màn.
 
@@ -176,6 +180,7 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, cỡ (S nhỏ, M 
 - [ ] UCS giải 33 màn.
 - [ ] Có bảng chi phí và lý do cho từng mức.
 - [ ] Tổng chi phí của UCS bằng A* ở mọi màn.
+- [ ] Liệt kê các màn mà UCS chọn đường khác BFS, kèm giải thích. Không có màn nào thì xem lại hàm chi phí.
 
 ### NV8 · A* và heuristic
 
@@ -183,37 +188,51 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, cỡ (S nhỏ, M 
 
 **Cách làm**
 1. Cài giống UCS nhưng ưu tiên theo f = g + h. Khi f bằng nhau, ưu tiên h nhỏ hơn; ghi rõ cách phá hòa này trong báo cáo.
-2. Thiết kế heuristic theo hàm chi phí của TV3. Vì mọi bước tốn ít nhất 1, một cận dưới của **số bước** còn lại cũng là cận dưới của chi phí. Các ý tưởng từ đề (mục 3.5):
-   - Khoảng cách Manhattan từ ô gần đích nhất của khối tới đích là d. Mỗi lần lăn, ô gần nhất tiến lại gần đích tối đa 2 ô, nên ⌈d/2⌉ là cận dưới.
-   - Thay Manhattan bằng khoảng cách đường đi trên lưới "điểm": bỏ qua hướng, coi mọi ô không trống (kể cả cầu) là đi được. Tính trước một lần bằng BFS ngược từ ô đích, trong `prepare()`.
-   - Phạt hướng phải chứng minh lại. Ví dụ ⌈d/2⌉ + 1 khi khối đang nằm là **không** chấp nhận được: khối nằm sát đích chỉ cần 1 bước để đứng lên đích. Có thể dùng max(⌈d/2⌉, 1) khi khối chưa đứng trên đích.
-3. Trạng thái đã tách cần cận dưới riêng (ví dụ dựa trên khối con gần đích hơn), và phải chứng minh vẫn không ước lượng quá.
-4. Kiểm tra trên 33 màn: tổng chi phí của A* phải bằng UCS, và số nút mở rộng của A* không lớn hơn UCS. Nếu lệch thì heuristic không chấp nhận được hoặc cài sai.
-5. Viết chứng minh heuristic chấp nhận được (h(s) không lớn hơn chi phí thật còn lại) và nhất quán (h(s) ≤ c(s, a, s') + h(s')), theo đúng hàm chi phí đã chốt.
+2. Thiết kế heuristic theo hàm chi phí của TV3. Vì mọi bước tốn ít nhất 1, một cận dưới của **số bước** còn lại cũng là cận dưới của chi phí. Gọi Φ(s) là khoảng cách nhỏ nhất từ một ô của khối (khi đã tách: một trong hai khối con) tới đích. Mỗi lần lăn, khối nguyên tiến lại gần đích tối đa 2 ô, khối con tối đa 1 ô, nên ⌈Φ/2⌉ là cận dưới, **với điều kiện Φ tính cả đường tắt qua công tắc tách** (bước 3).
+3. **Bẫy: công tắc tách dịch chuyển hai khối con đi xa**, nên Manhattan thuần có thể ước lượng quá. Ví dụ: khối đứng ở (5, 0), công tắc tách ở (5, 3), hai ô đáp (1, 10) và (1, 12), đích (1, 13). Lời giải thật chỉ 4 bước (R, R, R1 rồi tự ghép, R), nhưng ⌈17/2⌉ = 9. Repo khóa trước ([06 §3](06-bao-cao-video.md#3-tài-liệu-tham-khảo-đã-có) mục 8) mắc đúng lỗi này. Cài **hai** heuristic, cả hai đều tính đường tắt:
+   - **h_M (Manhattan):** Φ là khoảng cách Manhattan nhỏ nhất tới đích hoặc tới một công tắc tách bất kỳ. Ở màn không có công tắc tách, đây là Manhattan thường.
+   - **h_P (lưới điểm):** coi mọi ô không trống (kể cả cầu và ô dễ vỡ) là đi được, thêm cạnh chi phí 0 từ mỗi công tắc tách tới hai ô đáp của nó. Tính trước khoảng cách từ mọi ô tới đích bằng 0-1 BFS ngược từ đích, trong `prepare()`. Ô không tới được đích cho h = ∞: trạng thái đó là ngõ cụt, bỏ luôn.
+
+   h_P là heuristic chính; h_M dùng để so sánh trong thực nghiệm.
+4. Phạt hướng phải chứng minh lại. Ví dụ ⌈Φ/2⌉ + 1 khi khối đang nằm là **không** chấp nhận được: khối nằm sát đích chỉ cần 1 bước để đứng lên đích. Có thể dùng max(⌈Φ/2⌉, 1) khi khối chưa đứng trên đích.
+5. Viết chứng minh heuristic chấp nhận được (h(s) không lớn hơn chi phí thật còn lại) và nhất quán (h(s) ≤ c(s, a, s') + h(s')), theo đúng hàm chi phí đã chốt. Khung chứng minh: (i) mỗi bước, Φ giảm tối đa 2 (khối nguyên) hoặc 1 (khối con); (ii) dịch chuyển không làm Φ giảm thêm, vì khoảng cách tại công tắc tách không lớn hơn khoảng cách tại các ô đáp của nó; (iii) ở đích Φ = 0; (iv) mỗi bước tốn ít nhất 1.
+6. Kiểm tra bằng số liệu, bổ sung cho chứng minh: dọc lời giải tối ưu của UCS, mọi trạng thái có h(s) ≤ chi phí còn lại; trên mọi cạnh A* đã duyệt, h(s) ≤ c + h(s'). Đếm số vi phạm; phải bằng 0 ở cả 33 màn.
+7. Kiểm tra trên 33 màn: tổng chi phí của A* phải bằng UCS, và số nút mở rộng của A* không lớn hơn UCS. Nếu lệch thì heuristic không chấp nhận được hoặc cài sai.
 
 **Xong khi**
-- [ ] 33/33 màn cùng tổng chi phí với UCS.
+- [ ] 33/33 màn cùng tổng chi phí với UCS, với cả h_M và h_P.
+- [ ] Kiểm tra bằng số liệu ở bước 6: 0 vi phạm.
 - [ ] Chứng minh nằm trong chương 3.4.
-- [ ] (Tùy chọn) so sánh hai heuristic trong phần thực nghiệm.
+- [ ] Có số liệu so sánh h_M với h_P (bảng T5 và hình H5 ở [04 §7](04-thuc-nghiem.md#7-trình-bày-trong-báo-cáo)).
+
+**Lỗi hay gặp:** quên đường tắt qua công tắc tách; chọn heuristic quá yếu. Repo khóa trước dùng ⌈d/2⌉ Manhattan và chỉ bớt được 0,6–22 % số nút so với UCS, nên phần so sánh A* với UCS gần như không có gì để viết.
 
 ### NV9 · GUI 3D
 
 **Chủ:** TV5 · **Đọc chéo:** TV2 · **Cỡ:** L · **Hạn:** chơi tay 21/10, đủ tính năng 25/10 · **Việc:** V18–V22
 
 **Cách làm**
-1. Chọn công nghệ trước 20/10 và ghi vào biên bản: Ursina (Python) hoặc web Three.js gọi server Python. Thầy cho phép GUI viết bằng ngôn ngữ khác; chỉ thuật toán bắt buộc dùng Python.
+1. Chọn công nghệ trước 20/10 và ghi vào biên bản: Ursina (Python) hoặc web Three.js gọi server Python. Thầy cho phép GUI viết bằng ngôn ngữ khác; chỉ thuật toán bắt buộc dùng Python. Repo khóa trước ([06 §3](06-bao-cao-video.md#3-tài-liệu-tham-khảo-đã-có) mục 8) cho thấy Ursina đủ làm bàn 3D có hoạt ảnh lật và rơi qua mép, và gọi thẳng engine Python. Three.js đẹp hơn nhưng phải viết thêm server và API giữa GUI với engine.
 2. Vẽ bàn 3D từ file màn. Mỗi loại ô một màu hoặc hình dễ phân biệt: sàn, trống, đích (lỗ), ô dễ vỡ (cam), công tắc mềm (tròn), công tắc nặng (hình X), công tắc tách (hình "( )"), cầu mở, cầu đóng.
 3. Chơi tay: phím mũi tên gọi `result()` của engine; phím Space đổi khối con đang điều khiển; rơi thì thua, đứng trên đích thì thắng. **Không viết lại luật trong GUI.**
-4. Các nút: New Game (chọn màn 1–33), Restart, Solve BFS, Solve DFS, Solve UCS, Solve A*. Bấm Solve thì gọi solver, khối tự lăn theo lời giải (hoạt ảnh từng bước), và hiện số bước, số nút mở rộng, thời gian.
+4. Các nút: New Game (chọn màn 1–33), Restart, Solve BFS, Solve DFS, Solve UCS, Solve A*. Bấm Solve thì gọi solver, khối tự lăn theo lời giải (hoạt ảnh từng bước), và hiện số bước, số nút mở rộng, thời gian tìm kiếm (không tính thời gian hoạt ảnh).
 5. Trước khi có solver thật: nút Solve phát lại lời giải có sẵn của màn 1 là `R D D R R D R`.
 6. Hiện số màn, passcode và số bước đã đi.
+7. Solver chạy trong **tiến trình riêng** (`multiprocessing`), không chạy trong luồng giao diện. Trong lúc chờ, hiện "Đang tìm…" và nút Hủy; quá 60 giây thì dừng và báo hết giờ. Repo khóa trước gọi solver ngay trong luồng giao diện, nên cửa sổ đơ suốt lúc tìm. Dùng tiến trình chứ không dùng luồng (thread), vì Python không dừng ngang được một luồng. Trên Windows, `main.py` phải có `if __name__ == "__main__":`.
+8. Thông báo riêng cho 4 kết quả: thắng, rơi (thua), không có lời giải, hết giờ. Thử bằng màn không lời giải S3 ở [04 §8](04-thuc-nghiem.md#8-bộ-màn-tự-sinh).
+9. Nút **So sánh**: chạy cả 4 thuật toán trên màn đang mở, hiện một bảng gồm số bước, tổng chi phí, số nút mở rộng, thời gian. Ý tưởng lấy từ danh sách việc dự định trong README của repo khóa trước, nên ghi nguồn khi dùng.
+10. Camera tự căn theo kích thước bàn; chỉnh được tốc độ phát lại lời giải và tạm dừng. Có màn hướng dẫn: chú giải 9 loại ô và các phím.
 
 **Xong khi**
 - [ ] Hiện đủ 9 loại ô.
 - [ ] Chơi tay có thắng, có thua.
 - [ ] Tách và ghép khối hoạt động.
 - [ ] 4 nút Solve chạy được trên mọi màn.
+- [ ] Solver chạy lâu không làm đơ GUI; Hủy và hết giờ hoạt động (thử DFS trên màn khó nhất và trên màn không lời giải).
+- [ ] Nút So sánh hiện đủ bảng 4 thuật toán.
 - [ ] Người khác cài theo README trên máy của họ và chạy được.
+
+**Lỗi hay gặp (nếu dùng Ursina; rút từ README của repo khóa trước):** đối tượng không gắn vào một gốc chung của màn chơi thì không bị hủy khi đổi màn, nên bàn cũ còn sót; tạo nút trong vòng lặp bằng `lambda: chon(i)` thì mọi nút đều nhận giá trị cuối, phải viết `lambda i=i: chon(i)`; texture `.webp` không đọc được, phải chuyển hẳn sang PNG hoặc JPG (đổi đuôi file không đủ).
 
 ### NV10 · Thực nghiệm
 
@@ -222,14 +241,15 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, cỡ (S nhỏ, M 
 **Cách làm**
 1. Viết script đo theo [04-thuc-nghiem.md](04-thuc-nghiem.md). Mỗi cặp (màn, thuật toán) chạy trong một tiến trình riêng, có timeout. Đo thời gian 5 lần lấy trung vị; đo bộ nhớ 1 lần riêng bằng `tracemalloc`. Ghi ra CSV.
 2. Trước khi có solver thật, thử script với solver giả (trả kết quả cố định) để kiểm tra đủ cột CSV.
-3. Ngày 25/10 (M2): chạy thử đủ 4 × 33 và làm các kiểm tra chéo ở [04 §6](04-thuc-nghiem.md#6-kiểm-tra-chéo-trước-khi-dùng-số-liệu).
-4. Ngày 26–27/10: chạy chính thức trên một máy, ghi cấu hình máy, vẽ biểu đồ, điền bảng. Gửi số liệu cho cả nhóm để sáng 28/10 mọi người viết nhận xét.
-5. Nhập `summary.csv` vào tab ThucNghiem.
+3. Viết `experiments/gen_levels.py` sinh bộ màn tự sinh S1–S3 ([04 §8](04-thuc-nghiem.md#8-bộ-màn-tự-sinh)). 33 màn gốc quá nhỏ, thời gian chỉ vài mili-giây, nên cần màn lớn hơn để thấy khác biệt giữa các thuật toán.
+4. Ngày 25/10 (M2): chạy thử đủ 4 × 33, thêm A* với h_M và bộ màn tự sinh, rồi làm các kiểm tra chéo ở [04 §6](04-thuc-nghiem.md#6-kiểm-tra-chéo-trước-khi-dùng-số-liệu).
+5. Ngày 26–27/10: chạy chính thức trên một máy, ghi cấu hình máy, vẽ biểu đồ, điền bảng. Gửi số liệu cho cả nhóm để sáng 28/10 mọi người viết nhận xét.
+6. Nhập `summary.csv` vào tab ThucNghiem.
 
 **Xong khi**
-- [ ] CSV có đủ 4 × 33 dòng.
+- [ ] CSV có đủ 4 × 33 dòng chính, 33 dòng A* với h_M và các dòng của bộ màn tự sinh.
 - [ ] Các kiểm tra chéo đều qua.
-- [ ] Có bảng T1–T4 và hình H1–H6.
+- [ ] Có bảng T1–T5 và hình H1–H6, H8, H9.
 - [ ] Chương Thực nghiệm có số liệu.
 
 ### NV11 · Báo cáo
@@ -331,7 +351,7 @@ Source/
 | Mốc | TV1 (BFS) | TV2 (DFS) | TV3 (UCS) | TV4 (A*) | TV5 (GUI) |
 |---|---|---|---|---|---|
 | **M1 · T4 21/10**<br>một màn chạy trọn vòng | Engine lõi và test; bộ nạp màn; BFS giải màn 1, 3, 6 | 33 file màn; DFS giải màn 1, 3, 6 | UCS đúng trên mê cung; đang làm ô đặc biệt | A* đúng trên mê cung; đang làm tách khối | Bàn 3D vẽ từ file; chơi tay màn 1 bằng engine thật |
-| **M2 · CN 25/10**<br>đủ tính năng, đóng băng | Ghép xong, toàn bộ test qua; BFS 33/33 khớp bảng | DFS 33 màn; script đo chạy thử 4 × 33 | Ô đặc biệt xong; hàm chi phí đã chốt; UCS 33 màn | Tách khối xong; heuristic; A* 33 màn, cùng chi phí với UCS | Đủ loại ô; tách khối; 4 nút Solve; khối tự lăn |
+| **M2 · CN 25/10**<br>đủ tính năng, đóng băng | Ghép xong, toàn bộ test qua; BFS 33/33 khớp bảng | DFS 33 màn; bộ màn tự sinh; script đo chạy thử 4 × 33 | Ô đặc biệt xong; hàm chi phí đã chốt; UCS 33 màn | Tách khối xong; h_M và h_P; A* 33 màn, cùng chi phí với UCS, 0 vi phạm | Đủ loại ô; tách khối; 4 nút Solve chạy nền; khối tự lăn; nút So sánh |
 | **M3 · T4 28/10**<br>đủ số liệu, đủ chương | Chương Mô hình hóa và BFS | Số liệu chính thức và biểu đồ; chương DFS và Thực nghiệm | Chương UCS và hàm chi phí | Chương A* và chứng minh; bắt đầu ghép | README; chương Giao diện; kịch bản video |
 | **Nộp · T6 30/10** | Rà soát | Rà soát | Kiểm thử cài đặt (29/10); đóng gói | Báo cáo PDF hoàn chỉnh | Video YouTube công khai |
 
