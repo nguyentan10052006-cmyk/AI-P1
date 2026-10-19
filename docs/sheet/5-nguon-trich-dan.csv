@@ -6,3 +6,4 @@
 5,cs109: Bloxorz levels,Otfried Cheong,2015,https://github.com/otfried/cs109/tree/master/bloxorz/levels,0097f4a,Không ghi,Đối chiếu màn 1–13,,
 6,BloxorzSolver,Luan Pham và cộng sự,2018,https://github.com/phamquiluan/BloxorzSolver,cd9c142,Không ghi,Đối chiếu dữ liệu màn,,
 7,Artificial Intelligence: A Modern Approach (4th ed.),S. Russell và P. Norvig,2020,,,,"BFS, DFS, UCS, A*, heuristic",,
+8,bloxorz-game (đồ án Bloxorz Solver của một nhóm khóa trước cùng môn),P. T. Tran và cộng sự,2026,https://github.com/TranTai35/bloxorz-game,4f3afeb,Không ghi,"Chỉ lấy ý tưởng: bài học về thực nghiệm, nút So sánh, lỗi hay gặp với Ursina, sân trống lớn và màn không lời giải. Không dùng code, asset hay dữ liệu màn",,

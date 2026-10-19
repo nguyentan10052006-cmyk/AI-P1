@@ -131,11 +131,11 @@ Mỗi luật có ít nhất một test. Chủ module viết test của module m�
 | T14 | Một công tắc nối nhiều ô cầu với kiểu khác nhau | TV3 |
 | T15 | Cầu đóng ngay dưới khối: bị loại | TV3 |
 | T16 | Hai trạng thái cùng vị trí khối, khác trạng thái cầu: khác nhau khi so sánh và hash | TV3 |
-| T17 | Chỉ tách khi khối nguyên đứng trên công tắc tách | TV4 |
-| T18 | Sau khi tách: hai khối con ở đúng hai ô ghi trong file màn | TV4 |
-| T19 | Khối con kích hoạt công tắc mềm, không kích hoạt công tắc nặng | TV4 |
-| T20 | Khối con trên ô dễ vỡ không vỡ; trên ô đích không thắng | TV4 |
-| T21 | Hai khối con kề cạnh: ghép đúng tư thế và ô neo, theo cả chiều ngang và chiều dọc | TV4 |
-| T22 | Hai khối con kề chéo: không ghép | TV4 |
-| T23 | Khối con này bấm công tắc đóng cầu dưới khối con kia: bị loại | TV4 |
+| T17 | Chỉ tách khi khối nguyên đứng trên công tắc tách | TV1 |
+| T18 | Sau khi tách: hai khối con ở đúng hai ô ghi trong file màn | TV1 |
+| T19 | Khối con kích hoạt công tắc mềm, không kích hoạt công tắc nặng | TV1 |
+| T20 | Khối con trên ô dễ vỡ không vỡ; trên ô đích không thắng | TV1 |
+| T21 | Hai khối con kề cạnh: ghép đúng tư thế và ô neo, theo cả chiều ngang và chiều dọc | TV1 |
+| T22 | Hai khối con kề chéo: không ghép | TV1 |
+| T23 | Khối con này bấm công tắc đóng cầu dưới khối con kia: bị loại | TV1 |
 | T24 | BFS trên 33 màn ra đúng cột "Bước tối ưu" ở [03-man-choi.md](03-man-choi.md#4-danh-sách-33-màn) | TV1, chạy sau khi ghép |
