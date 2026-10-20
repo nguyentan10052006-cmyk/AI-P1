@@ -134,6 +134,7 @@ Chốt ngày 19/10 (tab bien-ban, #14): dùng định dạng mà bộ nạp màn
   - Công tắc mềm và nặng: `bridges` là danh sách ô cầu, `effect` là kiểu tác động chung: `toggle`, `open` hoặc `close`.
   - Công tắc tách: `targets` là hai ô đáp của hai khối con. Có thể có thêm `bridges` và `effect` nếu công tắc tách cũng nối cầu.
   - **Cần mở rộng (TV3, trước khi chuyển màn 29):** một công tắc nối nhiều cầu với kiểu khác nhau thì ghi `"links": [{"cell": [r, c], "effect": "toggle"}, …]` thay cho `bridges` + `effect`. Bộ nạp màn và `_apply_switch` trong `rules.py` hiện chưa đọc `links`.
+  - *Cập nhật 19/10 (TV2, khi chuyển đổi):* không chỉ màn 29 mà **6 màn** dùng `links`: 17, 23, 25, 29, 30, 31. Bộ nạp hiện tại từ chối đúng 6 màn này; 27 màn còn lại nạp được. Chi tiết ở `Source/levels/original/README.md`.
 
 **Bảng chuyển đổi từ bản GBA**
 
