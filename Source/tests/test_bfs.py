@@ -3,14 +3,15 @@ import unittest
 from pathlib import Path
 
 from bloxorz.level import load_level
-from bloxorz.maze import GridMaze
+from bloxorz.maze import MAZES, GridMaze
 from bloxorz.problem import Problem
-from bloxorz.state import Action, Dir
+from bloxorz.state import Action, Dir, Orient, State
 from solvers.base import NO_SOLUTION, SOLVED
 from solvers.bfs import BFS
 from tests.helpers import make_level
 
 ORIGINAL_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
+D = Action(Dir.DOWN)
 R = Action(Dir.RIGHT)
 
 # Màn 1 của Bloxorz (D. Clarke, 2007), chép từ levels/original/01.json của TV2
@@ -51,6 +52,43 @@ class BFSCountingTests(unittest.TestCase):
         self.assertEqual(result.path_cost, 2)
         self.assertEqual((result.expanded, result.generated, result.max_frontier, result.visited), (2, 3, 1, 3))
 
+    def test_counts_on_branching_maze_by_hand(self):
+        """Mê cung rẽ nhánh, thứ tự thử U, D, L, R (A = (0,0), M = (1,1), B = (0,2) không tới được):
+
+            .#.
+            S.G
+            ###
+
+        Lấy S ra (expanded 1): U sinh A, R sinh M; hàng đợi [A, M] dài 2.
+        Lấy A ra (expanded 2): D sinh lại S (đã thăm, vẫn đếm generated).
+        Lấy M ra (expanded 3): L sinh lại S (đã thăm), R sinh G là đích, dừng.
+        generated = 5, visited = {S, A, M, G} = 4, max_frontier = 2 (kiểm cập nhật max_frontier).
+        """
+        result = BFS().search(GridMaze([".#.", "S.G", "###"]))
+        self.assertEqual(result.status, SOLVED)
+        self.assertEqual(result.path, [R, R])
+        self.assertEqual((result.expanded, result.generated, result.max_frontier, result.visited), (3, 5, 2, 4))
+
+    def test_action_order_prefers_down_before_right_on_open_board(self):
+        """Sân trống 4 x 5 có nhiều đường 7 bước; thứ tự U, D, L, R làm BFS ra đúng một đường.
+
+        Mỗi lớp mở ô hàng dưới trước, nên ô nào cũng nhận cha qua R (nếu có), không thì qua D.
+        Lần ngược từ G ra D, D, D, R, R, R, R.
+        """
+        result = BFS().search(GridMaze(MAZES["open"].grid))
+        self.assertEqual(result.path, [D, D, D, R, R, R, R])
+        self.assertEqual(result.path_cost, 7)
+
+    def test_start_is_goal_returns_empty_path(self):
+        """Trạng thái đầu đã là đích: không mở rộng gì, hàng đợi coi như dài 1 và đã thăm 1 trạng thái."""
+        level = make_level(LEVEL_1)
+        at_goal = State(Orient.STANDING, level.goal)
+        result = BFS().search(Problem(level, start=at_goal))
+        self.assertEqual(result.status, SOLVED)
+        self.assertEqual(result.path, [])
+        self.assertEqual(result.path_cost, 0)
+        self.assertEqual((result.expanded, result.generated, result.max_frontier, result.visited), (0, 0, 1, 1))
+
 
 class BFSOnBloxorzTests(unittest.TestCase):
     def test_level_1_typed_by_hand(self):
@@ -64,7 +102,7 @@ class BFSOnBloxorzTests(unittest.TestCase):
         self.assertTrue(problem.is_goal(final))
 
     def test_no_solution_when_gap_is_two_tiles(self):
-        """Khối không vượt được khe rộng 2 ô: BFS duyệt hết rồi trả no_solution."""
+        """Khe hở không có cầu chặn đường tới G: BFS duyệt hết rồi trả no_solution."""
         problem = Problem(make_level(["S##..##G"]))
         result = BFS().search(problem)
         self.assertEqual(result.status, NO_SOLUTION)
