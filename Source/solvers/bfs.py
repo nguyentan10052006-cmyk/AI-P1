@@ -1,5 +1,8 @@
 """BFS (Breadth-First Search) - TV1 (docs/01 NV5).
 
+Thuật toán theo Russell và Norvig, Artificial Intelligence: A Modern Approach (4th ed., 2020),
+mục 3.4.1 (nguồn #7 ở tab cite).
+
 Các lựa chọn cài đặt (ghi vào báo cáo, chương 3.1):
 - Hàng đợi FIFO collections.deque: popleft() và append() đều tốn O(1).
 - Graph search: tập đã thăm `visited` chặn trạng thái lặp, nên luôn dừng trên không gian hữu hạn.
