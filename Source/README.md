@@ -84,8 +84,10 @@ Source/
     serialize.py       chuyển State/Action/Level qua JSON
   solvers/             thuật toán tìm kiếm
     base.py            hợp đồng chung: SearchResult và lớp cơ sở Solver
-    runner.py          khung chạy cho GUI: tiến trình riêng, đo thời gian, bộ nhớ, giới hạn thời gian, hủy
-    bfs.py dfs.py ucs.py astar.py   mỗi file một lớp con của Solver
+    runner.py          khung chạy cho GUI: tiến trình riêng, đo thời gian, bộ nhớ, giới hạn thời gian, hủy;
+                       bản không chặn (start_solver, poll, start_compare) cho Ursina
+    bfs.py dfs.py ucs.py astar.py   mỗi file một lớp con của Solver (astar.py có AStar với h_P, AStarM với h_M)
+    heuristics.py      heuristic cho A*: h_M, h_P trên GridMaze và Bloxorz
   server/              API HTTP (api.py: hàm thuần; app.py: server)
   levels/              18 màn chơi, định dạng JSON (mỗi file một màn)
   web/                 giao diện 3D
@@ -94,6 +96,8 @@ Source/
                        board.js block.js tiles.js (bảng và khối 3D),
                        camera.js input.js ai-panel.js audio.js storage.js strings.js ...
     vendor/            Three.js r160, OrbitControls, RoundedBoxGeometry, phông chữ
+  tools/
+    draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/ (chạy lại khi sửa MAZES)
   tests/               unit test: luật, đặc tả, màn chơi, API và server, GridMaze,
                        4 solver trên mê cung mẫu (test_solvers.py; solver chưa cài thì bỏ qua)
 ```

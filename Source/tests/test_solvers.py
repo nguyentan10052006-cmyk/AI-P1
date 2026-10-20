@@ -11,7 +11,7 @@ from solvers.base import NO_SOLUTION, SOLVED, SearchResult
 
 # Thuật toán phải cho lời giải ít bước nhất / chi phí nhỏ nhất
 SHORTEST = {"bfs"}
-CHEAPEST = {"ucs", "astar"}
+CHEAPEST = {"ucs", "astar", "astar_m"}
 
 
 def replay(problem, path):
@@ -42,15 +42,17 @@ class SolverOnMazeTests(unittest.TestCase):
         for name, case in MAZES.items():
             with self.subTest(maze=name):
                 problem, result = self.run_solver(key, case)
-                self.assertGreater(result.expanded, 0)
                 self.assertGreater(result.visited, 0)
-                self.assertGreater(result.max_frontier, 0)
-                self.assertGreaterEqual(result.generated, 0)
+                for counter in ("expanded", "generated", "max_frontier"):
+                    self.assertGreaterEqual(getattr(result, counter), 0, counter)
                 if case.steps is None:
+                    # Heuristic biết trước là không tới được đích thì có thể dừng ngay, không mở rộng nút nào
                     self.assertEqual(result.status, NO_SOLUTION)
                     self.assertEqual(result.path, [])
                     continue
                 self.assertEqual(result.status, SOLVED)
+                self.assertGreater(result.expanded, 0)
+                self.assertGreater(result.max_frontier, 0)
                 replayed = replay(problem, result.path)
                 self.assertIsNotNone(replayed, "lời giải có bước đâm vào tường")
                 final, cost = replayed
@@ -73,6 +75,9 @@ class SolverOnMazeTests(unittest.TestCase):
 
     def test_astar(self):
         self.check("astar")
+
+    def test_astar_m(self):
+        self.check("astar_m")
 
 
 if __name__ == "__main__":

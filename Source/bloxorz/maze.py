@@ -123,3 +123,27 @@ MAZES: Dict[str, MazeCase] = {
         note="Tường chắn kín: phải trả về NO_SOLUTION.",
     ),
 }
+
+
+def render(grid) -> str:
+    """Lưới dạng chữ, kèm số hàng và số cột, để xem nhanh trong terminal."""
+    cols = len(grid[0])
+    header = "    " + " ".join(f"{c % 10}" for c in range(cols))
+    lines = [header]
+    for r, row in enumerate(grid):
+        lines.append(f"{r:>3} " + " ".join(row))
+    return "\n".join(lines)
+
+
+if __name__ == "__main__":
+    # python -m bloxorz.maze  (trong Source/): in mọi mê cung mẫu. Hình SVG ở docs/gridmaze/.
+    import sys
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    print("Chú giải: # tường, . ô trống (tốn 1), S xuất phát, G đích, 1..9 ô tốn đúng số đó\n")
+    for name, case in MAZES.items():
+        answer = "không có lời giải" if case.steps is None else f"ít nhất {case.steps} bước, chi phí nhỏ nhất {case.cost:g}"
+        print(f"== {name}: {answer}")
+        print(render(case.grid))
+        print(f"   {case.note}\n")

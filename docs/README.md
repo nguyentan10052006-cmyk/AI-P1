@@ -10,6 +10,8 @@ Bắt đầu từ file **01**: mỗi người tìm vai trò của mình ở mụ
 | [04-thuc-nghiem.md](04-thuc-nghiem.md) | Định nghĩa 9 chỉ số; quy ước đếm; cách đo; file kết quả; kiểm tra chéo; bảng, biểu đồ và cách viết nhận xét; bộ màn tự sinh | TV2 và chủ 4 thuật toán |
 | [05-theo-doi-tien-do.md](05-theo-doi-tien-do.md) | Dựng Google Sheet: các tab, công thức % hoàn thành, dropdown, tô màu, nhịp cập nhật | Người điều phối, cả nhóm |
 | [06-bao-cao-video.md](06-bao-cao-video.md) | Khung báo cáo và người viết từng chương; quy ước viết; tài liệu tham khảo; phụ lục AI; kịch bản video; checklist nộp | Cả nhóm |
+| [07-kien-truc-gui-ursina.md](07-kien-truc-gui-ursina.md) | Bổ sung cho 01 §4 khi GUI chuyển sang Ursina: cấu trúc thư mục, quy tắc phụ thuộc, môi trường, hợp đồng GUI với engine, module chạy nền không chặn, quy trình Git | TV1, TV4, TV5; cả nhóm đọc mục 2–4 |
+| [gridmaze/](gridmaze/README.md) | Hình các mê cung mẫu của `GridMaze` kèm đáp án (số bước, chi phí), để thử 4 thuật toán trước khi chạy Bloxorz | TV1, TV2, TV3, TV4 |
 | [sheet/](sheet/) | 7 file CSV để nhập vào Google Sheet | Người điều phối |
 | `AI - Project 1.pdf` | Đề bài gốc | Cả nhóm |
 
