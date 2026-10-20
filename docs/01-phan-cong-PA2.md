@@ -380,12 +380,22 @@ class Solver:
 #   Đăng ký trong solvers/__init__.py: ALGORITHMS = {'bfs': BFS, 'dfs': DFS, 'ucs': UCS, 'astar': AStar, 'astar_m': AStarM}
 #   'astar' là A* với h_P (heuristic chính), 'astar_m' là A* với h_M; AStarM là lớp con của AStar (07 §9, #2)
 
-# Source/solvers/runner.py  (TV4, V39): chạy solver ở tiến trình riêng cho GUI (đã có bản chạy được)
+# Source/solvers/runner.py  (TV4, V39): chạy solver ở tiến trình riêng cho GUI; chi tiết ở 07 §6
+def start_solver(solver_cls, problem, timeout_s=60.0) -> SolveJob: ...   # không chặn: mở tiến trình con rồi trả về ngay
 class SolveJob:
-    def cancel(self) -> None: ...               # dừng tiến trình con ngay
-def run_solver(solver_cls, problem, timeout_s=60.0, job: SolveJob | None = None) -> dict: ...
-#   Gọi prepare() rồi search() trong tiến trình con. Trả về các trường của SearchResult
-#   cùng prepare_ms, time_ms (chỉ search), peak_kb; hoặc {'ok': False, 'error', 'timeout' | 'cancelled'}
+    elapsed: float                              # số giây đã chạy, dừng đếm khi có kết quả
+    done: bool
+    def poll(self) -> dict | None: ...          # None khi chưa xong; không chặn; quá timeout_s thì trả kết quả hết giờ
+    def cancel(self) -> None: ...               # dừng tiến trình con ngay; poll() sau đó trả kết quả đã hủy
+def start_compare(problem, names=COMPARE_NAMES, timeout_s=60.0) -> CompareJob: ...
+#   COMPARE_NAMES = ('bfs', 'dfs', 'ucs', 'astar', 'astar_m'); chạy lần lượt, mỗi solver một tiến trình
+class CompareJob:
+    done: bool; running: str | None; elapsed: float
+    def poll(self) -> dict[str, dict]: ...      # kết quả của các solver đã xong, theo thứ tự names
+    def cancel(self) -> None: ...               # solver đang chạy và chưa chạy đều ghi là đã hủy
+def run_solver(solver_cls, problem, timeout_s=60.0, job: SolveJob | None = None) -> dict: ...  # chặn: cho server, test, dòng lệnh
+#   Kết quả (dict): các trường của SearchResult cùng prepare_ms, time_ms (chỉ search), peak_kb khi 'ok' là True;
+#   không thì {'ok': False, 'error', kèm 'timeout': True hoặc 'cancelled': True}
 ```
 
 Bốn quy ước đi kèm:
@@ -411,7 +421,7 @@ Kiểm tra nhanh trên mê cung: `python -m unittest tests.test_solvers -v` (ch�
 | `SearchResult` | đủ 7 trường | **Theo tài liệu**: đã sửa code | Thực nghiệm cần đủ chỉ số |
 | `Solver` có `prepare()` | lớp `Solver` | **Theo tài liệu**: đã sửa code, 4 file solver là lớp con | Tổng thời gian và bộ nhớ đo cả `prepare()` ([04 §2](04-thuc-nghiem.md)) |
 | `GridMaze` | có | **Theo tài liệu**: đã thêm `bloxorz/maze.py` và test | Để TV2, TV3, TV4 thử thuật toán ngay |
-| Module chạy nền | `SolverRunner` có `start`, `poll`, `cancel` | **Giữ code**: `run_solver` và `SolveJob` trong `solvers/runner.py` | GUI web gọi qua server HTTP nên không cần `poll`; đã có hủy và hết giờ. V39 còn lại: nút So sánh hiện đủ chỉ số mới, kiểm thử trên 33 màn |
+| Module chạy nền | `SolverRunner` có `start`, `poll`, `cancel` | **Giữ code** và mở rộng: `run_solver` (chặn) cùng `start_solver`, `SolveJob.poll`, `start_compare` (không chặn, cho Ursina, 07 §6) trong `solvers/runner.py` | Đã có hủy, hết giờ, So sánh 5 solver, có `tests/test_runner.py`. V39 còn lại: kiểm thử với solver thật trên 33 màn và màn không lời giải S3 |
 | Bộ màn | `levels/01.json … 33.json` | 33 màn gốc ở `Source/levels/original/NN.json`; màn tự sinh ở `levels/gen/`; 18 màn tự thiết kế giữ ở `levels/` cho GUI | Script thực nghiệm chỉ đọc `original/` và `gen/`, không lẫn với màn hướng dẫn. GUI nạp thêm `original/` là việc của TV5 |
 
 Cấu trúc thư mục:

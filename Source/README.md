@@ -84,7 +84,8 @@ Source/
     serialize.py       chuyển State/Action/Level qua JSON
   solvers/             thuật toán tìm kiếm
     base.py            hợp đồng chung: SearchResult và lớp cơ sở Solver
-    runner.py          khung chạy cho GUI: tiến trình riêng, đo thời gian, bộ nhớ, giới hạn thời gian, hủy
+    runner.py          khung chạy cho GUI: tiến trình riêng, đo thời gian, bộ nhớ, giới hạn thời gian, hủy;
+                       bản không chặn (start_solver, poll, start_compare) cho Ursina
     bfs.py dfs.py ucs.py astar.py   mỗi file một lớp con của Solver (astar.py có AStar với h_P, AStarM với h_M)
     heuristics.py      heuristic cho A*: h_M, h_P trên GridMaze và Bloxorz
   server/              API HTTP (api.py: hàm thuần; app.py: server)
