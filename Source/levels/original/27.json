@@ -1,0 +1,24 @@
+{
+  "name": "Màn 27",
+  "passcode": "660141",
+  "group": "G4",
+  "source": "Bloxorz (D. Clarke, 2007), màn 27; dữ liệu: jacobcoughenour/bloxorz_gba (GPL-3.0), commit f57ebb6",
+  "par": 71,
+  "grid": [
+    "###....########",
+    "#S#########..##",
+    "###....##....##",
+    "............#x#",
+    "............##.",
+    "###..FFFF#..oo.",
+    "#G#FFFFFFF..###",
+    "###FFFFFFFFF###",
+    ".....FFFFFFF###",
+    "......B##B....."
+  ],
+  "switches": [
+    {"at": [5, 12], "bridges": [[9, 6]], "effect": "close"},
+    {"at": [5, 13], "bridges": [[9, 9]], "effect": "close"},
+    {"at": [3, 13], "bridges": [[9, 6], [9, 9]], "effect": "close"}
+  ]
+}
