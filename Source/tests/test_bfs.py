@@ -1,4 +1,4 @@
-"""Kiểm tra BFS (docs/01 NV5): quy ước đếm, lời giải ngắn nhất, vô nghiệm, màn gốc 1, 3, 6."""
+"""Kiểm tra BFS (docs/01 NV5): quy ước đếm, lời giải ngắn nhất, trạng thái cầu, vô nghiệm, màn gốc 1, 3, 6."""
 import unittest
 from pathlib import Path
 
@@ -12,6 +12,7 @@ from tests.helpers import make_level
 
 ORIGINAL_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
 D = Action(Dir.DOWN)
+L = Action(Dir.LEFT)
 R = Action(Dir.RIGHT)
 
 # Màn 1 của Bloxorz (D. Clarke, 2007), chép từ levels/original/01.json của TV2
@@ -100,6 +101,23 @@ class BFSOnBloxorzTests(unittest.TestCase):
         final = replay(problem, result.path)
         self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
         self.assertTrue(problem.is_goal(final))
+
+    def test_bridge_state_is_part_of_visited(self):
+        """Cùng màn với test cầu của DFS (TV2): o#S#bG#, công tắc mềm ở (0,0) bật tắt cầu (0,4).
+
+        Lời giải duy nhất: L (nằm lên công tắc, cầu mở), R (về đứng ở S), R, R (qua cầu tới G).
+        Sau 2 bước khối đứng đúng ô S như lúc đầu nhưng cầu đã mở. Trạng thái gồm cả open_bridges
+        nên đây là trạng thái mới; nếu tập đã thăm chỉ xét vị trí và tư thế, BFS sẽ bỏ nó và báo vô nghiệm.
+        """
+        level = make_level(["o#S#bG#"], [{"at": [0, 0], "bridges": [[0, 4]], "effect": "toggle"}])
+        problem = Problem(level)
+        result = BFS().search(problem)
+        self.assertEqual(result.status, SOLVED)
+        self.assertEqual(result.path, [L, R, R, R])
+        start, back_at_s = problem.initial_state(), replay(problem, result.path[:2])
+        self.assertEqual((back_at_s.orient, back_at_s.pos), (start.orient, start.pos))
+        self.assertNotEqual(back_at_s.open_bridges, start.open_bridges)
+        self.assertTrue(problem.is_goal(replay(problem, result.path)))
 
     def test_no_solution_when_gap_is_two_tiles(self):
         """Khe hở không có cầu chặn đường tới G: BFS duyệt hết rồi trả no_solution."""
