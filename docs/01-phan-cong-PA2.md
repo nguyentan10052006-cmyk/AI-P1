@@ -377,7 +377,8 @@ class Solver:
     name = "BASE"
     def prepare(self, problem) -> None: ...     # tiền xử lý (ví dụ bảng heuristic của A*); mặc định không làm gì
     def search(self, problem) -> SearchResult: ...
-#   Đăng ký trong solvers/__init__.py: ALGORITHMS = {'bfs': BFS, 'dfs': DFS, 'ucs': UCS, 'astar': AStar}
+#   Đăng ký trong solvers/__init__.py: ALGORITHMS = {'bfs': BFS, 'dfs': DFS, 'ucs': UCS, 'astar': AStar, 'astar_m': AStarM}
+#   'astar' là A* với h_P (heuristic chính), 'astar_m' là A* với h_M; AStarM là lớp con của AStar (07 §9, #2)
 
 # Source/solvers/runner.py  (TV4, V39): chạy solver ở tiến trình riêng cho GUI (đã có bản chạy được)
 class SolveJob:

@@ -140,7 +140,7 @@ class SolveJob:
     def poll(self) -> dict | None: ...  # None khi chưa xong; không chặn. Quá timeout_s thì tự dừng tiến trình và trả kết quả hết giờ
     def cancel(self) -> None: ...       # dừng tiến trình con ngay; lần poll() sau trả kết quả đã hủy
 
-def start_compare(problem: Problem, names: Sequence[str] = ("bfs", "dfs", "ucs", "astar"),
+def start_compare(problem: Problem, names: Sequence[str] = ("bfs", "dfs", "ucs", "astar", "astar_m"),
                   timeout_s: float = 60.0) -> CompareJob:
     """Chạy lần lượt từng thuật toán, mỗi thuật toán một tiến trình."""
 
@@ -156,7 +156,7 @@ class CompareJob:
 1. Dùng `multiprocessing` kiểu `spawn` trên mọi hệ điều hành, để hành vi trên Windows và các máy khác giống nhau.
 2. GUI **không** nhận callback từ tiến trình con hay luồng khác, vì Ursina không an toàn khi đối tượng được sửa ngoài luồng chính. GUI giữ `SolveJob` hoặc `CompareJob` và gọi `poll()` trong `update()` mỗi khung hình.
 3. Hết 60 giây thì tiến trình con bị dừng. Solver không cần tự kiểm tra thời gian.
-4. So sánh chạy **lần lượt**, không song song, để thời gian và bộ nhớ của các thuật toán không ảnh hưởng lẫn nhau.
+4. So sánh mặc định chạy 5 solver: 4 thuật toán và thêm A* với h_M (`astar_m`), để GUI so được h_P với h_M ngay trên màn đang mở. So sánh chạy **lần lượt**, không song song, để thời gian và bộ nhớ của các thuật toán không ảnh hưởng lẫn nhau.
 5. Thời gian và bộ nhớ hiện trên GUI chỉ để tham khảo. Số liệu cho báo cáo lấy từ script thực nghiệm (04 §4), vì GUI đo khi đang bật `tracemalloc`.
 6. GUI phân biệt bốn thông báo (01 NV9 bước 8): thắng hoặc giải được (`status == 'solved'`), không có lời giải (`'no_solution'`), hết giờ (`'timeout'`), lỗi hoặc đã hủy. Rơi chỉ xảy ra khi chơi tay.
 
@@ -193,7 +193,7 @@ Tab bien-ban #7 chưa chốt. Đề xuất theo cách nhóm đang làm trên rep
 | # | Vấn đề | Đề xuất | Ai chốt |
 |---|---|---|---|
 | 1 | Hàm chi phí đặt ở đâu. 01 §4.1 để `costs.py` trong `solvers/`, nhưng `Problem.step_cost()` nằm ở `bloxorz/`, nên `bloxorz` phải import `solvers`, trái bảng ở mục 2 | Đặt ở `bloxorz/costs.py`, vì hàm chi phí chỉ phụ thuộc `State` và `Level` | TV1, TV3 |
-| 2 | Chọn h_M hay h_P khi chạy A*. `ALGORITHMS` chỉ có một khóa `'astar'` | Thêm khóa `'astar_m'` cho h_M. GUI và nút So sánh dùng `'astar'` (h_P, heuristic chính theo 01 NV8) | TV4 |
+| 2 | Chọn h_M hay h_P khi chạy A*. `ALGORITHMS` chỉ có một khóa `'astar'` | **Đã chốt 20/10 (TV4, bien-ban #15):** thêm khóa `'astar_m'` (lớp `AStarM`, con của `AStar`) cho h_M; `'astar'` là h_P. Nút Solve A* dùng `'astar'`; nút So sánh chạy cả `'astar'` và `'astar_m'` để so h_P với h_M. Đã có trong code và `tests/test_solvers.py` | TV4 |
 | 3 | Giữ hay bỏ 18 màn tự thiết kế trong `levels/` | Giữ 2–3 màn ngắn làm màn hướng dẫn, chuyển vào `levels/tutorial/`; bỏ phần còn lại | TV5 |
 | 4 | Phiên bản Python và Ursina | Python 3.11, ghim bản Ursina mà TV5 đã cài thử chạy được | TV5 |
 
