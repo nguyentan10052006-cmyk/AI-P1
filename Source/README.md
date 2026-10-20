@@ -94,6 +94,8 @@ Source/
                        board.js block.js tiles.js (bảng và khối 3D),
                        camera.js input.js ai-panel.js audio.js storage.js strings.js ...
     vendor/            Three.js r160, OrbitControls, RoundedBoxGeometry, phông chữ
+  tools/
+    draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/ (chạy lại khi sửa MAZES)
   tests/               unit test: luật, đặc tả, màn chơi, API và server, GridMaze,
                        4 solver trên mê cung mẫu (test_solvers.py; solver chưa cài thì bỏ qua)
 ```
