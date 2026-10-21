@@ -1,0 +1,27 @@
+{
+  "name": "Màn 20",
+  "passcode": "543019",
+  "group": "G5",
+  "source": "Bloxorz (D. Clarke, 2007), màn 20; dữ liệu: jacobcoughenour/bloxorz_gba (GPL-3.0), commit f57ebb6",
+  "par": 56,
+  "grid": [
+    "............###",
+    "..###BB###bb###",
+    "..###..oS#..###",
+    "..###..###.....",
+    "..#o#..@#o.....",
+    "..###..###.....",
+    "####...###bbo##",
+    "#o..........###",
+    "............#G#",
+    "............###"
+  ],
+  "switches": [
+    {"at": [2, 7], "bridges": [[1, 5], [1, 6]], "effect": "close"},
+    {"at": [4, 9], "bridges": [[1, 5], [1, 6]], "effect": "close"},
+    {"at": [4, 3], "bridges": [[1, 5], [1, 6]], "effect": "close"},
+    {"at": [6, 12], "bridges": [[6, 10], [6, 11]], "effect": "toggle"},
+    {"at": [7, 1], "bridges": [[1, 10], [1, 11]], "effect": "toggle"},
+    {"at": [4, 7], "targets": [[1, 13], [7, 13]]}
+  ]
+}

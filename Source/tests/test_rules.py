@@ -218,6 +218,51 @@ class LevelValidationTests(unittest.TestCase):
         with self.assertRaises(LevelError):
             make_level(["S##@", "...G"], [{"at": [0, 3], "targets": [[1, 0]]}])
 
+    def test_links_must_point_to_bridge_tiles(self):
+        with self.assertRaises(LevelError):
+            make_level(["S#o#", "...G"], [{"at": [0, 2], "links": [{"cell": [0, 3], "effect": "toggle"}]}])
+
+    def test_links_duplicate_cell_is_rejected(self):
+        with self.assertRaises(LevelError):
+            make_level(["S#ob", "...G"], [{
+                "at": [0, 2],
+                "links": [{"cell": [0, 3], "effect": "open"}, {"cell": [0, 3], "effect": "close"}]
+            }])
+
+    def test_links_invalid_effect_is_rejected(self):
+        with self.assertRaises(LevelError):
+            make_level(["S#ob", "...G"], [{
+                "at": [0, 2],
+                "links": [{"cell": [0, 3], "effect": "invalid_mode"}]
+            }])
+
+
+class SwitchLinksTests(unittest.TestCase):
+    """Test T14: Một công tắc nối nhiều ô cầu với kiểu khác nhau."""
+
+    def test_multi_effect_links_switch(self):
+        level = make_level(
+            ["S#o.", "bBbG"],
+            [{
+                "at": [0, 2],
+                "links": [
+                    {"cell": [1, 0], "effect": "open"},
+                    {"cell": [1, 1], "effect": "close"},
+                    {"cell": [1, 2], "effect": "toggle"},
+                ]
+            }]
+        )
+        self.assertEqual(level.initial_open, frozenset({(1, 1)}))
+
+        # Khối lăn sang phải: từ S(0,0) -> nằm ngang (0,1),(0,2) đè lên o
+        res = step(level, level.initial_state(), Action(Dir.RIGHT))
+        self.assertEqual(res.status, OK)
+        self.assertEqual(res.state.open_bridges, frozenset({(1, 0), (1, 2)}))
+
+        # Kích hoạt lại: open giữ nguyên mở, close giữ nguyên đóng, toggle đảo thành đóng
+        res2 = step(level, block(Orient.HORIZONTAL, (0, 0), open_bridges=res.state.open_bridges), Action(Dir.RIGHT))
+        self.assertEqual(res2.state.open_bridges, frozenset({(1, 0)}))
+
 
 if __name__ == "__main__":
     unittest.main()
