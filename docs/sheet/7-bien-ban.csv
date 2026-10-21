@@ -1,7 +1,7 @@
 #,Ngày,Vấn đề,Quyết định,Lý do hoặc căn cứ,Người chốt,Ghi chú
 1,2026-10-18,Cách chia việc,PA2: mỗi người một thuật toán; một người làm GUI,,Cả nhóm,Phần chung chia thành nhóm việc có chủ (docs/01)
 2,2026-10-18,Người cho từng vai trò TV1–TV5,,,,Điền tên vào tab phan-cong
-3,2026-10-18,GUI 3D làm bằng gì,,,,
+3,2026-10-18,GUI 3D làm bằng gì,"Ursina (Python, chạy trên Panda3D). Bỏ bản demo web Three.js và server HTTP trong Source/ (web/, server/), thay bằng gui/","Gọi thẳng engine và solver bằng Python, không phải viết thêm server và API; repo khóa trước cho thấy Ursina đủ làm bàn 3D có hoạt ảnh lật và rơi qua mép (docs/01 NV9 bước 1). Bản web chỉ là demo cho buổi họp đầu",Cả nhóm,"Kiến trúc, hợp đồng GUI với engine và module chạy nền: docs/07"
 4,2026-10-18,Nguồn và số màn,33 màn của game gốc,Đánh giá chuẩn nhất; vượt mức tối thiểu 10 màn,Cả nhóm,Dữ liệu và đối chiếu: docs/03
 5,2026-10-18,Các điểm luật đề chưa rõ,Theo luật chuẩn của game gốc,,Cả nhóm,Bảng chốt: docs/02 mục 5
 6,2026-10-18,Ngôn ngữ và công cụ viết báo cáo,,,,
