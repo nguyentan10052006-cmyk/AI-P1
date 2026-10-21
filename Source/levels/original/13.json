@@ -1,0 +1,20 @@
+{
+  "name": "Màn 13",
+  "passcode": "448106",
+  "group": "G2",
+  "source": "Bloxorz (D. Clarke, 2007), màn 13; dữ liệu: jacobcoughenour/bloxorz_gba (GPL-3.0), commit f57ebb6",
+  "par": 46,
+  "grid": [
+    ".###F####F####.",
+    ".##........###.",
+    ".##.........###",
+    ".###...###..#S#",
+    ".###FFF#G#..###",
+    ".###..F###..#..",
+    "...#..FFFFF##..",
+    "...###FF#FFF...",
+    "....##FFFFFF...",
+    "....###..##...."
+  ],
+  "switches": []
+}

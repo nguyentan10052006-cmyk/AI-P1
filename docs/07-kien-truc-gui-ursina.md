@@ -84,7 +84,7 @@ Source/
 
 **Môi trường**
 - Cả nhóm dùng **Python 3.11**. Ursina chạy trên Panda3D, mà Panda3D thường ra bản cho Python mới chậm hơn. Dùng chung một phiên bản để tránh lỗi chỉ xảy ra trên một máy.
-- `requirements.txt` ghim phiên bản cụ thể (06 §6). TV5 cài thử và ghi số phiên bản vào đây trước 20/10.
+- `requirements.txt` ghim phiên bản cụ thể (06 §6): `ursina==7.0.0`, `panda3d==1.10.16`. TV5 đã cài thử với Python 3.11.9 trên Windows 11 và mở được cửa sổ (21/10). Cài bằng `python -m pip install -r requirements.txt` trong `Source/`.
 - Bộ nhớ đo bằng `tracemalloc` của thư viện chuẩn (04 §4), không cần `psutil`.
 - Test chạy bằng `unittest` như code hiện có: `python -m unittest discover -v` trong `Source/`.
 
@@ -195,7 +195,7 @@ Tab bien-ban #7 chưa chốt. Đề xuất theo cách nhóm đang làm trên rep
 | 1 | Hàm chi phí đặt ở đâu. 01 §4.1 để `costs.py` trong `solvers/`, nhưng `Problem.step_cost()` nằm ở `bloxorz/`, nên `bloxorz` phải import `solvers`, trái bảng ở mục 2 | Đặt ở `bloxorz/costs.py`, vì hàm chi phí chỉ phụ thuộc `State` và `Level` | TV1, TV3 |
 | 2 | Chọn h_M hay h_P khi chạy A*. `ALGORITHMS` chỉ có một khóa `'astar'` | **Đã chốt 20/10 (TV4, bien-ban #15):** thêm khóa `'astar_m'` (lớp `AStarM`, con của `AStar`) cho h_M; `'astar'` là h_P. Nút Solve A* dùng `'astar'`; nút So sánh chạy cả `'astar'` và `'astar_m'` để so h_P với h_M. Đã có trong code và `tests/test_solvers.py` | TV4 |
 | 3 | Giữ hay bỏ 18 màn tự thiết kế trong `levels/` | Giữ 2–3 màn ngắn làm màn hướng dẫn, chuyển vào `levels/tutorial/`; bỏ phần còn lại | TV5 |
-| 4 | Phiên bản Python và Ursina | Python 3.11, ghim bản Ursina mà TV5 đã cài thử chạy được | TV5 |
+| 4 | Phiên bản Python và Ursina | **Đã chốt 21/10 (TV5, bien-ban #16):** Python 3.11, `ursina==7.0.0`, `panda3d==1.10.16`, đã ghim trong `requirements.txt` | TV5 |
 
 **Sau khi duyệt, sửa các chỗ sau cho khớp:**
 - Tab bien-ban: điền #3 (GUI dùng Ursina) và #7 (Git); thêm một dòng cho các điểm ở bảng trên.

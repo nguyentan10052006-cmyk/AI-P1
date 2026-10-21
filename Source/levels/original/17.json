@@ -1,0 +1,26 @@
+{
+  "name": "Màn 17",
+  "passcode": "683596",
+  "group": "G3",
+  "source": "Bloxorz (D. Clarke, 2007), màn 17; dữ liệu: jacobcoughenour/bloxorz_gba (GPL-3.0), commit f57ebb6",
+  "par": 106,
+  "grid": [
+    "###............",
+    "#S#######b..###",
+    "###....b#####G#",
+    "###.........xx#",
+    "###............",
+    "###............",
+    "###...b#####x..",
+    "########b..##..",
+    "#o#........##..",
+    "###........#x.."
+  ],
+  "switches": [
+    {"at": [8, 1], "bridges": [[7, 8]], "effect": "toggle"},
+    {"at": [6, 12], "bridges": [[2, 7]], "effect": "open"},
+    {"at": [9, 12], "links": [{"cell": [1, 9], "effect": "open"}, {"cell": [7, 8], "effect": "close"}]},
+    {"at": [3, 12], "bridges": [[6, 6]], "effect": "close"},
+    {"at": [3, 13], "bridges": [[6, 6]], "effect": "open"}
+  ]
+}
