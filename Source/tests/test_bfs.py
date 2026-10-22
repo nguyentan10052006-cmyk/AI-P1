@@ -144,6 +144,19 @@ class BFSOnOriginalLevelsTests(unittest.TestCase):
                 self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
                 self.assertTrue(problem.is_goal(final))
 
+    def test_split_levels_8_9_16(self):
+        """V06: màn có công tắc tách 8, 9, 16 ra đúng 10, 24, 28 bước (docs/03 mục 4)."""
+        for name, steps in (("08", 10), ("09", 24), ("16", 28)):
+            with self.subTest(level=name):
+                level = load_level(ORIGINAL_DIR / f"{name}.json", name)
+                problem = Problem(level)
+                result = BFS().search(problem)
+                self.assertEqual(result.status, SOLVED)
+                self.assertEqual(len(result.path), steps)
+                final = replay(problem, result.path)
+                self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
+                self.assertTrue(problem.is_goal(final))
+
 
 if __name__ == "__main__":
     unittest.main()
