@@ -6,6 +6,7 @@ from bloxorz.problem import Problem
 from bloxorz.rules import FELL, OK, WON, step
 from bloxorz.state import Action, Dir, Orient, State, split_state
 from tests.helpers import make_level, open_board
+from tests.test_bfs import LEVEL_1
 
 
 def block(orient, pos, pos2=None, open_bridges=()):
@@ -33,6 +34,7 @@ class RollTableTests(unittest.TestCase):
     ]
 
     def test_all_twelve_transitions(self):
+        """T01: đủ 12 trường hợp (tư thế, hướng) của bảng chuyển ở docs/02 §3."""
         for orient, pos, direction, want_orient, want_cells in self.CASES:
             with self.subTest(orient=orient.value, dir=direction.value):
                 result = step(self.LEVEL, block(orient, pos), Action(direction))
@@ -43,12 +45,14 @@ class RollTableTests(unittest.TestCase):
 
 class FallAndWinTests(unittest.TestCase):
     def test_rolling_off_board_falls(self):
+        """T02: lăn ra ngoài bàn thì rơi."""
         level = open_board(3, 3, (0, 0))
         result = step(level, level.initial_state(), Action(Dir.LEFT))
         self.assertEqual(result.status, FELL)
         self.assertEqual(result.events[-1]["reason"], "off_board")
 
     def test_rolling_onto_void_falls(self):
+        """T03: lăn xong khối nằm, một nửa trên ô trống thì rơi."""
         level = make_level(["S.#G"])
         result = step(level, level.initial_state(), Action(Dir.RIGHT))
         self.assertEqual(result.status, FELL)
@@ -61,6 +65,7 @@ class FallAndWinTests(unittest.TestCase):
         self.assertEqual(result.events[-1]["reason"], "bridge_closed")
 
     def test_lying_across_goal_does_not_win(self):
+        """T05: nằm đè lên ô đích thì không thắng (cũng không rơi)."""
         level = make_level(["S#G"])
         first = step(level, level.initial_state(), Action(Dir.RIGHT))
         self.assertEqual(first.status, OK)
@@ -70,12 +75,33 @@ class FallAndWinTests(unittest.TestCase):
         self.assertEqual(second.status, FELL)
 
     def test_standing_on_goal_wins(self):
+        """T04: đứng trên ô đích thì thắng."""
         level = make_level(["S##G"])
         first = step(level, level.initial_state(), Action(Dir.RIGHT))
         second = step(level, first.state, Action(Dir.RIGHT))
         self.assertEqual(second.status, WON)
         self.assertEqual(second.state.pos, (0, 3))
         self.assertEqual(second.events[-1], {"type": "won"})
+
+    def test_lying_block_half_over_void_falls(self):
+        """T03: khối đang nằm lăn sang hàng mới, một nửa trên ô trống thì rơi."""
+        level = make_level(["S##", "G#."])
+        result = step(level, block(Orient.HORIZONTAL, (0, 1)), Action(Dir.DOWN))
+        self.assertEqual(result.status, FELL)
+        self.assertEqual(result.events[-1]["reason"], "void")
+
+    def test_level_1_reference_solution_wins_at_step_7(self):
+        """T06: phát lại R D D R R D R trên màn 1, sáu bước đầu chưa thắng, bước 7 thắng."""
+        level = make_level(LEVEL_1)
+        moves = [Dir.RIGHT, Dir.DOWN, Dir.DOWN, Dir.RIGHT, Dir.RIGHT, Dir.DOWN, Dir.RIGHT]
+        state = level.initial_state()
+        for number, direction in enumerate(moves, start=1):
+            with self.subTest(step=number, dir=direction.value):
+                result = step(level, state, Action(direction))
+                self.assertEqual(result.status, WON if number == len(moves) else OK)
+            state = result.state
+        self.assertEqual(state.orient, Orient.STANDING)
+        self.assertEqual(state.pos, level.goal)
 
     def test_fragile_lying_is_safe_but_standing_breaks(self):
         level = make_level(["SFFF", "...G"])
