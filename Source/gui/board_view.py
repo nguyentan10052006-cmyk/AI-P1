@@ -28,6 +28,7 @@ COLORS = {
     "split": color.hex("#2f6fd6"),
 }
 CLOSED_BRIDGE_ALPHA = 0.18
+HUD_SHIFT = 0.06      # phần chiều rộng bàn chừa cho cột nút bên phải (hud.py)
 
 
 def cell_to_world(cell: Cell, y: float = 0.0) -> Vec3:
@@ -103,9 +104,10 @@ class BoardView(Entity):
     def fit_camera(self) -> None:
         """Căn camera theo kích thước bàn, nhìn từ phía z âm để phím ↑ đẩy khối ra xa (docs/07 §4)."""
         rows, cols = self._extent()
-        size = max((rows[1] - rows[0] + 1) * 1.6, cols[1] - cols[0] + 1) + 2   # 1.6: tỉ lệ khung hình
-        camera.position = self.center + Vec3(size * 0.1, size * 1.05, -size * 0.95)
-        camera.look_at(self.center)
+        size = max((rows[1] - rows[0] + 1) * 1.6, cols[1] - cols[0] + 1) + 3   # 1.6: tỉ lệ khung hình; +3: lề quanh bàn
+        target = self.center + Vec3(size * HUD_SHIFT, 0, 0)   # nhìn lệch sang phải: bàn dời sang trái, chừa cột nút
+        camera.position = target + Vec3(size * 0.1, size * 1.05, -size * 0.95)
+        camera.look_at(target)
 
     def _slab(self, cell: Cell, tint: color.Color, scale_xz: float = TILE_SIZE, height: float = TILE_HEIGHT,
               top: float = 0.0) -> Entity:
