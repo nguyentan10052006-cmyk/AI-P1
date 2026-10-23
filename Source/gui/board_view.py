@@ -1,4 +1,4 @@
-"""Dựng bàn 3D từ Level (V18). Chỉ vẽ, không xử lý luật (docs/07 §5).
+"""Dựng bàn 3D từ Level (V18); cầu đóng/mở và ô dễ vỡ có hoạt ảnh (V20). Chỉ vẽ, không xử lý luật (docs/07 §5).
 
 Tọa độ theo docs/07 §4: ô (r, c) có tâm tại x = c, z = -r; mặt trên ô sàn ở y = 0.
 """
@@ -7,7 +7,7 @@ from __future__ import annotations
 import math
 from typing import Dict, FrozenSet, List, Optional
 
-from ursina import Circle, Entity, Mesh, Vec3, camera, color
+from ursina import Circle, Entity, Mesh, Vec3, camera, color, curve
 from ursina.shaders import lit_with_shadows_shader, unlit_shader
 
 from bloxorz.level import FRAGILE, GOAL, HEAVY, SOFT, SPLIT_SWITCH, VOID, BRIDGE_CHARS, Level
@@ -46,12 +46,31 @@ class BoardView(Entity):
         super().__init__()
         self.level = level
         self._bridges: Dict[Cell, Entity] = {}
+        self._fragile: Dict[Cell, Entity] = {}
+        self._open: Optional[FrozenSet[Cell]] = None
         for r in range(level.rows):
             for c in range(level.cols):
                 char = level.tile((r, c))
                 if char != VOID:
                     self._build_tile((r, c), char)
         self.set_open_bridges(level.initial_open if open_bridges is None else open_bridges)
+
+    def reset(self, open_bridges: FrozenSet[Cell]) -> None:
+        """Restart: dựng lại ô dễ vỡ đã vỡ và đặt cầu về trạng thái đầu, không hoạt ảnh."""
+        for slab in self._fragile.values():
+            for animation in slab.animations:   # dừng hoạt ảnh vỡ nếu bấm R lúc ô đang rơi
+                animation.kill()
+            slab.animations.clear()
+            slab.y, slab.color = -TILE_HEIGHT / 2, COLORS["fragile"]
+        self._open = None
+        self.set_open_bridges(open_bridges)
+
+    def break_tile(self, cell: Cell, duration: float) -> None:
+        """Ô dễ vỡ bị khối đứng lên: ô rơi xuống cùng khối và mờ dần."""
+        slab = self._fragile.get(cell)
+        if slab is not None:
+            slab.animate_y(slab.y - 12, duration=duration, curve=curve.in_quad)
+            slab.animate_color(_with_alpha(COLORS["fragile"], 0), duration=duration)
 
     @property
     def center(self) -> Vec3:
@@ -66,11 +85,20 @@ class BoardView(Entity):
         cs = [c for _, c in cells]
         return (min(rs), max(rs)), (min(cs), max(cs))
 
-    def set_open_bridges(self, open_bridges: FrozenSet[Cell]) -> None:
-        """Cầu mở vẽ như sàn gỗ; cầu đóng chỉ còn bóng mờ để người chơi biết chỗ có cầu."""
+    def set_open_bridges(self, open_bridges: FrozenSet[Cell], duration: float = 0.0) -> None:
+        """Cầu mở vẽ như sàn gỗ; cầu đóng chỉ còn bóng mờ để người chơi biết chỗ có cầu.
+
+        duration > 0 thì các ô cầu vừa đổi trạng thái hiện hoặc mờ dần (sau khi bấm công tắc).
+        """
         for cell, slab in self._bridges.items():
             opened = cell in open_bridges
-            slab.color = COLORS["bridge"] if opened else _with_alpha(COLORS["bridge"], CLOSED_BRIDGE_ALPHA)
+            target = COLORS["bridge"] if opened else _with_alpha(COLORS["bridge"], CLOSED_BRIDGE_ALPHA)
+            changed = self._open is not None and opened != (cell in self._open)
+            if duration > 0 and changed:
+                slab.animate_color(target, duration=duration)
+            else:
+                slab.color = target
+        self._open = open_bridges
 
     def fit_camera(self) -> None:
         """Căn camera theo kích thước bàn, nhìn từ phía z âm để phím ↑ đẩy khối ra xa (docs/07 §4)."""
@@ -90,7 +118,7 @@ class BoardView(Entity):
         if char == GOAL:
             self._build_goal(cell)
         elif char == FRAGILE:
-            self._slab(cell, COLORS["fragile"])
+            self._fragile[cell] = self._slab(cell, COLORS["fragile"])
         elif char in BRIDGE_CHARS:
             self._bridges[cell] = self._slab(cell, COLORS["bridge"])
         else:
