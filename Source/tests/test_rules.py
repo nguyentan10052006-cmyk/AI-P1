@@ -164,6 +164,7 @@ class SwitchTests(unittest.TestCase):
         self.assertEqual(result.events[-1]["reason"], "bridge_closed")
 
     def test_split_switch_teleports_and_splits(self):
+        """T18: khối đứng trên công tắc tách thì thành hai khối con ở đúng hai ô trong file màn."""
         level = make_level(
             ["S##@", "####", "...G"],
             [{"at": [0, 3], "targets": [[1, 0], [1, 2]]}],
@@ -176,6 +177,7 @@ class SwitchTests(unittest.TestCase):
         self.assertEqual(second.events[0]["type"], "split")
 
     def test_split_cubes_merge_when_adjacent(self):
+        """T21: hai khối con kề cạnh cùng hàng thì ghép thành H neo ô trái."""
         level = make_level(
             ["S##@", "####", "...G"],
             [{"at": [0, 3], "targets": [[1, 0], [1, 2]]}],
@@ -196,6 +198,76 @@ class SwitchTests(unittest.TestCase):
         split = block(Orient.SPLIT, (1, 0), (1, 2))
         result = step(level, split, Action(Dir.LEFT, cube=0))
         self.assertEqual(result.status, FELL)
+
+
+class SplitMergeTests(unittest.TestCase):
+    """V06: tách và ghép khối (docs/02 §4, mã T17–T23)."""
+
+    BOARD = open_board(4, 4, (0, 0))
+
+    def test_lying_block_on_split_switch_does_not_split(self):
+        """T17: khối nằm đè lên công tắc tách thì không tách (chỉ khối đứng mới tách)."""
+        level = make_level(["S#@#", "####", "...G"], [{"at": [0, 2], "targets": [[1, 0], [1, 3]]}])
+        for name, start, want in (
+            ("H", level.initial_state(), Orient.HORIZONTAL),        # S lăn R: nằm ngang (0,1)-(0,2)
+            ("V", block(Orient.VERTICAL, (0, 1)), Orient.VERTICAL),  # nằm dọc lăn R: (0,2)-(1,2)
+        ):
+            with self.subTest(orient=name):
+                result = step(level, start, Action(Dir.RIGHT))
+                self.assertEqual(result.status, OK)
+                self.assertEqual(result.state.orient, want)
+                self.assertIn((0, 2), result.state.cells())
+                self.assertNotIn("split", [e["type"] for e in result.events])
+
+    def test_adjacent_cubes_merge_with_correct_orient_and_anchor(self):
+        """T21: kề cạnh thì ghép; cùng hàng thành H neo ô trái, cùng cột thành V neo ô trên."""
+        cases = [
+            # (khối con 0, khối con 1, lệnh, tư thế sau ghép, ô neo)
+            ((1, 0), (1, 2), Action(Dir.LEFT, cube=1), Orient.HORIZONTAL, (1, 0)),
+            ((0, 2), (2, 2), Action(Dir.UP, cube=1), Orient.VERTICAL, (0, 2)),
+            ((0, 2), (2, 2), Action(Dir.DOWN, cube=0), Orient.VERTICAL, (1, 2)),
+        ]
+        for a, b, action, want_orient, want_anchor in cases:
+            with self.subTest(cubes=(a, b), action=(action.dir.value, action.cube)):
+                result = step(self.BOARD, block(Orient.SPLIT, a, b), action)
+                self.assertEqual(result.status, OK)
+                self.assertEqual(result.moved.orient, Orient.SPLIT)  # trước khi ghép
+                self.assertEqual(result.state.orient, want_orient)
+                self.assertEqual(result.state.pos, want_anchor)
+                self.assertIsNone(result.state.pos2)
+                self.assertEqual(result.events[-1], {"type": "merge"})
+
+    def test_diagonal_cubes_do_not_merge(self):
+        """T22: hai khối con kề chéo thì không ghép, vẫn là trạng thái đã tách."""
+        result = step(self.BOARD, block(Orient.SPLIT, (0, 2), (2, 1)), Action(Dir.DOWN, cube=0))
+        self.assertEqual(result.status, OK)
+        self.assertEqual(result.state.orient, Orient.SPLIT)
+        self.assertEqual(result.state.cells(), ((1, 2), (2, 1)))
+        self.assertEqual(result.events, [])
+
+    def test_cube_closing_bridge_under_other_cube_falls(self):
+        """T23: khối con 0 bấm công tắc mềm đóng cầu đang đỡ khối con 1, hành động bị loại."""
+        level = make_level(["S###", "o#B#", "...G"], [{"at": [1, 0], "effect": "close", "bridges": [[1, 2]]}])
+        split = block(Orient.SPLIT, (0, 0), (1, 2), open_bridges=[(1, 2)])
+        action = Action(Dir.DOWN, cube=0)
+        result = step(level, split, action)
+        self.assertEqual(result.status, FELL)
+        self.assertEqual(result.events[-1], {"type": "fell", "reason": "bridge_closed", "at": (1, 2)})
+        self.assertIsNone(Problem(level).result(split, action))
+
+    def test_actions_when_split_are_u_d_l_r_of_cube_0_then_cube_1(self):
+        """Thứ tự hành động cố định khi đã tách: U D L R của khối con 0, rồi của khối con 1."""
+        problem = Problem(self.BOARD)
+        order = [Dir.UP, Dir.DOWN, Dir.LEFT, Dir.RIGHT]
+        self.assertEqual(problem.actions(problem.initial_state()), [Action(d) for d in order])
+        want = [Action(d, 0) for d in order] + [Action(d, 1) for d in order]
+        self.assertEqual(problem.actions(block(Orient.SPLIT, (0, 2), (2, 1))), want)
+
+    def test_cube_numbers_follow_sorted_cells(self):
+        """Khối con 0 luôn là ô nhỏ hơn theo (hàng, cột), nên sau một bước hai số có thể đổi chỗ."""
+        result = step(self.BOARD, block(Orient.SPLIT, (2, 0), (2, 3)), Action(Dir.UP, cube=1))
+        self.assertEqual(result.state.pos, (1, 3))   # khối vừa đi lên giờ là khối con 0
+        self.assertEqual(result.state.pos2, (2, 0))
 
 
 class StateAndProblemTests(unittest.TestCase):

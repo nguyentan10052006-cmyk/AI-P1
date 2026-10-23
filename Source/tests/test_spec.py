@@ -97,7 +97,7 @@ class FragileTests(unittest.TestCase):
         self.assertEqual(roll_from_start(level, Dir.RIGHT).status, OK)
 
     def test_single_cube_does_not_break_fragile_tile(self):
-        """Đề chỉ đặt luật ô giòn cho 'the block' (khối 1×1×2). Khối con không nằm trong luật này,
+        """T20: Đề chỉ đặt luật ô giòn cho 'the block' (khối 1×1×2). Khối con không nằm trong luật này,
         nên không làm vỡ ô (quyết định ghi trong README, mục 'Luật chơi và các giả định')."""
         level = make_level(["S##@", "F#.#", "...G"], [{"at": [0, 3], "targets": [[1, 1], [1, 3]]}])
         split = roll_from_start(level, Dir.RIGHT, Dir.RIGHT)
@@ -157,7 +157,7 @@ class SwitchTests(unittest.TestCase):
         self.assertEqual(result.state.open_bridges, frozenset({(1, 3)}))
 
     def test_split_switch_only_when_standing_then_teleports(self):
-        """'It teleports the block to predefined positions and splits it into two 1×1×1 cubes.'"""
+        """T17, T18: 'It teleports the block to predefined positions and splits it into two 1×1×1 cubes.'"""
         level = make_level(["S##@", "####", "...G"], [{"at": [0, 3], "targets": [[1, 0], [1, 2]]}])
         result = roll_from_start(level, Dir.RIGHT, Dir.RIGHT)
         self.assertEqual(result.state.orient, Orient.SPLIT)
@@ -187,13 +187,13 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(set(result.moved.cells()), {(0, 0), (1, 2)})
 
     def test_cubes_merge_on_adjacent_tiles(self):
-        """'merge back into a standard 1×1×2 block when positioned on adjacent tiles.'"""
+        """T21: 'merge back into a standard 1×1×2 block when positioned on adjacent tiles.'"""
         split = block(Orient.SPLIT, (1, 0), (1, 2))
         result = step(self.LEVEL, split, Action(Dir.RIGHT, cube=0))
         self.assertEqual(result.state.orient, Orient.HORIZONTAL)
 
     def test_single_cube_activates_soft_switch(self):
-        """'A single cube can activate soft switches'"""
+        """T19: 'A single cube can activate soft switches'"""
         level = make_level(["S##@", "#o.#", "..bG"], [
             {"at": [0, 3], "targets": [[1, 0], [1, 3]]},
             {"at": [1, 1], "effect": "open", "bridges": [[2, 2]]},
@@ -203,7 +203,7 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(result.state.open_bridges, frozenset({(2, 2)}))
 
     def test_single_cube_cannot_activate_heavy_switch(self):
-        """'but cannot activate heavy switches'"""
+        """T19: 'but cannot activate heavy switches'"""
         level = make_level(["S##@", "#x.#", "..bG"], [
             {"at": [0, 3], "targets": [[1, 0], [1, 3]]},
             {"at": [1, 1], "effect": "open", "bridges": [[2, 2]]},
@@ -213,7 +213,7 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(result.state.open_bridges, frozenset())
 
     def test_single_cube_cannot_complete_stage(self):
-        """'A single cube can activate soft switches but cannot activate heavy switches or complete the stage.'"""
+        """T20: 'A single cube can activate soft switches but cannot activate heavy switches or complete the stage.'"""
         level = make_level(["S##@", "G#.#", "...."], [{"at": [0, 3], "targets": [[1, 1], [1, 3]]}])
         split = block(Orient.SPLIT, (1, 1), (1, 3))
         result = step(level, split, Action(Dir.LEFT, cube=0))  # khối con đặt lên ô G (1,0)
