@@ -101,13 +101,17 @@ class BoardView(Entity):
                 slab.color = target
         self._open = open_bridges
 
-    def fit_camera(self) -> None:
+    def fit_camera(self, camera_controller: Optional[object] = None) -> tuple[Vec3, float]:
         """Căn camera theo kích thước bàn, nhìn từ phía z âm để phím ↑ đẩy khối ra xa (docs/07 §4)."""
         rows, cols = self._extent()
         size = max((rows[1] - rows[0] + 1) * 1.6, cols[1] - cols[0] + 1) + 3   # 1.6: tỉ lệ khung hình; +3: lề quanh bàn
         target = self.center + Vec3(size * HUD_SHIFT, 0, 0)   # nhìn lệch sang phải: bàn dời sang trái, chừa cột nút
-        camera.position = target + Vec3(size * 0.1, size * 1.05, -size * 0.95)
-        camera.look_at(target)
+        if camera_controller is not None and hasattr(camera_controller, "setup"):
+            camera_controller.setup(target, size)
+        else:
+            camera.position = target + Vec3(size * 0.1, size * 1.05, -size * 0.95)
+            camera.look_at(target)
+        return target, size
 
     def _slab(self, cell: Cell, tint: color.Color, scale_xz: float = TILE_SIZE, height: float = TILE_HEIGHT,
               top: float = 0.0) -> Entity:

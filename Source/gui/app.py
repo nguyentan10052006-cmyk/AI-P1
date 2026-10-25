@@ -17,12 +17,13 @@ from bloxorz.rules import FELL, WON, StepResult, step
 from bloxorz.state import DELTA, Action, Dir, Orient, State
 from gui.block_view import BlockView
 from gui.board_view import BoardView
+from gui.camera_controller import CameraController
 from gui.hud import LABELS, Hud
 from solvers import ALGORITHMS                                   # docs/07 §2: gui chỉ dùng ALGORITHMS và runner
 from solvers.runner import CompareJob, SolveJob, start_compare, start_solver
 
 LEVELS_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
-HELP = "Mũi tên / WASD: lăn   Space: đổi khối con   R: chơi lại   N / P: màn sau / trước"
+HELP = "WASD/Mũi tên: lăn  ·  Q/E: xoay 90°  ·  T: đỉnh  ·  Chuột phải kéo: xoay  ·  Cuộn: zoom  ·  F: đặt lại cam  ·  Space: đổi khối  ·  R: chơi lại"
 KEY_DIRS = {
     "up arrow": Dir.UP, "w": Dir.UP,
     "down arrow": Dir.DOWN, "s": Dir.DOWN,
@@ -74,9 +75,14 @@ class Game(Entity):
         self.replay: Optional[List[Action]] = None   # lời giải đang được tự lăn
         self.replay_index = 0
         self.replay_wait = 0.0
+        self.camera_ctrl = CameraController()
         self.hud = Hud([p.stem for p in paths], on_new_game=lambda: self.load(0), on_restart=self.restart,
                        on_pick_level=self.load, on_solve=self.solve, on_compare=self.compare,
-                       on_cancel=self.cancel)
+                       on_cancel=self.cancel,
+                       on_rotate_cam=self.camera_ctrl.rotate_preset,
+                       on_toggle_top_down=self.camera_ctrl.toggle_top_down,
+                       on_reset_cam=self.camera_ctrl.reset_view)
+        self.camera_ctrl.on_view_change = self.hud.set_camera_view
         self.load(start_index)
 
     # ---- đổi màn, chơi lại ----
@@ -98,7 +104,7 @@ class Game(Entity):
             self.message.text = ""
             return
         self.board = BoardView(self.level)
-        self.board.fit_camera()
+        self.board.fit_camera(self.camera_ctrl)
         self.block = BlockView(self.level.initial_state(), parent=self.board)
         self.restart()
 
@@ -145,14 +151,27 @@ class Game(Entity):
             self.load(self.index - 1)
         elif key == "r":
             self.restart()
+        elif key == "q":
+            self.camera_ctrl.rotate_preset(-90.0)
+        elif key == "e":
+            self.camera_ctrl.rotate_preset(90.0)
+        elif key == "t":
+            self.camera_ctrl.toggle_top_down()
+        elif key == "f":
+            self.camera_ctrl.reset_view()
+        elif key in ("scroll up", "wheel_up"):
+            self.camera_ctrl.zoom(1.0)
+        elif key in ("scroll down", "wheel_down"):
+            self.camera_ctrl.zoom(-1.0)
         elif self.state is None or self.busy or self.over or self.replay is not None:
-            return   # đang tự lăn theo lời giải thì không nhận phím lăn; R, N, P vẫn dừng được
+            return   # đang tự lăn theo lời giải thì không nhận phím lăn; R, N, P, camera vẫn hoạt động
         elif key == "space" and self.state.orient is Orient.SPLIT:
             self.active_cube = 1 - self.active_cube
             self.block.show(self.state, self.active_cube)
             self._update_info()
         elif key in KEY_DIRS:
-            self.roll(KEY_DIRS[key])
+            aligned_dir = self.camera_ctrl.map_input_direction(KEY_DIRS[key])
+            self.roll(aligned_dir)
 
     # ---- Solve, So sánh, Hủy (V21) ----
 
@@ -185,6 +204,7 @@ class Game(Entity):
             self.hud.set_running(False)
 
     def update(self) -> None:
+        self.camera_ctrl.update()
         if self.job is not None:
             self._poll_job()
         if self.replay is not None:

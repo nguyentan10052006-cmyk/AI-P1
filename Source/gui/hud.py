@@ -53,7 +53,10 @@ class Hud(Entity):
     def __init__(self, level_ids: Sequence[str], *, on_new_game: Callable[[], None],
                  on_restart: Callable[[], None], on_pick_level: Callable[[int], None],
                  on_solve: Callable[[str], None], on_compare: Callable[[], None],
-                 on_cancel: Callable[[], None]) -> None:
+                 on_cancel: Callable[[], None],
+                 on_rotate_cam: Optional[Callable[[float], None]] = None,
+                 on_toggle_top_down: Optional[Callable[[], None]] = None,
+                 on_reset_cam: Optional[Callable[[], None]] = None) -> None:
         super().__init__(parent=camera.ui)
         self.on_pick_level = on_pick_level
         x = window.right.x - BUTTON_W / 2 - 0.02
@@ -62,8 +65,11 @@ class Hud(Entity):
 
         def add(key: str, text: str, on_click: Callable[[], None], tint: color.Color) -> None:
             nonlocal y
-            self.buttons[key] = Button(text=text, parent=self, position=(x, y), scale=(BUTTON_W, BUTTON_H),
-                                       color=tint, text_size=0.8, radius=0.25, on_click=on_click)
+            btn = Button(text=text, parent=self, position=(x, y), scale=(BUTTON_W, BUTTON_H),
+                         color=tint, text_size=0.8, radius=0.2, on_click=on_click)
+            btn.highlight_color = tint.tint(0.18)
+            btn.pressed_color = tint.tint(-0.15)
+            self.buttons[key] = btn
             y -= BUTTON_H + GAP
 
         add("new", "Màn mới (màn 01)", on_new_game, COLORS["button"])
@@ -74,6 +80,41 @@ class Hud(Entity):
             add(name, f"Giải bằng {LABELS[name]}", lambda name=name: on_solve(name), COLORS["solve"])
         add("compare", "So sánh", on_compare, COLORS["solve"])
         add("cancel", "Hủy", on_cancel, COLORS["cancel"])
+
+        # Cụm điều khiển Camera 3D (GAME_UI_UX_SPECIFICATION.md §4)
+        y -= GAP * 2
+        self.cam_title = Text("CAMERA 3D", parent=self, position=(x, y), origin=(0, 0), scale=0.75, color=COLORS["muted"])
+        y -= 0.025
+        self.cam_label = Text("Góc: NORTH (0°)", parent=self, position=(x, y), origin=(0, 0), scale=0.82, color=color.hex("#38bdf8"))
+        y -= 0.032
+
+        sub_w = BUTTON_W / 2 - 0.003
+        sub_h = BUTTON_H * 0.82
+        cam_tint = color.hex("#253241")
+
+        if on_rotate_cam is not None:
+            b_left = Button(text="Q ↶", parent=self, position=(x - sub_w / 2 - 0.003, y), scale=(sub_w, sub_h),
+                            color=cam_tint, text_size=0.75, radius=0.2, on_click=lambda: on_rotate_cam(-90.0))
+            b_left.highlight_color = cam_tint.tint(0.2)
+            self.buttons["cam_rot_l"] = b_left
+
+            b_right = Button(text="↷ E", parent=self, position=(x + sub_w / 2 + 0.003, y), scale=(sub_w, sub_h),
+                             color=cam_tint, text_size=0.75, radius=0.2, on_click=lambda: on_rotate_cam(90.0))
+            b_right.highlight_color = cam_tint.tint(0.2)
+            self.buttons["cam_rot_r"] = b_right
+            y -= sub_h + GAP
+
+        if on_toggle_top_down is not None and on_reset_cam is not None:
+            b_top = Button(text="Đỉnh (T)", parent=self, position=(x - sub_w / 2 - 0.003, y), scale=(sub_w, sub_h),
+                           color=cam_tint, text_size=0.72, radius=0.2, on_click=on_toggle_top_down)
+            b_top.highlight_color = cam_tint.tint(0.2)
+            self.buttons["cam_top"] = b_top
+
+            b_reset = Button(text="Đặt lại (F)", parent=self, position=(x + sub_w / 2 + 0.003, y), scale=(sub_w, sub_h),
+                             color=cam_tint, text_size=0.72, radius=0.2, on_click=on_reset_cam)
+            b_reset.highlight_color = cam_tint.tint(0.2)
+            self.buttons["cam_reset"] = b_reset
+            y -= sub_h + GAP
 
         # Khung kết quả ở góc trái dưới, nền tối để đọc được khi đè lên bàn; ẩn khi chưa có gì để hiện
         self.panel = Entity(parent=self, position=(window.left.x + 0.02, PANEL_TOP), enabled=False)
@@ -111,6 +152,11 @@ class Hud(Entity):
     def _pick(self, index: int) -> None:
         self.picker.enabled = False
         self.on_pick_level(index)
+
+    def set_camera_view(self, name: str) -> None:
+        """Cập nhật nhãn góc camera trên HUD khi người chơi xoay hoặc đổi góc."""
+        if hasattr(self, "cam_label") and self.cam_label:
+            self.cam_label.text = f"Góc: {name}"
 
     # ---- trạng thái nút và kết quả ----
 
