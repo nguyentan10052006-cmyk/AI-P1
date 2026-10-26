@@ -129,5 +129,48 @@ class CompareTests(unittest.TestCase):
             start_compare(PROBLEM, names=("fake", "nope"), algorithms=FAKES)
 
 
+class RealSolverTests(unittest.TestCase):
+    """So sánh với solver thật (V39): một màn gốc và một màn không có lời giải."""
+
+    def compare(self, level):
+        job = start_compare(Problem(level), timeout_s=30)
+        deadline = time.perf_counter() + 120
+        while not job.done and time.perf_counter() < deadline:
+            job.poll()
+            time.sleep(0.02)
+        self.assertTrue(job.done)
+        return job.poll()
+
+    def check_ucs(self, result, expected_status):
+        # UCS của TV3 có thể chưa gộp vào nhánh này; khi đó runner phải báo rõ, không làm hỏng So sánh
+        if result["ok"]:
+            self.assertEqual(result["status"], expected_status)
+        else:
+            self.assertIn("chưa cài", result["error"])
+
+    def test_compare_on_original_level_1(self):
+        from bloxorz.level import load_level
+        from pathlib import Path
+        level = load_level(Path(__file__).resolve().parents[1] / "levels" / "original" / "01.json", "01")
+        results = self.compare(level)
+        self.assertEqual(list(results), list(COMPARE_NAMES))
+        for name in ("bfs", "astar", "astar_m"):
+            with self.subTest(name):
+                self.assertEqual(results[name]["status"], SOLVED)
+                self.assertEqual(len(results[name]["path"]), level.par)
+        self.assertEqual(results["dfs"]["status"], SOLVED)
+        self.assertGreaterEqual(len(results["dfs"]["path"]), level.par)
+        self.check_ucs(results["ucs"], SOLVED)
+
+    def test_compare_on_level_without_solution(self):
+        results = self.compare(make_level(["S##..##G"]))
+        for name in ("bfs", "dfs", "astar", "astar_m"):
+            with self.subTest(name):
+                self.assertTrue(results[name]["ok"], results[name].get("error"))
+                self.assertEqual(results[name]["status"], NO_SOLUTION)
+                self.assertEqual(results[name]["path"], [])
+        self.check_ucs(results["ucs"], NO_SOLUTION)
+
+
 if __name__ == "__main__":
     unittest.main()

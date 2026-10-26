@@ -98,6 +98,7 @@ Source/
     vendor/            Three.js r160, OrbitControls, RoundedBoxGeometry, phông chữ
   tools/
     draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/ (chạy lại khi sửa MAZES)
+    check_heuristics.py  kiểm tra h_M, h_P bằng số liệu trên 33 màn: chấp nhận được, nhất quán, cùng chi phí với UCS
   tests/               unit test: luật, đặc tả, màn chơi, API và server, GridMaze,
                        4 solver trên mê cung mẫu (test_solvers.py; solver chưa cài thì bỏ qua)
 ```
