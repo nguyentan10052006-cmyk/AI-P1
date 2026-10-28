@@ -9,7 +9,7 @@ Script đo, kiểm tra, vẽ hình và sinh bảng cho chương 5 của báo cá
 | `charts.py` | Hình H1–H6, H8, H9, mỗi hình kèm một CSV số liệu (04 §7.2); cần `matplotlib` | TV2 (V25) |
 | `compare_runs.py` | So hai lần chạy để kiểm tra tái lập: số đếm phải trùng hẳn, thời gian và bộ nhớ chỉ báo tỉ lệ | TV2 (V24) |
 | `tables.py` | Bảng T3, T4, T5 và Phụ lục A dạng Markdown (04 §7.1); cần `matplotlib` (dùng chung hàm đọc với `charts.py`) | TV2 (V25) |
-| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40); bản hiện tại do TV2 viết tạm |
+| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40). Bản của TV3 nằm trên `feature/trong/V12-ucs` (tên file `s1_010`, `s2_04`, `s3_10`) và **thay** bản tạm của TV2 trên nhánh tích hợp này (`S1-010`, …) |
 | `convert_original_levels.py` | Sinh 33 màn gốc trong `levels/original/` | TV2 (V07) |
 
 Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
@@ -28,7 +28,8 @@ Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
 
 Còn thiếu điều kiện nào thì số liệu chỉ là nháp, không đưa vào báo cáo.
 
-- [ ] Hàm chi phí V13 đã chốt và đã cài vào `Problem.step_cost`; `tools/check_heuristics.py` cho 0 vi phạm với hàm chi phí đó.
+- [ ] Hàm chi phí V13 đã chốt **và được dùng khi chạy**. TV3 đã cài `bloxorz/costs.py` (`compute_step_cost`, nhánh `feature/trong/V12-ucs`), nhưng `Problem` mặc định vẫn có chi phí 1 (`DEFAULT_COST_FN = None`). Nhóm phải quyết cách nối V13 vào `run.py`, GUI và `tools/check_heuristics.py`; sau đó kiểm `run_info.json` và cột `path_cost` có đúng là chi phí V13 không.
+- [ ] `tools/check_heuristics.py` cho 0 vi phạm với hàm chi phí V13.
 - [ ] Nhánh chính đã có: bộ nạp màn có `links` (V03), UCS (V12), $h_P$ (V16), các sửa của V23 (PR #13), bộ màn S1–S3 (V40), và các script trong bảng trên.
 - [ ] Nhóm đã chốt định dạng file kết quả (Q1–Q7); nếu có đổi thì `docs/04` đã sửa theo, qua PR.
 - [ ] Máy chạy: một máy cho toàn bộ, cắm sạc, tắt ứng dụng nặng (04 §4).
@@ -40,7 +41,7 @@ Còn thiếu điều kiện nào thì số liệu chỉ là nháp, không đưa 
 cd Source
 python -m unittest                                   # phải OK; skip chỉ chấp nhận khi biết lý do
 python -m experiments.convert_original_levels --check # 33 màn gốc khớp nguồn
-python -m experiments.gen_levels --check             # S1–S3 khớp script
+python -m unittest tests.test_gen_levels           # S1–S3 (test của TV3; bản V40 của TV3 không có --check)
 python tools/check_heuristics.py                     # 0 vi phạm với hàm chi phí đã chốt
 ```
 

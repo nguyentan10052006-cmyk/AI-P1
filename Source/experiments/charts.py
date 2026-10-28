@@ -284,6 +284,11 @@ def h6(rows, out):
     return figure.save(fig, out), None
 
 
+# Tham số N (S1) và k (S2) đọc từ tên màn; nhận cả S1-010, S2-k04 (bản tạm của TV2) và s1_010, s2_04 (TV3, V40)
+S1_NAME = r"(?i)^s1[-_](\d+)$"
+S2_NAME = r"(?i)^s2[-_]k?(\d+)$"
+
+
 def _param(level: str, pattern: str) -> Optional[int]:
     match = re.search(pattern, short(level))
     return int(match.group(1)) if match else None
@@ -318,12 +323,12 @@ def _lines(rows, group, pattern, metric, key, title, xlabel, ylabel, out_dir, re
 
 
 def h8(rows, out):
-    return _lines(rows, "S1", r"S1-(\d+)", "expanded", "H8", "H8. Công tìm kiếm theo kích thước sân (S1)",
+    return _lines(rows, "S1", S1_NAME, "expanded", "H8", "H8. Công tìm kiếm theo kích thước sân (S1)",
                   "Kích thước sân N (N × N)", "Số nút mở rộng", out)
 
 
 def h9(rows, out):
-    return _lines(rows, "S2", r"S2-k(\d+)", "visited", "H9", "H9. Trạng thái cầu làm tăng số trạng thái (S2)",
+    return _lines(rows, "S2", S2_NAME, "visited", "H9", "H9. Trạng thái cầu làm tăng số trạng thái (S2)",
                   "Số công tắc–cầu k", "Số trạng thái đã thăm", out, reference=True)
 
 

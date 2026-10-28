@@ -120,6 +120,16 @@ class ChartsTests(unittest.TestCase):
         with self.assertRaisesRegex(charts.ChartDataError, "dòng 2.*solved thiếu"):
             charts.make_charts(self.summary, self.out)
 
+    def test_generated_level_names_of_tv3_are_recognised(self):
+        """Bộ màn V40 của TV3 đặt tên s1_010, s2_04 thay vì S1-010, S2-k04: H8, H9 vẫn phải vẽ được."""
+        rows = synthetic_rows()
+        for r in rows:
+            r["level"] = r["level"].replace("gen/S1-", "gen/s1_").replace("gen/S2-k", "gen/s2_")
+        write_summary(self.summary, rows)
+        report = charts.make_charts(self.summary, self.out, only=["H8", "H9"])
+        self.assertIn("png", report["H8"], report["H8"])
+        self.assertIn("png", report["H9"], report["H9"])
+
     def test_unsolved_pairs_are_listed(self):
         write_summary(self.summary, synthetic_rows())
         out = io.StringIO()
