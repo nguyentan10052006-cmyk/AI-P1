@@ -84,6 +84,9 @@ Riêng **số bước và các số đếm của BFS và DFS không phụ thuộ
 - Tổng chi phí của BFS và DFS không nhỏ hơn của UCS.
 - Số nút mở rộng của A* không lớn hơn UCS.
 - Màn không có lời giải (S3): mọi thuật toán trả `no_solution`.
+- Đủ dòng (01 NV10): 33 màn gốc × 5 cấu hình cùng các màn tự sinh, không thiếu cặp nào; mọi dòng của màn gốc là `solved`, vì màn gốc nào cũng có lời giải.
+
+Các mục trên được kiểm tự động bằng `experiments/check_results.py` (K1–K8). Kiểm tra "đặt mọi chi phí bằng 1 thì UCS bằng BFS" nằm ở test của UCS. Kiểm tra "0 vi phạm heuristic" nằm ở `tools/check_heuristics.py`.
 
 *(Ghi kết quả kiểm tra của lần chạy chính thức ở đây: số mục đạt / tổng số mục.)*
 
