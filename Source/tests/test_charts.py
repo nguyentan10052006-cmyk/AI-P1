@@ -3,7 +3,9 @@
 Số liệu ở đây chỉ để kiểm tra pipeline vẽ, không phải kết quả thực nghiệm. Bỏ qua nếu chưa cài matplotlib
 (engine, solver và các test khác không cần matplotlib, docs/07 §2).
 """
+import contextlib
 import csv
+import io
 import importlib.util
 import shutil
 import tempfile
@@ -112,6 +114,18 @@ class ChartsTests(unittest.TestCase):
             charts.make_charts(self.summary, self.out)
         with self.assertRaises(FileNotFoundError):
             charts.make_charts(self.tmp / "khong-co.csv", self.out)
+        rows = synthetic_rows()
+        rows[0]["steps"] = ""   # dòng solved mà thiếu số: file hỏng, không được lặng lẽ bỏ khỏi hình
+        write_summary(self.summary, rows)
+        with self.assertRaisesRegex(charts.ChartDataError, "dòng 2.*solved thiếu"):
+            charts.make_charts(self.summary, self.out)
+
+    def test_unsolved_pairs_are_listed(self):
+        write_summary(self.summary, synthetic_rows())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(charts.main(["--summary", str(self.summary), "--out", str(self.out)]), 0)
+        self.assertIn("Không vẽ 2 cặp không solved: gen/S3-010/bfs=no_solution, original/07/ucs=error", out.getvalue())
 
     def test_does_not_overwrite_and_colors_follow_algorithm(self):
         write_summary(self.summary, synthetic_rows())

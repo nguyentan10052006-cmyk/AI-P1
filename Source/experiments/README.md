@@ -7,11 +7,20 @@ Script đo, kiểm tra, vẽ hình và sinh bảng cho chương 5 của báo cá
 | `run.py` | Đo: mỗi lần chạy một tiến trình con, giới hạn 60 giây, thời gian lấy trung vị 5 lần, bộ nhớ đo một lần riêng; ghi `raw.csv`, `summary.csv`, `run_info.json` | TV2 (V23) |
 | `check_results.py` | Kiểm tra chéo K1–K8 trên `summary.csv` (04 §6) | TV2 (V24) |
 | `charts.py` | Hình H1–H6, H8, H9, mỗi hình kèm một CSV số liệu (04 §7.2); cần `matplotlib` | TV2 (V25) |
+| `compare_runs.py` | So hai lần chạy để kiểm tra tái lập: số đếm phải trùng hẳn, thời gian và bộ nhớ chỉ báo tỉ lệ | TV2 (V24) |
 | `tables.py` | Bảng T3, T4, T5 và Phụ lục A dạng Markdown (04 §7.1); cần `matplotlib` (dùng chung hàm đọc với `charts.py`) | TV2 (V25) |
 | `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40); bản hiện tại do TV2 viết tạm |
 | `convert_original_levels.py` | Sinh 33 màn gốc trong `levels/original/` | TV2 (V07) |
 
 Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
+
+`check_results.py`, `charts.py`, `tables.py` và `compare_runs.py` từ chối file hỏng, báo kèm số dòng:
+- thiếu cột;
+- ô số không đọc được;
+- trùng cặp (màn, thuật toán);
+- dòng `solved` thiếu `steps`, `path_cost` hoặc `expanded`.
+
+`charts.py` liệt kê các cặp không `solved`, vì các cặp này không có trên hình.
 
 ## Chạy chính thức
 
@@ -73,7 +82,22 @@ python -m experiments.tables    # đọc experiments/summary.csv, ghi experiment
 - **Hình:** mỗi hình là một file PNG kèm một file CSV chứa đúng số liệu đã vẽ. Mở từng hình để kiểm nhãn, chú giải và thang log.
 - **Bảng:** `tables.md` ghi commit nguồn ở đầu file. Nếu file có dòng **Cảnh báo** (số liệu từ nhiều commit, hoặc commit `-dirty`), không dùng.
 
-### 5. Đưa vào báo cáo
+### 5. Kiểm tra tái lập
+
+Clone sạch repo ở đúng commit của lần chạy chính thức (trên cùng máy, hoặc một máy khác), rồi chạy lại bước 2 vào một thư mục khác. Sau đó so hai lần chạy:
+
+```bash
+git clone <repo> tai-lap && cd tai-lap && git checkout <commit trong run_info.json>
+cd Source
+python -m experiments.run --levels levels/original levels/gen --out experiments/tai-lap
+python -m experiments.compare_runs <Source/experiments/summary.csv của lần chính thức> experiments/tai-lap/summary.csv
+```
+
+- **Phải ra `TRÙNG`** (exit 0): status, số bước, chi phí và các số đếm tất định, nên cùng commit phải ra cùng số.
+- **Thời gian và bộ nhớ:** chỉ có tỉ lệ B / A để ghi vào báo cáo như độ dao động giữa các lần đo.
+- **Kiểm thử kỹ thuật ngày 28/10:** chạy lại toàn bộ 235 cặp sau khi đã sửa các công cụ (code solver và file màn không đổi), rồi so với lần chạy thử. Số đếm trùng hẳn ở cả 235 cặp; bộ nhớ đỉnh trùng; thời gian tìm kiếm có trung vị B / A = 1,05.
+
+### 6. Đưa vào báo cáo
 
 - Điền Bảng 5.2 (T1) trong `docs/report/5-thuc-nghiem.md` từ `run_info.json`: máy, Python, commit, thời gian chạy.
 - Chép T3, T4, T5 từ `tables.md` vào mục 5.3, và Phụ lục A vào phụ lục. Chèn hình theo bảng "Hình cần có" ở mục 5.3.

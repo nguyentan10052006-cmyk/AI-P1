@@ -5,7 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.check_results import check, level_pars, original_stems
+from experiments.check_results import check, level_pars, load, main, original_stems
+from experiments.run import SUMMARY_COLUMNS
 
 
 def row(level, algorithm, status="solved", steps="", cost="", expanded="", group="G1"):
@@ -69,9 +70,11 @@ class CheckResultsTests(unittest.TestCase):
         root = Path(tempfile.mkdtemp(prefix="v24-check-"))
         self.addCleanup(shutil.rmtree, root, True)
         (root / "original").mkdir()
+        (root / "gen").mkdir()
         (root / "original" / "01.json").write_text(json.dumps({"par": 7}), encoding="utf-8")
-        rows = [row("original/01", "bfs"), row("01", "dfs")]   # mã của run.py hiện tại và mã cũ
-        self.assertEqual(level_pars(rows, root), {"original/01": 7, "01": 7})
+        (root / "gen" / "S1-010.json").write_text(json.dumps({"par": 12}), encoding="utf-8")
+        rows = [row("original/01", "bfs"), row("01", "dfs"), row("gen/S1-010", "bfs"), row("S1-010", "dfs")]
+        self.assertEqual(level_pars(rows, root), {"original/01": 7, "01": 7, "gen/S1-010": 12, "S1-010": 12})
         self.assertEqual(original_stems(root), ["01"])
 
     def test_missing_data_is_not_run_not_pass(self):
@@ -80,6 +83,43 @@ class CheckResultsTests(unittest.TestCase):
         self.assertEqual(v["K2"], "PASS")
         for code in ("K3", "K4", "K5", "K6", "K7"):
             self.assertEqual(v[code], "NOT RUN", code)
+
+
+class LoadTests(unittest.TestCase):
+    """Dữ liệu hỏng phải dừng với thông báo rõ (exit 2), không để K2–K6 bỏ qua hoặc văng TypeError."""
+
+    def write(self, rows):
+        root = Path(tempfile.mkdtemp(prefix="v24-load-"))
+        self.addCleanup(shutil.rmtree, root, True)
+        path = root / "summary.csv"
+        lines = [",".join(SUMMARY_COLUMNS)] + [",".join(r.get(c, "") for c in SUMMARY_COLUMNS) for r in rows]
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return path
+
+    def base(self):
+        return [{"level": "original/01", "group": "G1", "algorithm": a, "status": "solved", "steps": "7",
+                 "path_cost": "7", "expanded": "48"} for a in ("bfs", "dfs")]
+
+    def test_bad_files_are_rejected_with_line_number(self):
+        cases = {
+            "dòng 3: dòng solved thiếu ['steps']": lambda r: r[1].update(steps=""),
+            "dòng 3: cột expanded không phải số: 'abc'": lambda r: r[1].update(expanded="abc"),
+            "dòng 4: trùng cặp màn/thuật toán": lambda r: r.append(dict(r[1])),   # dòng trùng nằm cuối file
+        }
+        for message, mutate in cases.items():
+            with self.subTest(message):
+                rows = self.base()
+                mutate(rows)
+                path = self.write(rows)
+                with self.assertRaises(ValueError) as caught:
+                    load(path)
+                self.assertIn(message, str(caught.exception))
+                self.assertEqual(main([str(path)]), 2)
+
+    def test_unsolved_rows_may_have_empty_numbers(self):
+        rows = self.base()
+        rows[1].update(status="timeout", steps="", path_cost="", expanded="")
+        self.assertEqual(len(load(self.write(rows))), 2)
 
 
 if __name__ == "__main__":

@@ -34,23 +34,46 @@ from experiments.run import DEFAULT_ALGORITHMS, SUMMARY_COLUMNS
 SOURCE_DIR = Path(__file__).resolve().parent.parent
 EPS = 1e-9
 GROUPS = ("G1", "G2", "G3", "G4", "G5")   # màn gốc; S1–S3 là màn tự sinh
+NUMERIC = ("steps", "path_cost", "expanded", "generated", "max_frontier", "visited", "peak_mem_kb",
+           "search_ms", "total_ms")
+# run.py luôn ghi các cột này cho dòng solved; thiếu nghĩa là file hỏng, các kiểm tra K2–K6 sẽ so sai
+REQUIRED_WHEN_SOLVED = ("steps", "path_cost", "expanded")
 
 
 def load(summary: Path) -> List[Dict[str, str]]:
+    """Đọc summary.csv; dữ liệu hỏng thì báo ValueError kèm số dòng, không để kiểm tra nào bỏ qua nó."""
     with summary.open(encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         missing = [c for c in SUMMARY_COLUMNS if c not in (reader.fieldnames or [])]
         if missing:
             raise ValueError(f"{summary.name}: thiếu cột {missing}")
-        return list(reader)
+        rows, seen = [], set()
+        for line, row in enumerate(reader, start=2):
+            for name in NUMERIC:
+                value = (row.get(name) or "").strip()
+                try:
+                    float(value) if value else None
+                except ValueError:
+                    raise ValueError(f"{summary.name} dòng {line}: cột {name} không phải số: {value!r}") from None
+            if row["status"] == "solved":
+                empty = [c for c in REQUIRED_WHEN_SOLVED if not (row.get(c) or "").strip()]
+                if empty:
+                    raise ValueError(f"{summary.name} dòng {line}: dòng solved thiếu {empty}")
+            key = (row["level"], row["algorithm"])
+            if key in seen:
+                raise ValueError(f"{summary.name} dòng {line}: trùng cặp màn/thuật toán {key}")
+            seen.add(key)
+            rows.append(row)
+        return rows
 
 
 def level_pars(rows: List[Dict[str, str]], levels_root: Path) -> Dict[str, int]:
-    """par của từng màn, đọc từ file màn theo mã: original/01 -> levels/original/01.json; mã cũ 01 thì tìm
-    trong levels/original/."""
+    """par của từng màn, đọc từ file màn theo mã: original/01 -> levels/original/01.json; mã cũ (01, S1-010)
+    thì tìm trong levels/original/ rồi levels/gen/."""
     pars = {}
     for level in {r["level"] for r in rows}:
-        for path in (levels_root / f"{level}.json", levels_root / "original" / f"{level}.json"):
+        for path in (levels_root / f"{level}.json", levels_root / "original" / f"{level}.json",
+                     levels_root / "gen" / f"{level}.json"):
             if path.exists():
                 pars[level] = json.loads(path.read_text(encoding="utf-8")).get("par", 0)
                 break

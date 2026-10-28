@@ -34,6 +34,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
+from experiments.check_results import NUMERIC, REQUIRED_WHEN_SOLVED  # noqa: E402
 from experiments.run import SUMMARY_COLUMNS  # noqa: E402
 
 SOURCE_DIR = Path(__file__).resolve().parent.parent
@@ -48,8 +49,6 @@ LABELS = {"bfs": "BFS", "dfs": "DFS", "ucs": "UCS", "astar": "A* (h_P)", "astar_
 LINE_STYLE = {"bfs": ("o", "-"), "dfs": ("s", "-"), "ucs": ("^", "-"), "astar": ("D", "--"), "astar_m": ("v", ":")}
 GROUPS = ["G1", "G2", "G3", "G4", "G5"]
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
-NUMERIC = ("steps", "path_cost", "expanded", "generated", "max_frontier", "visited", "peak_mem_kb",
-           "search_ms", "total_ms")
 
 
 class ChartDataError(ValueError):
@@ -74,6 +73,9 @@ def read_summary(path: Path) -> List[Dict]:
                     row[name] = float(value) if value else None
                 except ValueError:
                     raise ChartDataError(f"{path.name} dòng {line}: cột {name} không phải số: {value!r}") from None
+            empty = [c for c in REQUIRED_WHEN_SOLVED if row[c] is None]
+            if row["status"] == "solved" and empty:
+                raise ChartDataError(f"{path.name} dòng {line}: dòng solved thiếu {empty}")
             key = (row["level"], row["algorithm"])
             if key in seen:
                 raise ChartDataError(f"{path.name} dòng {line}: trùng cặp màn/thuật toán {key}")
@@ -364,6 +366,10 @@ def main(argv=None) -> int:
         return 1
     for key, info in report.items():
         print(f"{key}: {info.get('png') or 'bỏ qua — ' + info['skipped']}")
+    excluded = [f"{r['level']}/{r['algorithm']}={r['status']}" for r in read_summary(args.summary)
+                if r["status"] != "solved"]
+    if excluded:   # các cặp này không có trên hình; nêu ra để không ai tưởng hình đủ mọi cặp
+        print(f"Không vẽ {len(excluded)} cặp không solved: {', '.join(excluded)}")
     return 0
 
 
