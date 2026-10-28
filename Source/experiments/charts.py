@@ -44,6 +44,8 @@ DEFAULT_OUT = SOURCE_DIR / "experiments" / "figures"
 PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
 ALGORITHM_ORDER = ["bfs", "dfs", "ucs", "astar", "astar_m"]
 LABELS = {"bfs": "BFS", "dfs": "DFS", "ucs": "UCS", "astar": "A* (h_P)", "astar_m": "A* (h_M)"}
+# Mã hóa phụ ngoài màu (in đen trắng, mù màu, hai đường trùng nhau): ký hiệu điểm và kiểu nét riêng
+LINE_STYLE = {"bfs": ("o", "-"), "dfs": ("s", "-"), "ucs": ("^", "-"), "astar": ("D", "--"), "astar_m": ("v", ":")}
 GROUPS = ["G1", "G2", "G3", "G4", "G5"]
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 NUMERIC = ("steps", "path_cost", "expanded", "generated", "max_frontier", "visited", "peak_mem_kb",
@@ -103,7 +105,7 @@ def label_of(algorithm: str) -> str:
 
 def _style(ax, xlabel: str, ylabel: str, title: str) -> None:
     ax.set_facecolor(SURFACE)
-    ax.set_title(title, color=INK, fontsize=11, loc="left")
+    ax.set_title(title, color=INK, fontsize=11, loc="left", pad=26)
     ax.set_xlabel(xlabel, color=INK_2)
     ax.set_ylabel(ylabel, color=INK_2)
     ax.tick_params(colors=INK_2, labelsize=8)
@@ -113,6 +115,19 @@ def _style(ax, xlabel: str, ylabel: str, title: str) -> None:
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(GRID)
+
+
+def _width(bars: int) -> float:
+    """Chiều rộng hình (inch) theo số cột, giới hạn 8–14 để vừa trang báo cáo."""
+    return min(14.0, max(8.0, 2 + 0.07 * bars))
+
+
+def _legend(ax, columns: int) -> None:
+    """Chú giải đặt trên vùng vẽ, không đè lên dữ liệu."""
+    legend = ax.legend(frameon=False, fontsize=8, ncol=columns, loc="lower left", bbox_to_anchor=(0, 1.0),
+                       labelcolor=INK, borderaxespad=0.2)
+    rows = -(-len(legend.get_texts()) // columns)
+    ax.set_title(ax.get_title("left"), color=INK, fontsize=11, loc="left", pad=10 + 14 * rows)   # chừa chỗ cho chú giải
 
 
 def _log_if_wide(ax, values: Sequence[float]) -> bool:
@@ -160,7 +175,7 @@ def _grouped_bars(rows, metric: str, ylabel: str, key: str, title: str, out_dir:
         return None, f"không có dòng solved có {metric} cho màn gốc"
     figure = Figure(key, title)
     width = 0.8 / len(algos)
-    fig, ax = plt.subplots(figsize=(max(8, 0.45 * len(levels) * max(1, len(algos) / 2)), 4.2), facecolor=SURFACE)
+    fig, ax = plt.subplots(figsize=(_width(len(levels) * len(algos)), 4.2), facecolor=SURFACE)
     values = []
     for i, algo in enumerate(algos):
         xs, ys = [], []
@@ -177,7 +192,7 @@ def _grouped_bars(rows, metric: str, ylabel: str, key: str, title: str, out_dir:
     ax.set_xticks(range(len(levels)), [short(lv) for lv in levels])
     _style(ax, "Màn (xếp theo nhóm G1–G5)", ylabel + (" (thang log)" if log else ""), title)
     if len(algos) > 1:
-        ax.legend(frameon=False, fontsize=8, ncol=len(algos), loc="upper left", labelcolor=INK)
+        _legend(ax, len(algos))
     fig.tight_layout()
     return figure.save(fig, out_dir), None
 
@@ -203,7 +218,7 @@ def _ratio_bars(rows, pairs, key, title, ylabel, out_dir, reference=1.0):
         return None, "không có màn nào có đủ cả hai thuật toán cần so"
     figure = Figure(key, title)
     width = 0.8 / len(pairs)
-    fig, ax = plt.subplots(figsize=(max(8, 0.32 * len(levels) * len(pairs)), 4.0), facecolor=SURFACE)
+    fig, ax = plt.subplots(figsize=(_width(len(levels) * len(pairs)), 4.0), facecolor=SURFACE)
     for i, (num, den, metric) in enumerate(pairs):
         xs, ys = [], []
         for x, level in enumerate(levels):
@@ -220,7 +235,7 @@ def _ratio_bars(rows, pairs, key, title, ylabel, out_dir, reference=1.0):
     ax.set_xticks(range(len(levels)), [short(lv) for lv in levels])
     _style(ax, "Màn (xếp theo nhóm G1–G5)", ylabel, title)
     if len(pairs) > 1:
-        ax.legend(frameon=False, fontsize=8, loc="upper left", labelcolor=INK)
+        _legend(ax, len(pairs))
     fig.tight_layout()
     return figure.save(fig, out_dir), None
 
@@ -262,7 +277,7 @@ def h6(rows, out):
     ax.set_xticks(range(len(groups)), groups)
     _style(ax, "Nhóm màn", "Trung vị số nút mở rộng" + (" (thang log)" if log else ""), figure.title)
     if len(algos) > 1:
-        ax.legend(frameon=False, fontsize=8, loc="upper left", labelcolor=INK)
+        _legend(ax, len(algos))
     fig.tight_layout()
     return figure.save(fig, out), None
 
@@ -281,8 +296,9 @@ def _lines(rows, group, pattern, metric, key, title, xlabel, ylabel, out_dir, re
     fig, ax = plt.subplots(figsize=(7, 4), facecolor=SURFACE)
     for algo in algorithms_in(solved):
         points = sorted((_param(r["level"], pattern), r[metric]) for r in solved if r["algorithm"] == algo)
+        marker, dash = LINE_STYLE.get(algo, ("o", "-"))
         ax.plot([p for p, _ in points], [v for _, v in points], color=color_of(algo, rows), linewidth=2,
-                marker="o", markersize=5, label=label_of(algo))
+                linestyle=dash, marker=marker, markersize=6, markeredgecolor=SURFACE, label=label_of(algo))
         for p, v in points:
             figure.table.append({"param": p, "algorithm": algo, metric: v})
     if reference:
@@ -294,7 +310,7 @@ def _lines(rows, group, pattern, metric, key, title, xlabel, ylabel, out_dir, re
                     label="visited(k=0) × 2^k")
     ax.set_yscale("log")
     _style(ax, xlabel, ylabel + " (thang log)", title)
-    ax.legend(frameon=False, fontsize=8, loc="upper left", labelcolor=INK)
+    _legend(ax, 3)
     fig.tight_layout()
     return figure.save(fig, out_dir), None
 
