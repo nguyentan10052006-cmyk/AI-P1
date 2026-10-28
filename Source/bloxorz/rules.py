@@ -130,13 +130,23 @@ def _activate(level: Level, state: State, pressed: Tuple[Cell, ...], events: Lis
 
 
 def _apply_switch(state: State, switch: Switch, events: List[dict]) -> State:
-    targets = set(switch.bridges)
-    if switch.effect == "toggle":
-        new_open = state.open_bridges ^ targets
-    elif switch.effect == "open":
-        new_open = state.open_bridges | targets
-    else:  # "close"
-        new_open = state.open_bridges - targets
+    new_open = set(state.open_bridges)
+    if switch.links:
+        for link in switch.links:
+            if link.effect == "toggle":
+                new_open.symmetric_difference_update({link.cell})
+            elif link.effect == "open":
+                new_open.add(link.cell)
+            elif link.effect == "close":
+                new_open.discard(link.cell)
+    else:
+        targets = set(switch.bridges)
+        if switch.effect == "toggle":
+            new_open ^= targets
+        elif switch.effect == "open":
+            new_open |= targets
+        elif switch.effect == "close":
+            new_open -= targets
     events.append({"type": "switch", "at": switch.at, "kind": switch.kind, "effect": switch.effect})
     return State(state.orient, state.pos, state.pos2, frozenset(new_open))
 
