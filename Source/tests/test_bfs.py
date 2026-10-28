@@ -1,8 +1,9 @@
 """Kiểm tra BFS (docs/01 NV5): quy ước đếm, lời giải ngắn nhất, trạng thái cầu, vô nghiệm, màn gốc 1, 3, 6."""
+import json
 import unittest
 from pathlib import Path
 
-from bloxorz.level import load_level
+from bloxorz.level import Switch, load_level, parse_level
 from bloxorz.maze import MAZES, GridMaze
 from bloxorz.problem import Problem
 from bloxorz.state import Action, Dir, Orient, State
@@ -143,6 +144,57 @@ class BFSOnOriginalLevelsTests(unittest.TestCase):
                 final = replay(problem, result.path)
                 self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
                 self.assertTrue(problem.is_goal(final))
+
+    def test_split_levels_8_9_16(self):
+        """V06: màn có công tắc tách 8, 9, 16 ra đúng 10, 24, 28 bước (docs/03 mục 4)."""
+        for name, steps in (("08", 10), ("09", 24), ("16", 28)):
+            with self.subTest(level=name):
+                level = load_level(ORIGINAL_DIR / f"{name}.json", name)
+                problem = Problem(level)
+                result = BFS().search(problem)
+                self.assertEqual(result.status, SOLVED)
+                self.assertEqual(len(result.path), steps)
+                final = replay(problem, result.path)
+                self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
+                self.assertTrue(problem.is_goal(final))
+
+
+@unittest.skipUnless(ORIGINAL_DIR.is_dir(), "chưa có levels/original/ (33 màn gốc của TV2) trên nhánh này")
+class BFSOnAllOriginalLevelsTests(unittest.TestCase):
+    """T24 (docs/02 mục 7), V09: BFS trên 33 màn ra đúng cột "Bước tối ưu" ở docs/03 mục 4 (trường par)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.data = {int(p.stem): json.loads(p.read_text(encoding="utf-8"))
+                    for p in ORIGINAL_DIR.glob("*.json")}
+
+    def check(self, numbers):
+        for n in numbers:
+            with self.subTest(level=n):
+                level = parse_level(self.data[n], f"{n:02d}")
+                problem = Problem(level)
+                result = BFS().search(problem)
+                self.assertEqual(result.status, SOLVED)
+                self.assertEqual(len(result.path), level.par)
+                final = replay(problem, result.path)
+                self.assertIsNotNone(final, "lời giải có bước làm khối rơi")
+                self.assertTrue(problem.is_goal(final))
+
+    def with_links(self):
+        return sorted(n for n, d in self.data.items() if any("links" in sw for sw in d["switches"]))
+
+    def test_t24_levels_without_links(self):
+        numbers = sorted(set(self.data) - set(self.with_links()))
+        self.assertEqual(len(numbers), 27)
+        self.check(numbers)
+
+    def test_t24_levels_with_links(self):
+        """6 màn 17, 23, 25, 29, 30, 31 chỉ chạy được khi bộ nạp màn (V03) đọc "links"."""
+        numbers = self.with_links()
+        self.assertEqual(numbers, [17, 23, 25, 29, 30, 31])
+        if "links" not in getattr(Switch, "__dataclass_fields__", {}):
+            self.skipTest(f"bộ nạp chưa đọc 'links'; chưa chạy màn {numbers}")
+        self.check(numbers)
 
 
 if __name__ == "__main__":

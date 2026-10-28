@@ -1,2 +1,5 @@
-# Không cần thư viện ngoài: chỉ dùng thư viện chuẩn của Python 3.10 trở lên.
-# Three.js được tải sẵn trong web/vendor/, không cần cài đặt.
+# Python 3.11 (docs/07 §4). Cài: python -m pip install -r requirements.txt
+# Engine, solver và test chỉ dùng thư viện chuẩn; ursina chỉ cần cho GUI.
+ursina==7.0.0
+panda3d==1.10.16
+matplotlib==3.10.9  # chỉ cần cho experiments/: vẽ biểu đồ V25 (docs/04 §7.2, docs/07 §2)
