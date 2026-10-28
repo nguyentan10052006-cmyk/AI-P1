@@ -1,7 +1,11 @@
 """Kiểm tra experiments/check_results.py (docs/04 §6) bằng các dòng summary tổng hợp, không phải số liệu thật."""
+import json
+import shutil
+import tempfile
 import unittest
+from pathlib import Path
 
-from experiments.check_results import check
+from experiments.check_results import check, level_pars, original_stems
 
 
 def row(level, algorithm, status="solved", steps="", cost="", expanded="", group="G1"):
@@ -19,9 +23,8 @@ class CheckResultsTests(unittest.TestCase):
                 row("original/01", "dfs", steps=37, cost=37, expanded=63),
                 row("original/01", "ucs", steps=7, cost=7, expanded=64),
                 row("original/01", "astar", steps=7, cost=7, expanded=20),
-                row("original/01", "astar_m", steps=7, cost=7, expanded=20),
-                row("gen/S3-010", "bfs", status="no_solution", group="S3"),
-                row("gen/S3-010", "dfs", status="no_solution", group="S3")]
+                row("original/01", "astar_m", steps=7, cost=7, expanded=20)] + [
+            row("gen/S3-010", a, status="no_solution", group="S3") for a in ("bfs", "dfs", "ucs", "astar", "astar_m")]
 
     def test_all_pass_on_consistent_rows(self):
         self.assertEqual(set(verdicts(self.good(), {"original/01": 7}).values()), {"PASS"})
@@ -41,6 +44,35 @@ class CheckResultsTests(unittest.TestCase):
                 rows = self.good()
                 mutate(rows)
                 self.assertEqual(verdicts(rows, {"original/01": 7})[code], "FAIL")
+
+    def test_k8_missing_rows_and_unsolved_original_levels(self):
+        rows = self.good()
+        del rows[4]                                            # original/01 thiếu astar_m
+        v = check(rows, {"original/01": 7})
+        self.assertEqual({c: x for c, x, _ in v}["K8"], "FAIL")
+        self.assertIn("original/01: thiếu astar_m", dict((c, d) for c, _, d in v)["K8"])
+        rows = self.good()
+        rows[1].update(status="timeout", steps="", path_cost="")  # màn gốc nào cũng có lời giải
+        self.assertEqual(verdicts(rows, {"original/01": 7})["K8"], "FAIL")
+
+    def test_k8_requires_every_original_level_and_default_algorithm(self):
+        self.assertEqual(verdicts(self.good(), {"original/01": 7})["K8"], "PASS")    # không truyền originals
+        self.assertEqual({c: x for c, x, _ in check(self.good(), {"original/01": 7}, ["01"])}["K8"], "PASS")
+        details = {c: (x, d) for c, x, d in check(self.good(), {"original/01": 7}, ["01", "02"])}
+        self.assertEqual(details["K8"][0], "FAIL")
+        self.assertIn("thiếu màn gốc 02", details["K8"][1])
+        rows = [r for r in self.good() if r["algorithm"] != "astar_m"]                # cả file không có astar_m
+        self.assertEqual(verdicts(rows, {"original/01": 7})["K8"], "PASS")
+        self.assertEqual({c: x for c, x, _ in check(rows, {"original/01": 7}, ["01"])}["K8"], "FAIL")
+
+    def test_par_and_original_levels_read_from_files_with_both_id_formats(self):
+        root = Path(tempfile.mkdtemp(prefix="v24-check-"))
+        self.addCleanup(shutil.rmtree, root, True)
+        (root / "original").mkdir()
+        (root / "original" / "01.json").write_text(json.dumps({"par": 7}), encoding="utf-8")
+        rows = [row("original/01", "bfs"), row("01", "dfs")]   # mã của run.py hiện tại và mã cũ
+        self.assertEqual(level_pars(rows, root), {"original/01": 7, "01": 7})
+        self.assertEqual(original_stems(root), ["01"])
 
     def test_missing_data_is_not_run_not_pass(self):
         rows = [row("original/01", "bfs", steps=7, cost=7, expanded=48)]
