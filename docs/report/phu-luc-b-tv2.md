@@ -1,6 +1,6 @@
 # Phụ lục B: phần của TV2 (gửi TV4 ghép vào `phu-luc-b-ai.md`)
 
-> TV2 soạn ngày 28/10. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 25 tin nhắn, 19/10–28/10). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
+> TV2 soạn ngày 28/10. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 25 prompt từ 19/10 20:32 tới 28/10 14:12; không tính thông báo hệ thống). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
 
 ## Đoạn ghép vào B.1 (bảng công cụ)
 
@@ -96,6 +96,7 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 | 28/10 13:18 | `# AI-P1 — Phát hành V23 riêng và bảo toàn nhánh tích hợp V24` |
 | 28/10 13:24 | `Tiếp tục dự án AI-P1 từ trạng thái hiện tại, nhưng trước khi phát triển thêm V24/V25, hãy hoàn tất kiểm tra repository …` |
 | 28/10 13:35 | `# AI-P1 / Bloxorz Solver — Hoàn thành toàn bộ công việc thuộc phạm vi TV2` |
+| 28/10 14:12 | `Tiếp tục công việc TV2 trong repository Bloxorz-Solver dựa trên báo cáo trạng thái gần nhất.` |
 
 ## Dòng dán vào tab prompt-ai (`docs/sheet/6-prompt-ai.csv`)
 
@@ -106,6 +107,7 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 2026-10-28,TV2,Claude Code (Anthropic),"Ghép tạm code TV3, TV4 để chạy thử V24; S1–S3 tạm; biểu đồ V25; kiểm tra chéo","# AI-P1 — Chủ động xử lý dependency của các thành viên để hoàn thành công việc TV2","Nhánh integration/Tien/V24 (chưa push); số liệu chạy thử không dùng trong báo cáo","Kiểm tra chéo 04 §6; xem lại từng hình; check_heuristics.py 0 vi phạm"
 2026-10-28,TV2,Claude Code (Anthropic),"Kiểm tra hồi cứu, đối chiếu đề bài, đọc chéo GUI V20/V21 của TV5","Trước khi tiếp tục dự án AI-P1 / Bloxorz Solver, hãy thực hiện kiểm tra hồi cứu việc khảo sát repository Git …","docs/nghiem-thu/ (không nộp); ghi chú cho TV3, TV4, TV5","GUI offscreen 13/13 khi đủ code TV3, TV4; tái hiện lỗi bằng script"
 2026-10-28,TV2,Claude Code (Anthropic),"Nháp chương 3.2, 5 (5.1, 5.2), 5.4.2, phụ lục B phần TV2","# AI-P1 / Bloxorz Solver — Hoàn thành toàn bộ công việc thuộc phạm vi TV2","docs/report/3.2-dfs.md, 5-thuc-nghiem.md, 5.4-nhan-xet-dfs.md, phu-luc-b-tv2.md","Đối chiếu với dfs.py, run.py và test; chạy lại lệnh ví dụ ở Bảng 3.2.1"
+2026-10-28,TV2,Claude Code (Anthropic),"Kiểm tra nhánh báo cáo, mở PR; rà lại tables.py, charts.py, check_results.py; soạn tin nhắn bàn giao","Tiếp tục công việc TV2 trong repository Bloxorz-Solver dựa trên báo cáo trạng thái gần nhất.","PR nhánh feature/Tien/report; docs/nghiem-thu/ (không nộp)","diff so với main chỉ gồm file báo cáo TV2; git diff --check; cả bộ test"
 ```
 
 ## Nguồn để kiểm lại
