@@ -309,12 +309,16 @@ def _lines(rows, group, pattern, metric, key, title, xlabel, ylabel, out_dir, re
         for p, v in points:
             figure.table.append({"param": p, "algorithm": algo, metric: v})
     if reference:
+        # Neo đường 2^k vào BFS ở k = 0 (BFS duyệt theo lớp, gần với cả không gian trạng thái nhất);
+        # không có BFS thì lấy giá trị nhỏ nhất. Ghi tên thuật toán neo lên hình và điểm của đường vào CSV.
         base = [r for r in solved if _param(r["level"], pattern) == 0]
         ks = sorted({_param(r["level"], pattern) for r in solved})
         if base:
-            start = min(r[metric] for r in base)
-            ax.plot(ks, [start * 2 ** k for k in ks], color=INK_2, linewidth=1, linestyle="--",
-                    label="visited(k=0) × 2^k")
+            anchor = next((r for r in base if r["algorithm"] == "bfs"), min(base, key=lambda r: r[metric]))
+            name = f"{label_of(anchor['algorithm'])} ở k = 0 × 2^k"
+            ax.plot(ks, [anchor[metric] * 2 ** k for k in ks], color=INK_2, linewidth=1, linestyle="--", label=name)
+            for k in ks:
+                figure.table.append({"param": k, "algorithm": name, metric: anchor[metric] * 2 ** k})
     ax.set_yscale("log")
     _style(ax, xlabel, ylabel + " (thang log)", title)
     _legend(ax, 3)

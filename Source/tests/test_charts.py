@@ -130,6 +130,16 @@ class ChartsTests(unittest.TestCase):
         self.assertIn("png", report["H8"], report["H8"])
         self.assertIn("png", report["H9"], report["H9"])
 
+    def test_h9_reference_line_is_anchored_on_bfs(self):
+        rows = synthetic_rows()
+        rows.append({"level": "gen/S2-k00", "group": "S2", "algorithm": "astar", "status": "solved",
+                     "steps": 13, "path_cost": 13, "expanded": 20, "visited": 20})   # nhỏ hơn BFS (260)
+        write_summary(self.summary, rows)
+        charts.make_charts(self.summary, self.out, only=["H9"])
+        with (self.out / "H9.csv").open(encoding="utf-8") as f:
+            ref = [r for r in csv.DictReader(f) if r["algorithm"] == "BFS ở k = 0 × 2^k"]
+        self.assertEqual([(int(r["param"]), float(r["visited"])) for r in ref], [(0, 260.0), (2, 1040.0), (4, 4160.0)])
+
     def test_unsolved_pairs_are_listed(self):
         write_summary(self.summary, synthetic_rows())
         out = io.StringIO()
