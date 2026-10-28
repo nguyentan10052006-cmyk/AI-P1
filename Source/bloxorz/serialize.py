@@ -47,6 +47,7 @@ def level_to_dict(level: Level) -> Dict[str, Any]:
         "group": level.group,
         "source": level.source,
         "grid": list(level.grid),
+        "passcode": getattr(level, "passcode", ""),
         "chapter": level.chapter,
         "order": level.order,
         "kind": level.kind,
@@ -62,6 +63,7 @@ def level_to_dict(level: Level) -> Dict[str, Any]:
                 "effect": sw.effect,
                 "bridges": [list(b) for b in sw.bridges],
                 "targets": [list(t) for t in sw.targets],
+                "links": [{"cell": list(lnk.cell), "effect": lnk.effect} for lnk in getattr(sw, "links", ())],
             }
             for sw in level.switches.values()
         ],
