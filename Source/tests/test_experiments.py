@@ -298,8 +298,9 @@ class ExperimentRunTests(unittest.TestCase):
                   f"False, 30.0)\nprint('STATUS=' + r['status'])\n")
         started = time.perf_counter()
         proc = subprocess.run([sys.executable, "-"], input=script, cwd=SOURCE_DIR, capture_output=True, text=True,
-                              encoding="utf-8", timeout=120)
-        self.assertIn("STATUS=error", proc.stdout, proc.stderr[-500:])
+                              encoding="utf-8", errors="replace", timeout=120)
+        stderr_tail = proc.stderr[-500:] if proc.stderr else ""
+        self.assertIn("STATUS=error", proc.stdout or "", stderr_tail)
         self.assertLess(time.perf_counter() - started, 25.0)
 
     def test_command_line(self):

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, FrozenSet, List, Optional, Tuple
+from typing import Any, Dict, FrozenSet, List, NamedTuple, Optional, Tuple
 
 from .state import Cell, Orient, State, to_cell
 
@@ -31,13 +31,19 @@ class LevelError(ValueError):
     """Màn chơi sai định dạng."""
 
 
+class Link(NamedTuple):
+    cell: Cell
+    effect: str  # "toggle" | "open" | "close"
+
+
 @dataclass(frozen=True)
 class Switch:
     at: Cell
-    kind: str                       # "soft" | "heavy" | "split"
-    effect: str = ""                # soft/heavy: "toggle" | "open" | "close"
-    bridges: Tuple[Cell, ...] = ()  # soft/heavy: các cầu bị điều khiển
-    targets: Tuple[Cell, ...] = ()  # split: hai ô đích của khối con
+    kind: str                           # "soft" | "heavy" | "split"
+    effect: str = ""                    # soft/heavy: "toggle" | "open" | "close" (rỗng nếu mixed)
+    bridges: Tuple[Cell, ...] = ()      # soft/heavy: các cầu bị điều khiển
+    targets: Tuple[Cell, ...] = ()      # split: hai ô đích của khối con
+    links: Tuple[Link, ...] = ()        # danh sách các liên kết riêng lẻ
 
 
 @dataclass(frozen=True)
@@ -57,6 +63,7 @@ class Level:
     par: int = 0              # số bước tối ưu, 0 nghĩa là chưa biết
     intro: Optional[str] = None
     unlock_stars: int = 0
+    passcode: str = ""
 
     @property
     def rows(self) -> int:
@@ -120,7 +127,7 @@ def parse_level(data: Any, level_id: str, where: str = "") -> Level:
 
     switches: Dict[Cell, Switch] = {}
     for raw in data.get("switches", []):
-        at, declared_kind, effect, bridges, targets = _read_switch(raw, where)
+        at, declared_kind, effect, bridges, targets, links = _read_switch(raw, where)
         if at in switches:
             raise LevelError(f"{where}: công tắc {at} được khai báo hai lần")
         if _char(grid, at) not in SWITCH_KIND:
@@ -137,17 +144,17 @@ def parse_level(data: Any, level_id: str, where: str = "") -> Level:
         else:
             if targets:
                 raise LevelError(f"{where}: chỉ công tắc tách mới có 'targets' (ô {at})")
-            if not bridges:
+            if not bridges and not links:
                 raise LevelError(f"{where}: công tắc {at} phải điều khiển ít nhất một cầu")
-        # Công tắc tách có thể nối cầu (tùy chọn), nên effect chỉ bắt buộc khi có cầu.
-        if bridges and effect not in EFFECTS:
+        # Công tắc tách có thể nối cầu (tùy chọn), nên effect chỉ bắt buộc khi có cầu và không dùng links.
+        if (bridges or links) and not links and effect not in EFFECTS:
             raise LevelError(f"{where}: công tắc {at} có effect phải là một trong {EFFECTS}")
-        if effect and not bridges:
+        if effect and not bridges and not links:
             raise LevelError(f"{where}: công tắc {at} có effect nhưng không có cầu nào")
         unknown = [b for b in bridges if b not in bridge_set]
         if unknown:
             raise LevelError(f"{where}: công tắc {at} trỏ tới ô không phải cầu: {unknown}")
-        switches[at] = Switch(at, kind, effect, bridges, targets)
+        switches[at] = Switch(at, kind, effect, bridges, targets, links)
 
     for cell, ch in _iter_cells(grid):
         if ch in SWITCH_KIND and cell not in switches:
@@ -176,6 +183,7 @@ def parse_level(data: Any, level_id: str, where: str = "") -> Level:
         par=_int_field(data, "par", 0, where, minimum=0),
         intro=intro,
         unlock_stars=_int_field(data, "unlock_stars", 0, where, minimum=0),
+        passcode=str(data.get("passcode", "")),
     )
 
 
@@ -191,11 +199,51 @@ def _read_switch(raw: Any, where: str):
         raise LevelError(f"{where}: mỗi công tắc phải là một object JSON")
     try:
         at = to_cell(raw["at"])
-        bridges = tuple(to_cell(x) for x in raw.get("bridges", []))
         targets = tuple(to_cell(x) for x in raw.get("targets", []))
     except (KeyError, ValueError) as exc:
         raise LevelError(f"{where}: cấu hình công tắc không hợp lệ ({exc})") from exc
-    return at, raw.get("type"), str(raw.get("effect", "")), bridges, targets
+
+    raw_links = raw.get("links")
+    links_list: List[Link] = []
+    if raw_links is not None:
+        if not isinstance(raw_links, list) or not raw_links:
+            raise LevelError(f"{where}: 'links' của công tắc {at} phải là danh sách không rỗng")
+        seen_cells = set()
+        for lnk in raw_links:
+            if not isinstance(lnk, dict) or "cell" not in lnk or "effect" not in lnk:
+                raise LevelError(f"{where}: mỗi liên kết trong 'links' phải có 'cell' và 'effect' (công tắc {at})")
+            try:
+                cell = to_cell(lnk["cell"])
+            except (KeyError, ValueError) as exc:
+                raise LevelError(f"{where}: tọa độ ô cầu không hợp lệ trong 'links' ({exc})") from exc
+            eff = str(lnk["effect"])
+            if eff not in EFFECTS:
+                raise LevelError(f"{where}: 'effect' {eff!r} trong 'links' phải là một trong {EFFECTS} (công tắc {at})")
+            if cell in seen_cells:
+                raise LevelError(f"{where}: công tắc {at} nối ô cầu {cell} hai lần")
+            seen_cells.add(cell)
+            links_list.append(Link(cell, eff))
+
+    bridges_list: List[Cell] = []
+    if "bridges" in raw:
+        try:
+            bridges_list = [to_cell(x) for x in raw.get("bridges", [])]
+        except (KeyError, ValueError) as exc:
+            raise LevelError(f"{where}: cấu hình 'bridges' không hợp lệ ({exc})") from exc
+
+    effect = str(raw.get("effect", ""))
+    declared_kind = raw.get("type") or raw.get("kind")
+
+    if links_list and not bridges_list:
+        bridges_list = [lnk.cell for lnk in links_list]
+        effects_set = {lnk.effect for lnk in links_list}
+        if len(effects_set) == 1:
+            effect = next(iter(effects_set))
+
+    if bridges_list and not links_list and effect:
+        links_list = [Link(cell, effect) for cell in bridges_list]
+
+    return at, declared_kind, effect, tuple(bridges_list), targets, tuple(links_list)
 
 
 def _char(grid: Tuple[str, ...], cell: Cell) -> str:
