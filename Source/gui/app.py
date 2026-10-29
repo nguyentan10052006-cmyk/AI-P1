@@ -1,4 +1,5 @@
-"""Cửa sổ GUI Ursina: vẽ bàn (V18), chơi tay bằng engine thật (V19), thông báo và hoạt ảnh ô đặc biệt (V20).
+"""Cửa sổ GUI Ursina: vẽ bàn (V18), chơi tay bằng engine thật (V19), thông báo và hoạt ảnh ô đặc biệt (V20),
+nút Solve, So sánh, Hủy và khối tự lăn theo lời giải (V21).
 
 Chạy trong Source/: python main.py [mã màn, ví dụ 05], hoặc python -m gui.app [mã màn]
 """
@@ -6,18 +7,36 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from ursina import AmbientLight, DirectionalLight, Entity, Text, Ursina, Vec3, camera, color, destroy, invoke, window
+from ursina import (AmbientLight, DirectionalLight, Entity, Mesh, Text, Ursina, Vec3, camera, color, curve, destroy,
+                    invoke, time, window)
+from ursina.shaders import unlit_shader
 
 from bloxorz.level import Level, LevelError, load_level
+from bloxorz.problem import Problem
 from bloxorz.rules import FELL, WON, StepResult, step
 from bloxorz.state import DELTA, Action, Dir, Orient, State
 from gui.block_view import BlockView
 from gui.board_view import BoardView
+from gui.camera_controller import CameraController
+from gui.hud import LABELS, Hud
+from solvers import ALGORITHMS                                   # docs/07 §2: gui chỉ dùng ALGORITHMS và runner
+from solvers.runner import CompareJob, SolveJob, start_compare, start_solver
 
 LEVELS_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
-HELP = "Mũi tên / WASD: lăn   Space: đổi khối con   R: chơi lại   N / P: màn sau / trước"
+HELP = ("WASD/Mũi tên: lăn  ·  Space: đổi khối  ·  R: chơi lại  ·  Q/E: nghiêng trái phải  ·  Z/X: hạ nâng góc"
+        "  ·  T: đỉnh  ·  F: đặt lại  ·  Chuột phải: chỉnh góc  ·  Cuộn: zoom  ·  H: ẩn kết quả")
+# Bảng màu theo GAME_UI_UX_SPECIFICATION.md §2.1
+THEME = {
+    "bg_top": color.hex("#18212b"),   # nền gradient: xám đậm ở trên xuống đen ở dưới
+    "bg_bottom": color.hex("#0b0f14"),
+    "accent": color.hex("#38bdf8"),
+    "muted": color.hex("#9aa3ad"),
+    "ok": color.hex("#7ee787"),
+    "warn": color.hex("#f2c94c"),
+    "bad": color.hex("#ff7b72"),
+}
 KEY_DIRS = {
     "up arrow": Dir.UP, "w": Dir.UP,
     "down arrow": Dir.DOWN, "s": Dir.DOWN,
@@ -30,9 +49,12 @@ WIN_TIME = 0.45
 SPLIT_TIME = 0.3   # hai khối con bay tới ô đích của công tắc tách
 BRIDGE_TIME = 0.25
 NOTICE_TIME = 2.0  # thông báo sự kiện tự tắt sau chừng này giây
+REPLAY_PAUSE = 0.12   # giây nghỉ giữa hai bước khi khối tự lăn theo lời giải
+SOLVE_TIMEOUT = 60.0  # docs/07 §6 quy tắc 3
 
 SWITCH_KINDS = {"soft": "Công tắc mềm", "heavy": "Công tắc nặng", "split": "Công tắc tách"}
-SWITCH_EFFECTS = {"toggle": "đổi trạng thái cầu", "open": "mở cầu", "close": "đóng cầu"}
+# Công tắc dùng "links" với hiệu ứng khác nhau cho từng cầu có effect rỗng (V03)
+SWITCH_EFFECTS = {"toggle": "đổi trạng thái cầu", "open": "mở cầu", "close": "đóng cầu", "": "đổi trạng thái các cầu"}
 FALL_MESSAGES = {
     "fragile": "Ô dễ vỡ bị vỡ!",
     "bridge_closed": "Cầu đang đóng, khối rơi!",
@@ -55,10 +77,31 @@ class Game(Entity):
         self.busy = False        # đang chạy hoạt ảnh: bỏ qua phím để state không đi trước hình (docs/07 §7)
         self.over = False        # đã thắng hoặc rơi: chờ R
         self.turn = 0            # tăng mỗi lần đổi màn hoặc chơi lại; lệnh invoke của lượt cũ thấy lệch thì bỏ qua
-        self.info = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.02, 0), scale=1.1)
+        self.info = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.02, 0), scale=1.15)
+        self.moves = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.065, 0), scale=1.3,
+                          color=THEME["accent"])
+        self.help = Text(HELP, parent=camera.ui, origin=(0, 0), y=window.bottom.y + 0.022, scale=0.8,
+                         color=THEME["muted"])
         self.message = Text(parent=camera.ui, origin=(0, 0), y=0.38, scale=2)
-        self.notice = Text(parent=camera.ui, origin=(0, 0), y=-0.42, scale=1.3, color=color.hex("#f2c94c"))
+        # Ngay dưới dòng thắng/thua; góc trái dưới dành cho khung kết quả của solver (hud.py)
+        self.notice = Text(parent=camera.ui, origin=(0, 0), y=0.31, scale=1.3, color=THEME["warn"])
         self._notice_id = 0
+        # Solver chạy ở tiến trình riêng; GUI chỉ giữ job và gọi poll() trong update() (docs/07 §6 quy tắc 2)
+        self.job: Optional[Union[SolveJob, CompareJob]] = None
+        self.job_name = ""                       # khóa ALGORITHMS của nút Solve đang chạy; rỗng khi So sánh
+        self.replay: Optional[List[Action]] = None   # lời giải đang được tự lăn
+        self.replay_index = 0
+        self.replay_wait = 0.0
+        self.camera_ctrl = CameraController()
+        self.hud = Hud([p.stem for p in paths], on_new_game=lambda: self.load(0), on_restart=self.restart,
+                       on_pick_level=self.load, on_solve=self.solve, on_compare=self.compare,
+                       on_cancel=self.cancel,
+                       on_rotate_cam=self.camera_ctrl.rotate_preset,
+                       on_tilt_cam=self.camera_ctrl.tilt_preset,
+                       on_toggle_top_down=self.camera_ctrl.toggle_top_down,
+                       on_reset_cam=self.camera_ctrl.reset_view)
+        self.camera_ctrl.on_view_change = self.hud.set_camera_view
+        self.hud.on_panel_change = self._frame_board
         self.load(start_index)
 
     # ---- đổi màn, chơi lại ----
@@ -67,17 +110,22 @@ class Game(Entity):
         self.index = index % len(self.paths)
         path = self.paths[self.index]
         self.turn += 1   # màn nạp lỗi thì restart() không chạy, vẫn phải hủy lượt đang dở
+        self._stop_job()   # lời giải của màn cũ không dùng được cho màn mới
+        self.replay = None
+        self.hud.clear_results()
+        self.hud.set_current_level(self.index)
         if self.board is not None:
             destroy(self.board)   # khối là con của bàn nên bị hủy cùng
         self.board = self.block = self.level = self.state = None
         try:
             self.level = load_level(path, path.stem)
         except LevelError as exc:
-            self.info.text = f"Không nạp được {path.name}: {exc}\n{HELP}"
+            self.info.text = f"Không nạp được {path.name}: {exc}"
+            self.moves.text = ""
             self.message.text = ""
             return
         self.board = BoardView(self.level)
-        self.board.fit_camera()
+        self.board.fit_camera(self.camera_ctrl)
         self.block = BlockView(self.level.initial_state(), parent=self.board)
         self.restart()
 
@@ -85,6 +133,7 @@ class Game(Entity):
         if self.level is None:
             return
         self.turn += 1
+        self.replay = None   # solver đang chạy thì vẫn để chạy: bài toán luôn tính từ trạng thái đầu của màn
         self.state = self.level.initial_state()
         self.active_cube = 0
         self.steps = 0
@@ -95,13 +144,38 @@ class Game(Entity):
         self.show_notice("")
         self._update_info()
 
+    def _frame_board(self, panel_visible: bool) -> None:
+        """Khung kết quả hiện thì thu bàn vào vùng trống giữa khung và cột nút; ẩn thì trả về cỡ đầy đủ.
+
+        Bàn vốn được căn giữa vùng [mép trái màn hình, mép trái cột nút]. Lùi camera xa k lần thì hình
+        co về tâm màn hình k lần, sau đó dịch ngang (film offset) cho tâm bàn tới giữa vùng còn trống.
+        """
+        left, right = window.left.x + 0.02, self.hud.dock_left
+        center_x = 0.0
+        if panel_visible:
+            inner_left = self.hud.panel_right + 0.02
+            scale = (right - left) / (right - inner_left)
+            center_x = (inner_left + right) / 2
+            shift = center_x - (left + right) / 2 / scale
+            self.camera_ctrl.set_frame(scale, shift / window.aspect_ratio)
+        else:
+            self.camera_ctrl.set_frame(1.0, 0.0)
+        for text in (self.message, self.notice):   # dòng thắng/thua và thông báo nằm giữa vùng bàn
+            text.animate_x(center_x, duration=0.2, curve=curve.out_quad)
+
     def _update_info(self) -> None:
         level = self.level
         cube = ""
         if self.state is not None and self.state.orient is Orient.SPLIT:
-            cube = f"  ·  đang điều khiển khối con {self.active_cube + 1}/2"
-        self.info.text = (f"{level.name}  ·  nhóm {level.group}  ·  bước đã đi {self.steps}"
-                          f"  ·  tối ưu {level.par}{cube}\n{HELP}")
+            cube = f"   KHỐI CON {self.active_cube + 1}/2 (Space để đổi)"
+        self.info.text = f"STAGE {level.id}  ·  {level.group.upper()}  ·  PAR {level.par}"
+        moves = f"MOVES {self.steps}{cube}"
+        if self.moves.text != moves:
+            bump = self.steps > 0 and not self.moves.text.startswith(f"MOVES {self.steps}")
+            self.moves.text = moves
+            if bump:   # số bước vừa tăng: nảy nhẹ 1 → 1.15 → 1 (§3.1)
+                self.moves.scale = 1.3 * 1.15
+                self.moves.animate_scale(1.3, duration=0.12, curve=curve.out_quad)
 
     def show_notice(self, text: str) -> None:
         """Dòng thông báo sự kiện ở cuối màn hình; tự tắt sau NOTICE_TIME giây."""
@@ -123,14 +197,111 @@ class Game(Entity):
             self.load(self.index - 1)
         elif key == "r":
             self.restart()
-        elif self.state is None or self.busy or self.over:
-            return
+        elif key == "q":
+            self.camera_ctrl.rotate_preset(-1)
+        elif key == "e":
+            self.camera_ctrl.rotate_preset(1)
+        elif key == "z":
+            self.camera_ctrl.tilt_preset(-1)
+        elif key == "x":
+            self.camera_ctrl.tilt_preset(1)
+        elif key == "h":
+            self.hud.toggle_panel()
+        elif key == "escape":
+            self.hud.close_picker()
+        elif key == "t":
+            self.camera_ctrl.toggle_top_down()
+        elif key == "f":
+            self.camera_ctrl.reset_view()
+        elif key in ("scroll up", "wheel_up"):
+            self.camera_ctrl.zoom(1.0)
+        elif key in ("scroll down", "wheel_down"):
+            self.camera_ctrl.zoom(-1.0)
+        elif self.state is None or self.busy or self.over or self.replay is not None:
+            return   # đang tự lăn theo lời giải thì không nhận phím lăn; R, N, P, camera vẫn hoạt động
         elif key == "space" and self.state.orient is Orient.SPLIT:
             self.active_cube = 1 - self.active_cube
             self.block.show(self.state, self.active_cube)
             self._update_info()
         elif key in KEY_DIRS:
-            self.roll(KEY_DIRS[key])
+            self.roll(KEY_DIRS[key])   # camera không lệch quá ±20° nên hướng phím luôn khớp màn hình
+
+    # ---- Solve, So sánh, Hủy (V21) ----
+
+    def solve(self, name: str) -> None:
+        if self.level is None or self.job is not None:
+            return
+        self.hud.clear_results()
+        self.job, self.job_name = start_solver(ALGORITHMS[name], Problem(self.level), SOLVE_TIMEOUT), name
+        self.hud.set_running(True)
+
+    def compare(self) -> None:
+        if self.level is None or self.job is not None:
+            return
+        self.hud.clear_results()
+        self.job, self.job_name = start_compare(Problem(self.level), timeout_s=SOLVE_TIMEOUT), ""
+        self.hud.set_running(True)
+
+    def cancel(self) -> None:
+        """Nút Hủy: dừng solver đang chạy (lần poll() sau trả kết quả đã hủy) hoặc dừng khối đang tự lăn."""
+        if self.job is not None:
+            self.job.cancel()
+        elif self.replay is not None:
+            self.replay = None
+            self.hud.show_status("Đã dừng tự lăn. Bấm R để chơi lại", THEME["muted"])
+
+    def _stop_job(self) -> None:
+        if self.job is not None:
+            self.job.cancel()
+            self.job = None
+            self.hud.set_running(False)
+
+    def update(self) -> None:
+        self.camera_ctrl.update()
+        if self.job is not None:
+            self._poll_job()
+        if self.replay is not None:
+            self._replay_step()
+
+    def _poll_job(self) -> None:
+        job = self.job
+        if isinstance(job, CompareJob):
+            results = job.poll()
+            self.hud.show_compare(job.names, results, job.running, job.elapsed)
+            if job.done:
+                self.job = None
+                self.hud.set_running(False)
+                self.hud.show_status("Đã hủy So sánh" if job.cancelled else f"So sánh xong trên {self.level.name}")
+            else:
+                self.hud.show_status(f"So sánh: {LABELS[job.running]} đang tìm… {job.elapsed:.1f} s")
+            return
+        outcome = job.poll()
+        if outcome is None:
+            self.hud.show_status(f"{LABELS[self.job_name]} đang tìm… {job.elapsed:.1f} s")
+            return
+        self.job = None
+        self.hud.set_running(False)
+        self.hud.show_result(self.job_name, outcome)
+        if outcome.get("ok") and outcome["status"] == "solved":
+            self.restart()   # lời giải tính từ trạng thái đầu
+            self.replay, self.replay_index, self.replay_wait = list(outcome["path"]), 0, REPLAY_PAUSE
+
+    def _replay_step(self) -> None:
+        """Khối tự lăn: mỗi bước gọi rules.step() như khi chơi tay (docs/07 §5), chờ hoạt ảnh xong mới đi tiếp."""
+        if self.busy:
+            return
+        if self.over or self.replay_index >= len(self.replay):
+            self.replay = None
+            return
+        if self.replay_wait > 0:
+            self.replay_wait -= time.dt
+            return
+        action = self.replay[self.replay_index]
+        if action.cube is not None:
+            self.active_cube = action.cube   # Action.cube đã tính theo thứ tự khối con của trạng thái lúc đó
+        self.replay_index += 1
+        self.replay_wait = REPLAY_PAUSE
+        self.roll(action.dir)
 
     # ---- một lượt đi ----
 
@@ -157,7 +328,7 @@ class Game(Entity):
             self.over = True
             self.block.drop(12, FALL_TIME)
             self.message.text = FALL_MESSAGES.get(fell["reason"], "Rơi khỏi bàn!") + " Bấm R để chơi lại"
-            self.message.color = color.hex("#ff7b72")
+            self.message.color = THEME["bad"]
             invoke(self._unbusy, turn, delay=FALL_TIME)
             return
         self.state = result.state
@@ -169,7 +340,7 @@ class Game(Entity):
             self.over = True
             self.block.drop(2.2, WIN_TIME)
             self.message.text = f"Thắng sau {self.steps} bước! (tối ưu {self.level.par})"
-            self.message.color = color.hex("#7ee787")
+            self.message.color = THEME["ok"]
         if split:
             invoke(self._unbusy, turn, delay=SPLIT_TIME)
         else:
@@ -184,7 +355,8 @@ class Game(Entity):
         parts = []
         for event in events:
             if event["type"] == "switch":
-                parts.append(f"{SWITCH_KINDS[event['kind']]}: {SWITCH_EFFECTS[event['effect']]}")
+                effect = SWITCH_EFFECTS.get(event["effect"], SWITCH_EFFECTS[""])
+                parts.append(f"{SWITCH_KINDS.get(event['kind'], 'Công tắc')}: {effect}")
             elif event["type"] == "split":
                 parts.append("Khối tách đôi, bấm Space để đổi khối con")
             elif event["type"] == "merge":
@@ -209,10 +381,16 @@ class Game(Entity):
 
 
 def setup_scene() -> None:
-    window.color = color.hex("#1d2733")
-    sun = DirectionalLight(shadows=False, color=color.hsv(0, 0, 0.7))
-    sun.look_at(Vec3(0.4, -1, 0.7))
-    AmbientLight(color=color.hsv(0, 0, 0.35))
+    """Nền và ánh sáng theo GAME_UI_UX_SPECIFICATION.md §2.2 (không đổ bóng)."""
+    window.color = THEME["bg_bottom"]
+    # Tấm nền gradient gắn vào camera, đặt thật xa nên luôn nằm sau bàn chơi
+    Entity(parent=camera, model=Mesh(vertices=[(-0.5, -0.5, 0), (0.5, -0.5, 0), (0.5, 0.5, 0), (-0.5, 0.5, 0)],
+                                     triangles=[(0, 1, 2), (0, 2, 3)],
+                                     colors=[THEME["bg_bottom"], THEME["bg_bottom"], THEME["bg_top"], THEME["bg_top"]]),
+           shader=unlit_shader, z=900, scale=(3000, 800))
+    sun = DirectionalLight(shadows=False, color=color.hsv(40, 0.03, 0.62))   # #fdfbf7 hạ sáng để sàn không bị cháy
+    sun.look_at(Vec3(1, -2, 1))
+    AmbientLight(color=color.hex("#3d444d"))
 
 
 def run(level_id: str = "01") -> int:

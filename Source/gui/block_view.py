@@ -8,17 +8,19 @@ from itertools import permutations
 from typing import List, Optional, Tuple
 
 from ursina import Entity, Vec3, color, curve
-from ursina.shaders import lit_with_shadows_shader
+from ursina.shaders import lit_with_shadows_shader, unlit_shader
 
 from bloxorz.state import Orient, State
 from gui.board_view import cell_to_world
 
 SIZE = 0.96   # nhỏ hơn ô một chút để thấy viền giữa khối và sàn
 COLORS = {
-    "block": color.hex("#c9a227"),
-    "active": color.hex("#f2c94c"),   # khối con đang điều khiển
-    "idle": color.hex("#8a7330"),     # khối con còn lại
+    "block": color.hex("#f0f6fc"),
+    "active": color.hex("#f0f6fc"),   # khối con đang điều khiển
+    "idle": color.hex("#7d8896"),     # khối con còn lại
+    "edge": color.hex("#38bdf8"),     # viền sáng giúp khối nổi trên sàn xám
 }
+EDGE_ALPHA = {"active": 0.9, "idle": 0.25}
 
 Transform = Tuple[Vec3, Vec3]   # (vị trí tâm, kích thước)
 
@@ -42,6 +44,8 @@ class BlockView(Entity):
         super().__init__(**kwargs)
         self.pieces = [Entity(parent=self, model="cube", color=COLORS["block"], shader=lit_with_shadows_shader)
                        for _ in range(2)]
+        self.edges = [Entity(parent=piece, model="wireframe_cube", color=COLORS["edge"], shader=unlit_shader,
+                             scale=1.004) for piece in self.pieces]
         self.show(state)
 
     def show(self, state: State, active_cube: Optional[int] = None, duration: float = 0.0) -> None:
@@ -87,6 +91,9 @@ class BlockView(Entity):
     def _paint(self, state: State, order: List[int], active_cube: Optional[int]) -> None:
         if state.orient is not Orient.SPLIT or active_cube is None:
             self.pieces[order[0]].color = COLORS["block"]
+            self.edges[order[0]].alpha = EDGE_ALPHA["active"]
             return
         for k, index in enumerate(order):
-            self.pieces[index].color = COLORS["active"] if k == active_cube else COLORS["idle"]
+            role = "active" if k == active_cube else "idle"
+            self.pieces[index].color = COLORS[role]
+            self.edges[index].alpha = EDGE_ALPHA[role]
