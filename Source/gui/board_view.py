@@ -5,6 +5,7 @@ Tọa độ theo docs/07 §4: ô (r, c) có tâm tại x = c, z = -r; mặt trê
 from __future__ import annotations
 
 import math
+import time
 from typing import Dict, FrozenSet, List, Optional
 
 from ursina import Circle, Entity, Mesh, Vec3, camera, color, curve
@@ -22,12 +23,14 @@ COLORS = {
     "fragile": color.hex("#e8892c"),
     "bridge": color.hex("#a9784a"),
     "goal_rim": color.hex("#6b737c"),
-    "goal_hole": color.hex("#15181c"),
+    "goal_hole": color.hex("#090d12"),
+    "goal_glow": color.hex("#f2c94c"),
     "soft": color.hex("#e9eef2"),
     "heavy": color.hex("#c43c3c"),
     "split": color.hex("#2f6fd6"),
 }
 CLOSED_BRIDGE_ALPHA = 0.18
+GOAL_PULSE = (0.45, 1.0, 2.4)   # hào quang ô đích: alpha thấp nhất, cao nhất, tốc độ nhấp nháy (rad/s)
 HUD_SHIFT = 0.06      # phần chiều rộng bàn chừa cho cột nút bên phải (hud.py)
 
 
@@ -49,6 +52,7 @@ class BoardView(Entity):
         self._bridges: Dict[Cell, Entity] = {}
         self._fragile: Dict[Cell, Entity] = {}
         self._open: Optional[FrozenSet[Cell]] = None
+        self._glow: List[Entity] = []
         for r in range(level.rows):
             for c in range(level.cols):
                 char = level.tile((r, c))
@@ -72,6 +76,13 @@ class BoardView(Entity):
         if slab is not None:
             slab.animate_y(slab.y - 12, duration=duration, curve=curve.in_quad)
             slab.animate_color(_with_alpha(COLORS["fragile"], 0), duration=duration)
+
+    def update(self) -> None:
+        """Ursina gọi mỗi frame: hào quang ô đích sáng tối nhịp nhàng để người chơi thấy đích ngay."""
+        low, high, speed = GOAL_PULSE
+        alpha = low + (high - low) * (0.5 + 0.5 * math.sin(time.time() * speed))
+        for strip in self._glow:
+            strip.alpha = alpha
 
     @property
     def center(self) -> Vec3:
@@ -107,7 +118,8 @@ class BoardView(Entity):
         size = max((rows[1] - rows[0] + 1) * 1.6, cols[1] - cols[0] + 1) + 3   # 1.6: tỉ lệ khung hình; +3: lề quanh bàn
         target = self.center + Vec3(size * HUD_SHIFT, 0, 0)   # nhìn lệch sang phải: bàn dời sang trái, chừa cột nút
         if camera_controller is not None and hasattr(camera_controller, "setup"):
-            camera_controller.setup(target, size)
+            # camera xoay quanh tâm bàn; độ lệch chừa cột nút tính theo chiều ngang màn hình
+            camera_controller.setup(self.center, size, screen_shift=size * HUD_SHIFT)
         else:
             camera.position = target + Vec3(size * 0.1, size * 1.05, -size * 0.95)
             camera.look_at(target)
@@ -146,6 +158,13 @@ class BoardView(Entity):
             Entity(parent=self, model="cube", color=COLORS["goal_rim"], shader=lit_with_shadows_shader,
                    position=center + Vec3(dx, 0, dz), scale=(sx, TILE_HEIGHT, sz))
         self._slab(cell, COLORS["goal_hole"], scale_xz=TILE_SIZE - 2 * rim, height=0.05, top=-0.15)
+        # Viền sáng unlit nằm sát mép trong của lỗ, không phụ thuộc hướng đèn
+        glow, inner = 0.045, TILE_SIZE / 2 - rim + 0.045 / 2
+        for dx, dz, sx, sz in ((-inner, 0, glow, 2 * inner + glow), (inner, 0, glow, 2 * inner + glow),
+                               (0, -inner, 2 * inner - glow, glow), (0, inner, 2 * inner - glow, glow)):
+            self._glow.append(Entity(parent=self, model="quad", color=COLORS["goal_glow"], shader=unlit_shader,
+                                     position=cell_to_world(cell, MARK_Y) + Vec3(dx, 0, dz), rotation_x=90,
+                                     scale=(sx, sz)))
 
     def _mark_soft(self, cell: Cell) -> None:
         """Công tắc mềm: đĩa tròn."""
@@ -166,4 +185,4 @@ class BoardView(Entity):
                 a = math.radians(start + i * 10)
                 points.append(Vec3(0.3 * math.cos(a), 0, 0.3 * math.sin(a)))
             Entity(parent=self, model=Mesh(vertices=points, mode="line", thickness=5), color=COLORS["split"],
-                   position=cell_to_world(cell, MARK_Y + 0.01))
+                   shader=unlit_shader, position=cell_to_world(cell, MARK_Y + 0.01))
