@@ -33,6 +33,15 @@ Trên Windows, chạy bằng `python main.py` chứ không chạy `gui/app.py` t
 | Space | Đổi khối con đang điều khiển (sau khi khối bị tách) |
 | R | Chơi lại màn đang mở (cũng dừng khối đang tự lăn) |
 | N / P | Sang màn sau / màn trước |
+| Q / E | Nghiêng camera sang trái / phải một nấc (chính diện, 20°, 40°) |
+| Z / X | Hạ thấp / nâng cao góc nhìn một nấc (52°, 45°, 38°, 30°) |
+| T | Bật/tắt góc nhìn thẳng từ đỉnh |
+| F | Đặt lại camera về chính diện, 52° |
+| Giữ chuột phải và kéo, con lăn chuột | Chỉnh góc nhìn (trong giới hạn trên), thu phóng |
+| H | Ẩn/hiện khung kết quả |
+| Esc | Đóng lưới chọn màn |
+
+Camera luôn nhìn từ trên xuống, từ phía người chơi, và không lệch quá 40° sang hai bên, nên phím ↑ luôn đẩy khối về phía trên màn hình. Góc đã chọn được giữ khi đổi màn. Các nút camera ở cột phải làm được việc như các phím trên.
 
 ### Các nút
 
@@ -40,12 +49,12 @@ Trên Windows, chạy bằng `python main.py` chứ không chạy `gui/app.py` t
 |---|---|
 | Màn mới (màn 01) | Bắt đầu lại từ màn 01 |
 | Chơi lại | Như phím R |
-| Chọn màn… | Mở lưới 33 màn, bấm một màn để chuyển tới |
-| Giải bằng BFS / DFS / UCS / A* | Chạy thuật toán ở tiến trình riêng. Giải được thì khối tự lăn theo lời giải, khung góc trái dưới hiện số bước, chi phí, số nút mở rộng và sinh, frontier lớn nhất, số trạng thái đã thăm, thời gian tìm kiếm, bộ nhớ |
+| Chọn màn… | Mở lưới 33 màn (màn đang mở tô xanh), bấm một màn để chuyển tới |
+| Giải bằng BFS / DFS / UCS / A* | Chạy thuật toán ở tiến trình riêng. Giải được thì khối tự lăn theo lời giải, khung kết quả ở cột trái hiện số bước, chi phí, số nút mở rộng và sinh, frontier lớn nhất, số trạng thái đã thăm, thời gian tìm kiếm, bộ nhớ |
 | So sánh | Chạy lần lượt BFS, DFS, UCS, A* (h_P) và A* (h_M) trên màn đang mở, hiện bảng kết quả |
 | Hủy | Dừng thuật toán đang chạy hoặc khối đang tự lăn |
 
-Mỗi lần giải có bốn kết quả: giải được, không có lời giải, hết giờ (quá 60 giây thì tiến trình bị dừng), lỗi hoặc đã hủy. Trong lúc thuật toán chạy, cửa sổ vẫn phản hồi và nút Hủy dùng được. Thời gian và bộ nhớ hiện trên giao diện chỉ để tham khảo; số liệu trong báo cáo lấy từ script thực nghiệm.
+Mỗi lần giải có bốn kết quả: giải được, không có lời giải, hết giờ (quá 60 giây thì tiến trình bị dừng), lỗi hoặc đã hủy. Trong lúc thuật toán chạy, cửa sổ vẫn phản hồi và nút Hủy dùng được. Khi khung kết quả hiện, bàn tự thu vào phần màn hình còn trống nên không bị che; bấm H để ẩn khung. Thời gian và bộ nhớ hiện trên giao diện chỉ để tham khảo; số liệu trong báo cáo lấy từ script thực nghiệm.
 
 ## Cách chơi
 
@@ -54,7 +63,7 @@ Mục tiêu: lăn khối 1×1×2 tới lỗ vuông đích và **đứng thẳng*
 | Ô | Hình trên giao diện | Luật |
 |---|---|---|
 | Sàn | ô xám | Đi bình thường |
-| Đích | lỗ vuông tối có viền | Khối đứng thẳng trên ô này thì thắng |
+| Đích | lỗ vuông tối, viền vàng nhấp nháy | Khối đứng thẳng trên ô này thì thắng |
 | Ô dễ vỡ | ô cam | Khối đứng thẳng lên thì ô vỡ, khối rơi |
 | Công tắc mềm | đĩa tròn trắng | Bất kỳ phần nào của khối chạm vào đều kích hoạt |
 | Công tắc nặng | hình X đỏ | Chỉ kích hoạt khi khối đứng thẳng trên nó |
@@ -132,6 +141,7 @@ Source/
     board_view.py      dựng bàn từ Level: các loại ô, cầu mở/đóng, ô dễ vỡ vỡ
     block_view.py      khối và hai khối con; hoạt ảnh lăn, tách, ghép, rơi
     hud.py             các nút, lưới chọn màn, khung kết quả, bảng So sánh
+    camera_controller.py  góc nhìn: các nấc nghiêng, nhìn từ đỉnh, thu phóng, căn bàn khi khung kết quả hiện
   levels/original/     33 màn gốc (JSON)
   tools/draw_mazes.py  vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/
   tests/               unit test (unittest)
