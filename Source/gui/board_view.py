@@ -26,6 +26,8 @@ TILE_HEIGHT = 0.3
 TILE_BEVEL = 0.05
 TILE_SHADE = (1.0, 0.68, 0.45)   # mặt trên, mặt bên, mặt dưới
 MARK_Y = 0.006        # ký hiệu công tắc nằm sát trên mặt ô
+GOAL_RIM = 0.045      # viền lỗ đích; miệng lỗ rộng TILE_SIZE - 2 * GOAL_RIM
+GOAL_OPENING = TILE_SIZE - 2 * GOAL_RIM
 
 COLORS = {
     "floor": color.hex("#9aa3ad"),
@@ -33,8 +35,8 @@ COLORS = {
     "fragile": color.hex("#e8892c"),
     "bridge": color.hex("#a9784a"),
     "goal_rim": color.hex("#6b737c"),
-    "goal_hole": color.hex("#090d12"),
     "goal_glow": color.hex("#f2c94c"),
+    "goal_shaft": color.hex("#0b0f14"),   # cùng màu nền phía dưới
     "soft": color.hex("#e9eef2"),
     "heavy": color.hex("#c43c3c"),
     "split": color.hex("#2f6fd6"),
@@ -226,20 +228,23 @@ class BoardView(Entity):
                 self._mark_split(cell)
 
     def _build_goal(self, cell: Cell) -> None:
-        """Lỗ vuông: viền 4 cạnh ngang mặt sàn, đáy tối lún xuống."""
-        rim = 0.12
+        """Lỗ vuông thông xuống dưới: viền mỏng 4 cạnh dày bằng ô, không có đáy, nên khối lọt xuống vẫn nhìn
+        thấy qua miệng lỗ. Viền sáng (unlit, không phụ thuộc hướng đèn) phủ đúng mặt trên của viền."""
+        rim = GOAL_RIM
         half = TILE_SIZE / 2 - rim / 2
-        for dx, dz, sx, sz in ((-half, 0, rim, TILE_SIZE), (half, 0, rim, TILE_SIZE),
-                               (0, -half, TILE_SIZE - 2 * rim, rim), (0, half, TILE_SIZE - 2 * rim, rim)):
+        strips = ((-half, 0, rim, TILE_SIZE), (half, 0, rim, TILE_SIZE),
+                  (0, -half, TILE_SIZE - 2 * rim, rim), (0, half, TILE_SIZE - 2 * rim, rim))
+        for dx, dz, sx, sz in strips:
             self._slab(cell, COLORS["goal_rim"], scale_xz=sx, size_z=sz, offset=Vec3(dx, 0, dz))
-        self._slab(cell, COLORS["goal_hole"], scale_xz=TILE_SIZE - 2 * rim, height=0.05, top=-0.22)
-        # Viền sáng unlit nằm sát mép trong của lỗ, không phụ thuộc hướng đèn
-        glow, inner = 0.045, TILE_SIZE / 2 - rim + 0.045 / 2
-        for dx, dz, sx, sz in ((-inner, 0, glow, 2 * inner + glow), (inner, 0, glow, 2 * inner + glow),
-                               (0, -inner, 2 * inner - glow, glow), (0, inner, 2 * inner - glow, glow)):
             self._glow.append(Entity(parent=self._roots[cell], model="quad", color=COLORS["goal_glow"],
                                      shader=unlit_shader, position=Vec3(dx, MARK_Y, dz), rotation_x=90,
                                      scale=(sx, sz)))
+        # Giếng tối dưới miệng lỗ: khối thắng lọt xuống nằm trong giếng, không lộ ra qua khe giữa các ô xung quanh;
+        # mặt trên của khối dừng cao hơn miệng giếng (block_view.SINK_TOP) nên vẫn nhìn thấy qua lỗ
+        depth = 2.4
+        Entity(parent=self._roots[cell], model="cube", color=COLORS["goal_shaft"], shader=unlit_shader,
+               position=Vec3(0, -TILE_HEIGHT - depth / 2 - 0.002, 0),
+               scale=(GOAL_OPENING + 0.02, depth, GOAL_OPENING + 0.02))
 
     def _mark_soft(self, cell: Cell) -> None:
         """Công tắc mềm: đĩa tròn."""

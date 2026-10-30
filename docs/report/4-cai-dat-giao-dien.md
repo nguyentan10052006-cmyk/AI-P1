@@ -65,7 +65,7 @@ Thuật toán chạy ở tiến trình riêng bằng `multiprocessing` kiểu `s
 
 ### 4.4. Bàn chơi và các loại ô
 
-Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi mã màn, nhóm độ khó, số bước tối ưu tham khảo (PAR) và số bước đã đi (MOVES); cột nút ở bên phải; dòng dưới cùng tóm tắt các phím.
+Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi tên màn, nhóm độ khó, số bước tối ưu tham khảo và số bước đã đi; các nút ở bên phải; dòng dưới cùng tóm tắt các phím hay dùng (F1 mở bảng đầy đủ). Chữ dùng font Be Vietnam Pro [13], thiết kế cho tiếng Việt nên dấu rõ ở cỡ nhỏ.
 
 ![Hình 4.1](hinh/h4-1-man23-du-loai-o.png)
 
@@ -120,7 +120,9 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 | Q / E, Z / X, T, F, chuột phải, con lăn | Đổi góc nhìn (mục 4.7) |
 | H | Ẩn hoặc hiện khung kết quả (mục 4.7) |
 | Ctrl+K | Mở hoặc đóng lưới chọn màn |
-| Esc | Đóng lưới chọn màn |
+| Enter | Nút chính của hộp kết thúc màn |
+| F1 | Bảng tất cả phím tắt |
+| Esc | Đóng hộp kết thúc màn, lưới chọn màn hoặc bảng phím tắt |
 
 Một lượt đi diễn ra theo thứ tự: phím được đổi thành hành động và gửi vào `rules.step()`; khối lật 90° quanh cạnh đáy theo hướng đi, tới vị trí ngay sau khi lăn (khối được gắn tạm vào một trục đặt ở cạnh đó rồi xoay trục; lật xong thì đặt lại đúng vị trí và góc theo trạng thái, nên sai số không dồn qua các bước); sau đó giao diện cập nhật cầu, hiện thông báo sự kiện, rồi vẽ trạng thái cuối (tách, ghép, rơi hoặc thắng). Trong lúc hoạt ảnh chạy, phím mới bị bỏ qua, để trạng thái giao diện đang giữ không đi trước hình đang vẽ. Mỗi lần chơi lại hoặc đổi màn, giao diện tăng một số đếm lượt; lệnh hẹn giờ nào của lượt cũ còn sót lại thấy số đếm đã đổi thì bỏ qua, nên bấm R giữa lúc khối đang lăn không làm trạng thái cũ ghi đè lên màn vừa chơi lại.
 
@@ -130,7 +132,9 @@ Khi vào màn, các ô trồi lên lần lượt theo đường chéo rồi kh�
 
 ### 4.6. Giải tự động và So sánh
 
-Cột nút bên phải gồm Màn mới, Chơi lại, Chọn màn (Hình 4.9), bốn nút Giải bằng BFS, DFS, UCS, A*, nút So sánh, nút Hủy và nhóm nút camera. Trong lúc giải, một vệt sáng bên trái cột nút chỉ vào nút của thuật toán đang chạy (khi So sánh, vệt sáng trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
+Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
+
+**Hộp kết thúc màn.** Khi thắng hoặc rơi, sau khi hoạt ảnh gần xong, một hộp hiện giữa vùng bàn (không che khung kết quả và cột nút). Khi thắng, hộp ghi số bước so với số bước tối ưu, và tên thuật toán nếu khối vừa tự lăn theo lời giải; nút chính là Màn tiếp. Khi rơi, hộp ghi lý do (ô dễ vỡ, cầu đóng, hụt khỏi bàn) theo sự kiện của engine; nút chính là Chơi lại. Enter bấm nút chính, Esc đóng hộp; chơi lại hay đổi màn thì hộp tự đóng.
 
 **Chạy thuật toán không làm đơ giao diện.** Ursina vẽ mọi thứ trong một vòng lặp duy nhất, nên nếu chạy thuật toán ngay trong vòng lặp đó thì cửa sổ đứng yên suốt lúc tìm. Khi bấm một nút Giải, giao diện gọi `runner.start_solver()`; hàm này mở một tiến trình con chạy thuật toán rồi trả về ngay. Mỗi khung hình, giao diện gọi `poll()` để hỏi kết quả mà không phải chờ; không dùng callback từ tiến trình khác, vì Ursina không an toàn khi đối tượng bị sửa ngoài luồng chính. Dùng tiến trình chứ không dùng luồng vì Python không dừng ngang được một luồng: quá 60 giây hoặc khi bấm Hủy, tiến trình con bị dừng hẳn. Trong lúc chờ, khung kết quả hiện tên thuật toán và số giây đã chạy, các nút Giải mờ đi và nút Hủy sáng lên (Hình 4.7). Khi đo trong lúc thuật toán chạy, khung hình chậm nhất khoảng 55 ms, tức cửa sổ vẫn phản hồi.
 
@@ -194,11 +198,16 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 | Cài trong môi trường ảo mới theo README | Cài đúng phiên bản, test qua, cửa sổ mở được |
 | Giải bằng BFS rồi tự lăn trên cả 33 màn, với hoạt ảnh lật khối mới (30/10) | 33/33 màn thắng đúng số bước tối ưu |
 | Bấm phím ngẫu nhiên mỗi khung hình (lăn, R, N, P, Space, camera, Ctrl+K) xen với Giải, So sánh, Hủy; 17 lần × 35 giây (30/10) | Không lỗi, không treo (trước khi sửa hoạt ảnh hẹn giờ: 4/12 lần dừng vì lỗi `!is_empty()`) |
+| Thắng ở màn 1; bấm F1, Esc; rơi ở màn 1 (30/10) | Khối thu vừa miệng lỗ và nhìn thấy trong lòng lỗ; hộp thắng ghi đúng số bước; hộp rơi ghi đúng lý do |
 | Lăn ra mép ở màn 1 (một đầu hụt, rồi hụt cả hai đầu), tách và ghép ở màn 8, đứng lên ô dễ vỡ, rồi bấm R (30/10) | Khối đổ nghiêng qua mép, không xuyên sàn; chỉ khối con hụt rơi; ô dễ vỡ được dựng lại |
 
 ### 4.9. Hạn chế
 
 - Chấm đánh dấu màn đã thắng chỉ giữ trong một lần chạy chương trình, chưa lưu ra file.
+
+#### Nguồn đề xuất thêm vào danh mục tài liệu tham khảo
+
+[13] The Be Vietnam Pro Project Authors, *Be Vietnam Pro*, giấy phép SIL Open Font License 1.1. [Trực tuyến]. Địa chỉ: https://github.com/bettergui/BeVietnamPro
 - Chưa có màn hướng dẫn chú giải các loại ô và phím; người chơi xem Bảng 4.1, dòng phím tắt cuối màn hình hoặc README.
 - Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
 - Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.

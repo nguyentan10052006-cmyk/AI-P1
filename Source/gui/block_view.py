@@ -22,7 +22,7 @@ from ursina.shaders import lit_with_shadows_shader, unlit_shader
 
 from bloxorz.state import DELTA, Cell, Dir, Orient, State
 from gui.anim import animate_later, stop_animations
-from gui.board_view import cell_to_world
+from gui.board_view import GOAL_OPENING, cell_to_world
 from gui.meshes import beveled_box
 
 SIZE = 0.96          # nhỏ hơn ô một chút để thấy khe giữa khối và sàn
@@ -49,6 +49,7 @@ EDGE_ALPHA = {"active": 0.9, "idle": 0.25}
 ROLL_CURVE = curve.in_out_sine
 SHADOW_SOFT = 1.55   # bóng rộng hơn đáy khối chừng này lần, mép mờ dần
 SHADOW_FADE = 2.5    # khối cao hơn mặt sàn chừng này đơn vị thì bóng mờ hẳn
+SINK_TOP = -0.12     # thắng: mặt trên của khối dừng ở độ sâu này, trong lòng lỗ đích (ô dày 0.3)
 
 # Hướng lăn -> (trục quay của Ursina, góc): rotation_z +90 đưa +y sang +x, rotation_x +90 đưa +y sang +z
 ROLL_AXIS = {
@@ -242,9 +243,14 @@ class BlockView(Entity):
         self._drop(self.body, duration)
 
     def sink(self, duration: float) -> None:
-        """Thắng: khối đứng lọt xuống lỗ đích."""
+        """Thắng: khối đứng thu vừa miệng lỗ đích rồi lọt xuống, dừng lại khi mặt trên nằm trong lòng lỗ
+        (dưới mặt sàn SINK_TOP) để vẫn nhìn thấy khối qua miệng lỗ."""
         self._finish_roll()
-        self.body.animate_y(self.body.y - 2.2, duration=duration, curve=curve.in_quad)
+        narrow = 0.1
+        fit = GOAL_OPENING * 0.97 / SIZE
+        self.body.outline.animate("alpha", 0, duration=narrow, curve=curve.linear)
+        self.body.animate_scale(Vec3(fit, 1, fit), duration=narrow, curve=curve.out_quad)
+        animate_later(self.body, "y", SINK_TOP - SIZE, duration - narrow, narrow, curve.in_quad)
 
     @classmethod
     def _drop(cls, piece: Entity, duration: float) -> None:
@@ -276,10 +282,11 @@ class BlockView(Entity):
             extent_x = sum(abs(axis.x) * h for axis, h in zip(axes, half))
             extent_z = sum(abs(axis.z) * h for axis, h in zip(axes, half))
             extent_y = sum(abs(axis.y) * h for axis, h in zip(axes, half))
-            height = max(0.0, center.y - extent_y)     # khoảng cách từ đáy khối tới mặt sàn
+            bottom = center.y - extent_y     # độ cao của đáy khối so với mặt sàn
             shadow.x, shadow.z = center.x, center.z
             shadow.scale = Vec3(2 * extent_x * SHADOW_SOFT, 2 * extent_z * SHADOW_SOFT, 1)
-            shadow.alpha = COLORS["shadow"].a * max(0.0, 1 - height / SHADOW_FADE) if center.y > -0.2 else 0
+            # đáy đã xuống dưới mặt sàn (rơi, lọt lỗ đích): bỏ bóng, nếu không bóng phủ tối miệng lỗ
+            shadow.alpha = COLORS["shadow"].a * max(0.0, 1 - bottom / SHADOW_FADE) if bottom > -0.05 else 0
 
     # ---- tiện ích ----
 

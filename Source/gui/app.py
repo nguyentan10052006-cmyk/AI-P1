@@ -24,12 +24,15 @@ from gui.block_view import BlockView
 from gui.board_view import BoardView
 from gui.camera_controller import CameraController
 from gui.hud import LABELS, Hud
+from gui.popup import ResultPopup
+from gui.theme import FONT_BOLD, FONT_SEMIBOLD, use_fonts
 from solvers import ALGORITHMS                                   # docs/07 §2: gui chỉ dùng ALGORITHMS và runner
 from solvers.runner import CompareJob, SolveJob, start_compare, start_solver
 
 LEVELS_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
-HELP = ("WASD/Mũi tên: lăn  ·  Space: đổi khối  ·  R: chơi lại  ·  Q/E: nghiêng trái phải  ·  Z/X: hạ nâng góc"
-        "  ·  T: đỉnh  ·  F: đặt lại  ·  Chuột phải: chỉnh góc  ·  Cuộn: zoom  ·  H: ẩn kết quả")
+# Dòng phím tắt dưới đáy chỉ ghi các phím hay dùng; F1 mở bảng đầy đủ (hud.SHORTCUTS)
+HELP = ("WASD / mũi tên: lăn   ·   Space: đổi khối   ·   R: chơi lại   ·   N / P: màn sau / trước"
+        "   ·   H: ẩn kết quả   ·   F1: tất cả phím tắt")
 # Bảng màu theo GAME_UI_UX_SPECIFICATION.md §2.1
 THEME = {
     "bg_top": color.hex("#18212b"),   # nền gradient: xám đậm ở trên xuống đen ở dưới
@@ -65,10 +68,13 @@ COST_FN = compute_step_cost
 SWITCH_KINDS = {"soft": "Công tắc mềm", "heavy": "Công tắc nặng", "split": "Công tắc tách"}
 # Công tắc dùng "links" với hiệu ứng khác nhau cho từng cầu có effect rỗng (V03)
 SWITCH_EFFECTS = {"toggle": "đổi trạng thái cầu", "open": "mở cầu", "close": "đóng cầu", "": "đổi trạng thái các cầu"}
-FALL_MESSAGES = {
-    "fragile": "Ô dễ vỡ bị vỡ!",
-    "bridge_closed": "Cầu đang đóng, khối rơi!",
+# Hộp kết thúc khi rơi: (tiêu đề, giải thích) theo lý do rơi của engine (sự kiện "fell")
+FALL_TEXTS = {
+    "fragile": ("Ô dễ vỡ bị vỡ", "Khối đứng thẳng trên ô cam nên ô vỡ."),
+    "bridge_closed": ("Cầu đang đóng", "Khối đi vào ô cầu chưa mở."),
 }
+FALL_DEFAULT = ("Khối rơi khỏi bàn", "Có phần khối không còn ô đỡ bên dưới.")
+POPUP_DELAY = 0.15   # hộp kết thúc hiện sau khi hoạt ảnh rơi hoặc lọt lỗ gần xong
 
 
 class Game(Entity):
@@ -87,17 +93,23 @@ class Game(Entity):
         self.busy = False        # đang chạy hoạt ảnh: bỏ qua phím để state không đi trước hình (docs/07 §7)
         self.over = False        # đã thắng hoặc rơi: chờ R
         self.turn = 0            # tăng mỗi lần đổi màn hoặc chơi lại; lệnh invoke của lượt cũ thấy lệch thì bỏ qua
-        self.info = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.02, 0), scale=1.15)
-        self.moves = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.065, 0), scale=1.3,
-                          color=THEME["accent"])
-        self.help = Text(HELP, parent=camera.ui, origin=(0, 0), y=window.bottom.y + 0.022, scale=0.8,
+        # Góc trái trên: tên màn (đậm), nhóm và số bước tối ưu, số bước đã đi
+        self.info = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.018, 0), scale=1.6,
+                         font=FONT_BOLD)
+        self.subtitle = Text(parent=camera.ui, position=window.top_left + Vec3(0.022, -0.068, 0), scale=0.82,
+                             color=THEME["muted"])
+        self.moves = Text(parent=camera.ui, position=window.top_left + Vec3(0.022, -0.1, 0), scale=1.15,
+                          color=THEME["accent"], font=FONT_SEMIBOLD)
+        self.help = Text(HELP, parent=camera.ui, origin=(0, 0), y=window.bottom.y + 0.022, scale=0.76,
                          color=THEME["muted"])
-        self.message = Text(parent=camera.ui, origin=(0, 0), y=0.38, scale=2)
-        # Ngay dưới dòng thắng/thua; góc trái dưới dành cho khung kết quả của solver (hud.py)
-        self.notice = Text(parent=camera.ui, origin=(0, 0), y=NOTICE_Y, scale=1.3, color=THEME["warn"])
+        # Thông báo sự kiện (công tắc, tách, ghép) ở phía trên vùng bàn; kết thúc màn dùng hộp popup
+        self.notice = Text(parent=camera.ui, origin=(0, 0), y=NOTICE_Y, scale=1.2, color=THEME["warn"],
+                           font=FONT_SEMIBOLD)
         self._notice_id = 0
-        self.fps = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.112, 0), scale=0.7,
-                        color=THEME["muted"])
+        self.fps = Text(parent=camera.ui, position=window.bottom_left + Vec3(0.02, 0.022, 0), origin=(-0.5, 0),
+                        scale=0.65, color=THEME["muted"])
+        self.popup = ResultPopup()
+        self.board_center_x = 0.0   # tâm ngang vùng bàn trên màn hình (đổi khi khung kết quả hiện hay ẩn)
         self._fps_frames, self._fps_time = 0, 0.0
         # Solver chạy ở tiến trình riêng; GUI chỉ giữ job và gọi poll() trong update() (docs/07 §6 quy tắc 2)
         self.job: Optional[Union[SolveJob, CompareJob]] = None
@@ -105,9 +117,11 @@ class Game(Entity):
         self.replay: Optional[List[Action]] = None   # lời giải đang được tự lăn
         self.replay_index = 0
         self.replay_wait = 0.0
+        self.replay_label = ""                   # tên thuật toán của lời giải đang tự lăn (hiện trong hộp thắng)
         self.camera_ctrl = CameraController()
         self.hud = Hud([p.stem for p in paths], on_new_game=lambda: self.load(0), on_restart=self.restart,
                        on_pick_level=self.load, on_solve=self.solve, on_compare=self.compare,
+                       on_prev=lambda: self.load(self.index - 1), on_next=lambda: self.load(self.index + 1),
                        on_cancel=self.cancel,
                        on_rotate_cam=self.camera_ctrl.rotate_preset,
                        on_tilt_cam=self.camera_ctrl.tilt_preset,
@@ -133,9 +147,10 @@ class Game(Entity):
         try:
             self.level = load_level(path, path.stem)
         except LevelError as exc:
-            self.info.text = f"Không nạp được {path.name}: {exc}"
+            self.info.text = f"Không nạp được {path.name}"
+            self.subtitle.text = str(exc)
             self.moves.text = ""
-            self.message.text = ""
+            self.popup.hide()
             return
         self.board = BoardView(self.level)
         self.board.fit_camera(self.camera_ctrl)
@@ -157,7 +172,7 @@ class Game(Entity):
         self.busy = True
         self.block.spawn(self.state, SPAWN_TIME, delay=spawn_delay)
         invoke(self._unbusy, self.turn, delay=spawn_delay + SPAWN_TIME)
-        self.message.text = ""
+        self.popup.hide()
         self.show_notice("")
         self._update_info()
 
@@ -177,22 +192,24 @@ class Game(Entity):
             self.camera_ctrl.set_frame(scale, shift / window.aspect_ratio)
         else:
             self.camera_ctrl.set_frame(1.0, 0.0)
-        for text in (self.message, self.notice):   # dòng thắng/thua và thông báo nằm giữa vùng bàn
-            text.animate_x(center_x, duration=0.2, curve=curve.out_quad)
+        self.board_center_x = center_x
+        self.notice.animate_x(center_x, duration=0.2, curve=curve.out_quad)   # thông báo và hộp kết thúc
+        self.popup.move_to(center_x)                                         # nằm giữa vùng bàn
 
     def _update_info(self) -> None:
         level = self.level
         cube = ""
         if self.state is not None and self.state.orient is Orient.SPLIT:
-            cube = f"   KHỐI CON {self.active_cube + 1}/2 (Space để đổi)"
-        self.info.text = f"STAGE {level.id}  ·  {level.group.upper()}  ·  PAR {level.par}"
-        moves = f"MOVES {self.steps}{cube}"
+            cube = f"   ·   khối con {self.active_cube + 1}/2 (Space để đổi)"
+        self.info.text = f"Màn {level.id}"
+        self.subtitle.text = f"Nhóm {level.group.upper()}   ·   tối ưu {level.par} bước"
+        moves = f"Số bước: {self.steps}{cube}"
         if self.moves.text != moves:
-            bump = self.steps > 0 and not self.moves.text.startswith(f"MOVES {self.steps}")
+            bump = self.steps > 0 and not self.moves.text.startswith(f"Số bước: {self.steps}")
             self.moves.text = moves
             if bump:   # số bước vừa tăng: nảy nhẹ 1 → 1.15 → 1 (§3.1)
-                self.moves.scale = 1.3 * 1.15
-                self.moves.animate_scale(1.3, duration=0.12, curve=curve.out_quad)
+                self.moves.scale = 1.15 * 1.15
+                self.moves.animate_scale(1.15, duration=0.12, curve=curve.out_quad)
 
     def show_notice(self, text: str) -> None:
         """Dòng thông báo sự kiện dưới dòng thắng/thua: trượt xuống khi hiện, mờ dần sau NOTICE_TIME giây."""
@@ -238,9 +255,17 @@ class Game(Entity):
         elif key == "h":
             self.hud.toggle_panel()
         elif key == "escape":
-            self.hud.close_picker()
+            if self.hud.overlay_open:
+                self.hud.close_picker()
+                self.hud.close_help()
+            else:
+                self.popup.hide()
         elif key == "control+k":
             self.hud.toggle_picker()
+        elif key == "f1":
+            self.hud.toggle_help()
+        elif key == "enter":
+            self.popup.press_primary()
         elif key == "t":
             self.camera_ctrl.toggle_top_down()
         elif key == "f":
@@ -249,8 +274,8 @@ class Game(Entity):
             self.camera_ctrl.zoom(1.0)
         elif key in ("scroll down", "wheel_down"):
             self.camera_ctrl.zoom(-1.0)
-        elif self.state is None or self.busy or self.over or self.replay is not None:
-            return   # đang tự lăn theo lời giải thì không nhận phím lăn; R, N, P, camera vẫn hoạt động
+        elif self.state is None or self.busy or self.over or self.replay is not None or self.hud.overlay_open:
+            return   # đang tự lăn hoặc đang mở bảng chọn màn, phím tắt: không nhận phím lăn; R, N, P, camera vẫn được
         elif key == "space" and self.state.orient is Orient.SPLIT:
             self.active_cube = 1 - self.active_cube
             self.block.show(self.state, self.active_cube)
@@ -324,6 +349,7 @@ class Game(Entity):
         if outcome.get("ok") and outcome["status"] == "solved":
             self.restart()   # lời giải tính từ trạng thái đầu
             self.replay, self.replay_index, self.replay_wait = list(outcome["path"]), 0, REPLAY_PAUSE
+            self.replay_label = LABELS[self.job_name]
 
     def _replay_step(self) -> None:
         """Khối tự lăn: mỗi bước gọi rules.step() như khi chơi tay (docs/07 §5), chờ hoạt ảnh xong mới đi tiếp."""
@@ -372,8 +398,7 @@ class Game(Entity):
             hanging = [cell for cell in result.state.cells()
                        if not self.board.supports(cell, result.state.open_bridges)]
             self.block.fall(result.state, hanging, FALL_TIME)
-            self.message.text = FALL_MESSAGES.get(fell["reason"], "Rơi khỏi bàn!") + " Bấm R để chơi lại"
-            self.message.color = THEME["bad"]
+            invoke(self._show_fall, turn, fell["reason"], delay=FALL_TIME * 0.7)
             invoke(self._unbusy, turn, delay=FALL_TIME)
             return
         self.state = result.state
@@ -389,12 +414,38 @@ class Game(Entity):
             self.block.sink(WIN_TIME)
             self.board.celebrate_goal()
             self.hud.mark_solved(self.index)
-            self.message.text = f"Thắng sau {self.steps} bước! (tối ưu {self.level.par})"
-            self.message.color = THEME["ok"]
+            invoke(self._show_win, turn, self.replay_label if self.replay is not None else "",
+                   delay=WIN_TIME + POPUP_DELAY)
         if split:
             invoke(self._unbusy, turn, delay=SPLIT_TIME)
         else:
             self.busy = False
+
+    # ---- hộp kết thúc màn ----
+
+    def _show_win(self, turn: int, solver: str) -> None:
+        if turn != self.turn:   # đã chơi lại hoặc đổi màn trước khi hộp kịp hiện
+            return
+        par, extra = self.level.par, self.steps - self.level.par
+        if extra <= 0:
+            verdict = ("Đúng số bước tối ưu!", THEME["ok"])
+        else:
+            verdict = (f"Nhiều hơn tối ưu {extra} bước, thử lại để rút ngắn?", THEME["warn"])
+        first = f"Lời giải của {solver}: {self.steps} bước" if solver else f"Hoàn thành sau {self.steps} bước"
+        last = self.index == len(self.paths) - 1
+        self.popup.show("win", f"Hoàn thành màn {self.level.id}!",
+                        [(f"{first}  ·  tối ưu {par}", color.white), verdict],
+                        [("Chơi lại", self.restart, False),
+                         ("Về màn 01" if last else "Màn tiếp  ›", lambda: self.load(self.index + 1), True)],
+                        "Enter: màn tiếp   ·   R: chơi lại   ·   Esc: đóng", x=self.board_center_x)
+
+    def _show_fall(self, turn: int, reason: str) -> None:
+        if turn != self.turn:
+            return
+        title, why = FALL_TEXTS.get(reason, FALL_DEFAULT)
+        self.popup.show("fall", title, [(why, color.white), (f"Đã đi {self.steps} bước.", THEME["muted"])],
+                        [("Chọn màn", self.hud.toggle_picker, False), ("Chơi lại", self.restart, True)],
+                        "Enter hoặc R: chơi lại   ·   Esc: đóng", x=self.board_center_x)
 
     def _update_fps(self) -> None:
         self._fps_frames += 1
@@ -438,7 +489,8 @@ class Game(Entity):
 
 
 def setup_scene() -> None:
-    """Nền và ánh sáng theo GAME_UI_UX_SPECIFICATION.md §2.2 (không đổ bóng)."""
+    """Font, nền và ánh sáng theo GAME_UI_UX_SPECIFICATION.md §2 (không đổ bóng)."""
+    use_fonts()
     window.color = THEME["bg_bottom"]
     # Tấm nền gradient gắn vào camera, đặt thật xa nên luôn nằm sau bàn chơi
     Entity(parent=camera, model=Mesh(vertices=[(-0.5, -0.5, 0), (0.5, -0.5, 0), (0.5, 0.5, 0), (-0.5, 0.5, 0)],

@@ -40,7 +40,9 @@ Trên Windows, chạy bằng `python main.py` chứ không chạy `gui/app.py` t
 | Giữ chuột phải và kéo, con lăn chuột | Chỉnh góc nhìn (trong giới hạn trên), thu phóng |
 | H | Ẩn/hiện khung kết quả |
 | Ctrl+K | Mở/đóng lưới chọn màn (chấm xanh đánh dấu màn đã thắng) |
-| Esc | Đóng lưới chọn màn |
+| Enter | Bấm nút chính của hộp kết thúc màn (Màn tiếp hoặc Chơi lại) |
+| F1 | Bảng tất cả phím tắt |
+| Esc | Đóng hộp kết thúc màn, lưới chọn màn hoặc bảng phím tắt |
 
 Camera luôn nhìn từ trên xuống, từ phía người chơi, và không lệch quá 40° sang hai bên, nên phím ↑ luôn đẩy khối về phía trên màn hình. Góc đã chọn được giữ khi đổi màn. Các nút camera ở cột phải làm được việc như các phím trên.
 
@@ -48,14 +50,15 @@ Camera luôn nhìn từ trên xuống, từ phía người chơi, và không l�
 
 | Nút | Tác dụng |
 |---|---|
-| Màn mới (màn 01) | Bắt đầu lại từ màn 01 |
-| Chơi lại | Như phím R |
-| Chọn màn… | Mở lưới 33 màn (màn đang mở tô xanh), bấm một màn để chuyển tới |
-| Giải bằng BFS / DFS / UCS / A* | Chạy thuật toán ở tiến trình riêng. Giải được thì khối tự lăn theo lời giải, khung kết quả ở cột trái hiện số bước, chi phí, số nút mở rộng và sinh, frontier lớn nhất, số trạng thái đã thăm, thời gian tìm kiếm, bộ nhớ |
-| So sánh | Chạy lần lượt BFS, DFS, UCS, A* (h_P) và A* (h_M) trên màn đang mở, hiện bảng kết quả |
+| Màn đầu, ‹ Trước, Sau ›, Chơi lại (thanh trên cùng bên phải) | Về màn 01, sang màn trước hoặc sau, chơi lại màn đang mở (như phím P, N, R) |
+| Chọn màn (thanh trên cùng) | Mở lưới 33 màn (màn đang mở tô xanh), bấm một màn để chuyển tới |
+| BFS / DFS / UCS / A* (thẻ "Tìm lời giải") | Chạy thuật toán ở tiến trình riêng. Giải được thì khối tự lăn theo lời giải, khung kết quả ở cột trái hiện số bước, chi phí, số nút mở rộng và sinh, frontier lớn nhất, số trạng thái đã thăm, thời gian tìm kiếm, bộ nhớ |
+| So sánh cả 5 thuật toán | Chạy lần lượt BFS, DFS, UCS, A* (h_P) và A* (h_M) trên màn đang mở, hiện bảng kết quả |
 | Hủy | Dừng thuật toán đang chạy hoặc khối đang tự lăn |
 
 Mỗi lần giải có bốn kết quả: giải được, không có lời giải, hết giờ (quá 60 giây thì tiến trình bị dừng), lỗi hoặc đã hủy. Trong lúc thuật toán chạy, cửa sổ vẫn phản hồi và nút Hủy dùng được. Khi khung kết quả hiện, bàn tự thu vào phần màn hình còn trống nên không bị che; bấm H để ẩn khung. Thời gian và bộ nhớ hiện trên giao diện chỉ để tham khảo; số liệu trong báo cáo lấy từ script thực nghiệm.
+
+Khi thắng hoặc rơi, một hộp thông báo hiện giữa vùng bàn: số bước so với tối ưu (hoặc lý do rơi) và các nút Màn tiếp, Chơi lại, Chọn màn. Các nút camera nằm trong thẻ "Góc nhìn".
 
 ## Cách chơi
 
@@ -196,6 +199,7 @@ Quy tắc phụ thuộc: `bloxorz/` không import package nào khác của dự 
 - **Bloxorz** (D. Clarke, 2007): luật chơi và thiết kế 33 màn gốc.
 - **bloxorz_gba** (J. Coughenour, commit f57ebb6), giấy phép **GPL-3.0**: dữ liệu 33 màn trong `levels/original/` được chuyển từ `game/levels.json` của repo này. https://github.com/jacobcoughenour/bloxorz_gba
 - **Ursina 7.0.0** (giấy phép MIT) và **Panda3D 1.10.16** (giấy phép Modified BSD): giao diện 3D. https://www.ursinaengine.org, https://www.panda3d.org
+- **Be Vietnam Pro** (The Be Vietnam Pro Project Authors, giấy phép SIL Open Font License 1.1, `gui/fonts/OFL.txt`): font chữ của giao diện. https://github.com/bettergui/BeVietnamPro
 - **Matplotlib 3.10.9**: biểu đồ thực nghiệm.
 - Bản demo trong `web/` dùng **Three.js r160**, **OrbitControls.js**, **RoundedBoxGeometry.js** (giấy phép MIT, `web/vendor/LICENSE-three.txt`) và phông **Baloo 2**, **Nunito** (SIL Open Font License 1.1, `web/vendor/fonts/OFL-*.txt`).
 
