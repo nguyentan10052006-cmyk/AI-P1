@@ -13,7 +13,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` ghim `ursina==7.0.0` và `panda3d==1.10.16`. Engine, các thuật toán và test chỉ dùng thư viện chuẩn, nên chạy được cả trên máy chưa cài Ursina; chỉ giao diện cần hai thư viện này.
+`requirements.txt` ghim `ursina==7.0.0`, `panda3d==1.10.16` (giao diện) và `matplotlib==3.10.9` (chỉ để vẽ biểu đồ thực nghiệm). Engine, các thuật toán và test chỉ dùng thư viện chuẩn, nên chạy được cả trên máy chưa cài Ursina.
 
 ## Chạy giao diện
 
@@ -87,6 +87,20 @@ Luật theo đề bài (mục 2). Các điểm đề bài chưa nói rõ, nhóm 
 
 Trạng thái đầy đủ gồm vị trí, tư thế và tập các cầu đang mở. Hai trạng thái cùng vị trí khối nhưng khác cấu hình cầu là hai trạng thái khác nhau.
 
+## Hàm chi phí
+
+UCS và A* dùng hàm chi phí không đồng nhất trong `bloxorz/costs.py` (công nâng trọng tâm khi lật khối, cộng phụ phí khi đi lên ô dễ vỡ). Mọi bước tốn ít nhất 1, nên heuristic đếm bước của A* vẫn chấp nhận được.
+
+| Bước | Chi phí |
+|---|---|
+| Đứng → nằm | 1.12 |
+| Nằm → đứng | 1.62 |
+| Nằm → nằm (lăn quanh trục dài) | 1.21 |
+| Khối con 1×1×1 lăn | 1.10 |
+| Thêm khi có phần khối nằm trên ô dễ vỡ | +0.50 |
+
+Nút Giải, nút So sánh và script thực nghiệm đều dùng hàm này (`COST_FN` trong `gui/app.py`, `--cost` trong `experiments/run.py`), nên cột chi phí của BFS và DFS cũng tính theo cùng hàm để so chất lượng lời giải (docs/04 §2). BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất; trên 33 màn gốc, hai tiêu chí này cho đường khác nhau ở màn 17 và 23.
+
 ## Màn chơi
 
 `levels/original/01.json` … `33.json` là 33 màn của Bloxorz gốc theo đúng thứ tự trong game, chuyển tự động từ dữ liệu của bloxorz_gba (cách sinh lại và kiểm tra: `levels/original/README.md`). Mỗi file có `name`, `passcode`, `group` (nhóm độ khó), `source`, `par` (số bước tối ưu tham khảo), `grid` và `switches`:
@@ -106,7 +120,9 @@ Trạng thái đầy đủ gồm vị trí, tư thế và tập các cầu đang
 
 Ký hiệu trong `grid`: `.` ô trống, `#` sàn, `S` vị trí xuất phát (khối đứng), `G` đích, `F` ô dễ vỡ, `b` / `B` cầu đóng / mở lúc đầu, `o` công tắc mềm, `x` công tắc nặng, `@` công tắc tách. Công tắc mềm và nặng có `effect` (`toggle`, `open`, `close`) và `bridges`; công tắc tách có `targets` là hai ô đích của khối con. Công tắc nối nhiều cầu với hiệu ứng khác nhau dùng `links`: `[{"cell": [r, c], "effect": "open"}, …]`. `bloxorz/level.py` kiểm tra file trước khi chạy và báo lỗi rõ ràng nếu file sai.
 
-Các file `levels/*.json` ngoài thư mục `original/` (1-1 … 5-3, T1, T2, B1) là 18 màn tự thiết kế của bản demo đầu, giao diện Ursina chưa dùng (đang chờ nhóm chốt giữ làm màn hướng dẫn hay bỏ).
+`levels/gen/` là bộ màn tự sinh cho thực nghiệm (`python -m experiments.gen_levels`, docs/04 §8): S1 sân trống N × N (N từ 10 tới 200), S2 có k công tắc mềm (k từ 0 tới 10), S3 không có lời giải.
+
+Các file `levels/*.json` ngay trong `levels/` (1-1 … 5-3, T1, T2, B1) là 18 màn tự thiết kế của bản demo đầu, giao diện Ursina chưa dùng (đang chờ nhóm chốt giữ làm màn hướng dẫn hay bỏ).
 
 ## Chạy kiểm thử
 
@@ -115,11 +131,28 @@ cd Source
 python -m unittest discover -v
 ```
 
-Bộ test gồm bảng chuyển tư thế, rơi, thắng, các loại công tắc, tách và ghép khối (`test_rules.py`, `test_spec.py` với mỗi câu luật trích từ đề), bộ nạp màn, các solver trên mê cung mẫu `GridMaze` (`test_solvers.py`, `test_bfs.py`) và module chạy solver ở tiến trình riêng (`test_runner.py`). Test không cần Ursina.
+Bộ test (khoảng 200 test, chạy chừng 30 giây) gồm:
+
+- luật chơi: bảng chuyển tư thế, rơi, thắng, các loại công tắc, tách và ghép khối (`test_rules.py`, `test_spec.py` với mỗi câu luật trích từ đề);
+- màn chơi: bộ nạp màn, 33 màn gốc, bộ màn tự sinh (`test_levels.py`, `test_original_levels.py`, `test_gen_levels.py`);
+- thuật toán: mê cung mẫu `GridMaze`, BFS đúng số bước tối ưu trên 33 màn, UCS và A* cùng chi phí, hàm chi phí (`test_solvers.py`, `test_bfs.py`, `test_dfs.py`, `test_ucs.py`, `test_astar.py`, `test_costs.py`);
+- module chạy solver ở tiến trình riêng và script thực nghiệm (`test_runner.py`, `test_experiments.py`).
+
+Test không cần Ursina.
 
 ## Thực nghiệm
 
-_(TV2 bổ sung khi có script đo V23: lệnh chạy, file CSV kết quả, lệnh vẽ biểu đồ.)_
+```bash
+cd Source
+python -m experiments.run                          # 5 thuật toán × 33 màn gốc, ghi vào experiments/
+python -m experiments.run --levels levels/gen --out experiments/gen   # bộ màn tự sinh
+python -m experiments.run --cost unit --out experiments/unit           # chi phí 1 mỗi bước, để đối chiếu
+python tools/check_heuristics.py                   # kiểm tra h_M, h_P chấp nhận được và nhất quán
+```
+
+Mỗi lần đo chạy trong một tiến trình riêng, có giới hạn thời gian (mặc định 60 giây). Thời gian là trung vị của 5 lần chạy không bật `tracemalloc`; bộ nhớ đo ở một lần chạy riêng. Kết quả gồm `raw.csv` (mỗi lần chạy một dòng), `summary.csv` (mỗi cặp màn, thuật toán một dòng, cột theo docs/04 §5) và `run_info.json` (cấu hình máy, commit, hàm chi phí). Mặc định không ghi đè kết quả cũ; thêm `--force` nếu chắc chắn.
+
+_(TV2 bổ sung lệnh vẽ biểu đồ khi có script V25.)_
 
 ## Cấu trúc thư mục
 
@@ -132,7 +165,9 @@ Source/
     level.py           đọc và kiểm tra file màn JSON
     rules.py           step(): một nước đi -> trạng thái mới + sự kiện (công tắc, tách, ghép, rơi, thắng)
     problem.py         giao diện bài toán tìm kiếm cho solver
+    costs.py           hàm chi phí không đồng nhất (V13)
     maze.py            GridMaze: mê cung nhỏ cùng giao diện Problem, để thử solver
+    serialize.py       chuyển State, Action, Level qua JSON (dùng cho bản demo web)
   solvers/             thuật toán tìm kiếm, mỗi file một lớp con của Solver (base.py)
     bfs.py dfs.py ucs.py astar.py heuristics.py
     runner.py          chạy solver ở tiến trình riêng: hết giờ, Hủy, So sánh; start_solver()/poll() cho giao diện
@@ -143,7 +178,12 @@ Source/
     hud.py             các nút, lưới chọn màn, khung kết quả, bảng So sánh
     camera_controller.py  góc nhìn: các nấc nghiêng, nhìn từ đỉnh, thu phóng, căn bàn khi khung kết quả hiện
   levels/original/     33 màn gốc (JSON)
-  tools/draw_mazes.py  vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/
+  levels/gen/          bộ màn tự sinh S1–S3 cho thực nghiệm
+  experiments/         run.py: script đo (CSV); gen_levels.py: sinh levels/gen/;
+                       convert_original_levels.py: chuyển 33 màn từ dữ liệu bloxorz_gba
+  tools/
+    check_heuristics.py  kiểm tra h_M, h_P bằng số liệu trên 33 màn: chấp nhận được, nhất quán, cùng chi phí với UCS
+    draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/
   tests/               unit test (unittest)
   server/, web/        bản demo đầu (giao diện web Three.js qua server HTTP), không còn dùng; chờ nhóm đồng ý thì bỏ
 ```
@@ -155,6 +195,7 @@ Quy tắc phụ thuộc: `bloxorz/` không import package nào khác của dự 
 - **Bloxorz** (D. Clarke, 2007): luật chơi và thiết kế 33 màn gốc.
 - **bloxorz_gba** (J. Coughenour, commit f57ebb6), giấy phép **GPL-3.0**: dữ liệu 33 màn trong `levels/original/` được chuyển từ `game/levels.json` của repo này. https://github.com/jacobcoughenour/bloxorz_gba
 - **Ursina 7.0.0** (giấy phép MIT) và **Panda3D 1.10.16** (giấy phép Modified BSD): giao diện 3D. https://www.ursinaengine.org, https://www.panda3d.org
+- **Matplotlib 3.10.9**: biểu đồ thực nghiệm.
 - Bản demo trong `web/` dùng **Three.js r160**, **OrbitControls.js**, **RoundedBoxGeometry.js** (giấy phép MIT, `web/vendor/LICENSE-three.txt`) và phông **Baloo 2**, **Nunito** (SIL Open Font License 1.1, `web/vendor/fonts/OFL-*.txt`).
 
-Danh mục nguồn đầy đủ (kể cả các nguồn chỉ dùng để đối chiếu) nằm ở `docs/06-bao-cao-video.md` mục 3.
+Danh mục nguồn đầy đủ (kể cả các nguồn chỉ dùng để đối chiếu) nằm ở `docs/06-bao-cao-video.md` mục 3 và `docs/report/tai-lieu-tham-khao.md`.
