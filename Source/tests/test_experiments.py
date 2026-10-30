@@ -110,6 +110,11 @@ class ExperimentRunTests(unittest.TestCase):
         self.assertEqual(summary[0]["status"], "invalid")
         self.assertIn("path_cost", raw[0]["error"])
 
+    def test_rounding_in_path_cost_is_not_invalid(self):
+        """DFS màn s1_200 (35287 bước, chi phí V13) từng bị ghi invalid chỉ vì tổng chi phí lệch 2.6e-9."""
+        summary, _ = self.run_fake("tests.experiment_fakes:RoundingCostSolver")
+        self.assertEqual(summary[0]["status"], "solved")
+
     def test_timeout(self):
         summary, raw = self.run_fake("tests.fakes:SleepySolver", repeat=3, timeout=1.0)
         self.assertEqual(summary[0]["status"], "timeout")

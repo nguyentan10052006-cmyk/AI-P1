@@ -49,6 +49,7 @@ import gc
 import hashlib
 import importlib
 import json
+import math
 import multiprocessing as mp
 import os
 import platform
@@ -69,8 +70,8 @@ DEFAULT_OUT = SOURCE_DIR / "experiments"
 DEFAULT_ALGORITHMS = ("bfs", "dfs", "ucs", "astar", "astar_m")
 # Hàm chi phí (docs/04 §2: path_cost của cả 4 thuật toán tính bằng hàm chi phí của UCS).
 # "energy" là bloxorz.costs.compute_step_cost (V13); "unit" là 1 mỗi bước, như trước khi nối V13.
-# Dòng lệnh mặc định "energy"; run_experiment() mặc định "unit" cho các test dùng solver giả.
-# Tạm bật ngày 30/10, chờ TV2, TV3 chốt lại.
+# Dòng lệnh mặc định "energy" (hàm chi phí chính thức, như GUI và web); run_experiment() mặc định "unit"
+# cho các test dùng solver giả.
 COSTS = ("energy", "unit")
 
 SOLVED, NO_SOLUTION, TIMEOUT, INVALID, ERROR = "solved", "no_solution", "timeout", "invalid", "error"
@@ -154,9 +155,11 @@ def measure_once(level_path: str, level_id: str, spec: str, measure_memory: bool
             return out
         cost += problem.step_cost(state, action, nxt)
         state = nxt
+    # path_cost so tương đối: chi phí V13 là số lẻ, solver cộng từ đích ngược về còn phát lại cộng từ đầu, nên
+    # lời giải dài lệch ở chữ số cuối dù đúng (DFS màn s1_200, 35287 bước: lệch 2.6e-9)
     if not problem.is_goal(state):
         out.update(status=INVALID, steps=len(result.path), path_cost=cost, error="phát lại không tới đích")
-    elif abs(cost - result.path_cost) > 1e-9:
+    elif not math.isclose(cost, result.path_cost, rel_tol=1e-9, abs_tol=1e-9):
         out.update(status=INVALID, steps=len(result.path), path_cost=cost,
                    error=f"solver báo path_cost {result.path_cost}, phát lại ra {cost}")
     else:
@@ -514,6 +517,10 @@ def run_experiment(level_paths: Sequence[Path], algorithms: Sequence[str], out_d
 
 
 def main(argv=None) -> int:
+    # Console Windows mặc định cp1252, không in được tiếng Việt; đổi trước parse_args() vì --help in ngay trong đó
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--levels", type=Path, nargs="+", default=[DEFAULT_LEVELS],
                         help="file .json hoặc thư mục màn (mặc định levels/original)")
@@ -528,9 +535,6 @@ def main(argv=None) -> int:
                         help="hàm chi phí: energy (bloxorz/costs.py, mặc định) hoặc unit (1 mỗi bước)")
     parser.add_argument("--force", action="store_true", help="ghi đè raw.csv, summary.csv, run_info.json đã có")
     args = parser.parse_args(argv)
-    for stream in (sys.stdout, sys.stderr):  # console Windows mặc định cp1252, không in được tiếng Việt
-        if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8", errors="replace")
 
     algorithms = [a.strip() for a in args.algorithms.split(",") if a.strip()]
     try:
