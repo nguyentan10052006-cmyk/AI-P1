@@ -1,8 +1,9 @@
 """Các hàm API thuần (không phụ thuộc HTTP). Mỗi hàm trả về (mã HTTP, dữ liệu JSON)."""
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 
+from bloxorz.costs import compute_step_cost
 from bloxorz.level import Level
 from bloxorz.problem import Problem
 from bloxorz.rules import FELL, step
@@ -79,7 +80,9 @@ def solve_level(
     algorithms: Mapping[str, Any] = ALGORITHMS,
     timeout_s: float = 60.0,
     job: Optional[SolveJob] = None,
+    cost_fn: Optional[Callable] = compute_step_cost,
 ) -> Response:
+    """Giải màn bằng solver ở tiến trình riêng. Chi phí theo hàm V13 như GUI và thực nghiệm (cost_fn=None: 1 mỗi bước)."""
     try:
         level = _level_from(levels, body)
         start = state_from_dict(body["state"])
@@ -91,7 +94,7 @@ def solve_level(
     if solver_cls is None:
         return 400, {"error": f"Thuật toán không hợp lệ: {name!r}"}
 
-    problem = Problem(level, start)
+    problem = Problem(level, start, cost_fn=cost_fn)
     outcome = run_solver(solver_cls, problem, timeout_s, job=job)
     if not outcome["ok"]:
         return 200, {"algorithm": name, "error": outcome["error"],

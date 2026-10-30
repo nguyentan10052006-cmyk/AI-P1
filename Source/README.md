@@ -103,7 +103,7 @@ UCS và A* dùng hàm chi phí không đồng nhất trong `bloxorz/costs.py` (c
 | Khối con 1×1×1 lăn | 1.10 |
 | Thêm khi có phần khối nằm trên ô dễ vỡ | +0.50 |
 
-Nút Giải, nút So sánh và script thực nghiệm đều dùng hàm này (`COST_FN` trong `gui/app.py`, `--cost` trong `experiments/run.py`), nên cột chi phí của BFS và DFS cũng tính theo cùng hàm để so chất lượng lời giải (docs/04 §2). BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất; trên 33 màn gốc, hai tiêu chí này cho đường khác nhau ở màn 17 và 23.
+Đây là hàm chi phí chính thức của nhóm. Nút Giải, nút So sánh, script thực nghiệm, công cụ kiểm tra heuristic và bản demo web đều dùng hàm này (`COST_FN` trong `gui/app.py`, `--cost` trong `experiments/run.py` và `tools/check_heuristics.py`, `cost_fn` trong `server/api.py`; `--cost unit` để đối chiếu với chi phí 1 mỗi bước), nên cột chi phí của BFS và DFS cũng tính theo cùng hàm để so chất lượng lời giải (docs/04 §2). BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất; trên 33 màn gốc, hai tiêu chí này cho đường khác nhau ở màn 17 và 23.
 
 ## Màn chơi
 
@@ -151,7 +151,7 @@ cd Source
 python -m experiments.run                          # 5 thuật toán × 33 màn gốc, ghi vào experiments/
 python -m experiments.run --levels levels/gen --out experiments/gen   # bộ màn tự sinh
 python -m experiments.run --cost unit --out experiments/unit           # chi phí 1 mỗi bước, để đối chiếu
-python tools/check_heuristics.py                   # kiểm tra h_M, h_P chấp nhận được và nhất quán
+python tools/check_heuristics.py                   # kiểm tra h_M, h_P chấp nhận được và nhất quán (chi phí V13)
 ```
 
 Mỗi lần đo chạy trong một tiến trình riêng, có giới hạn thời gian (mặc định 60 giây). Thời gian là trung vị của 5 lần chạy không bật `tracemalloc`; bộ nhớ đo ở một lần chạy riêng. Kết quả gồm `raw.csv` (mỗi lần chạy một dòng), `summary.csv` (mỗi cặp màn, thuật toán một dòng, cột theo docs/04 §5) và `run_info.json` (cấu hình máy, commit, hàm chi phí). Mặc định không ghi đè kết quả cũ; thêm `--force` nếu chắc chắn.

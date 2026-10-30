@@ -61,8 +61,8 @@ NOTICE_Y = 0.31
 REPLAY_PAUSE = 0.06   # giây nghỉ giữa hai bước khi khối tự lăn theo lời giải
 FPS_INTERVAL = 0.5    # giây giữa hai lần cập nhật bộ đếm FPS
 SOLVE_TIMEOUT = 60.0  # docs/07 §6 quy tắc 3
-# Hàm chi phí V13 cho nút Giải và So sánh (docs/04 §2: path_cost tính bằng hàm chi phí của UCS).
-# Tạm bật ngày 30/10, chờ nhóm chốt; đổi thành None để quay về chi phí 1 mỗi bước.
+# Hàm chi phí V13 cho nút Giải và So sánh (docs/04 §2: path_cost tính bằng hàm chi phí của UCS), cùng hàm với
+# experiments/run.py, web (server/api.py) và tools/check_heuristics.py. None: chi phí 1 mỗi bước.
 COST_FN = compute_step_cost
 
 SWITCH_KINDS = {"soft": "Công tắc mềm", "heavy": "Công tắc nặng", "split": "Công tắc tách"}

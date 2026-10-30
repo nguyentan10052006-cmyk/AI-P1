@@ -3,6 +3,7 @@
     python tools/check_heuristics.py                       # 33 màn gốc trong levels/original/
     python tools/check_heuristics.py levels levels/gen     # thư mục khác (có thể nhiều)
     python tools/check_heuristics.py --csv kq.csv          # ghi thêm bảng ra CSV
+    python tools/check_heuristics.py --cost unit           # chi phí 1 mỗi bước, để đối chiếu với V13
 
 Với mỗi màn và mỗi heuristic, đếm:
 - vi phạm chấp nhận được: trạng thái trên một lời giải tối ưu có h(s) > chi phí thật còn lại;
@@ -10,8 +11,9 @@ Với mỗi màn và mỗi heuristic, đếm:
 - A* có cùng tổng chi phí với mốc so sánh không, và có mở rộng nhiều nút hơn mốc không.
 
 Mốc so sánh là A* với h = 0 (chạy như UCS, cùng code A*), nên không phụ thuộc UCS của TV3. Nếu
-solvers/ucs.py đã cài, công cụ so thêm tổng chi phí với UCS thật. Chi phí lấy từ problem.step_cost(),
-nên khi TV3 chốt hàm chi phí (V13) chỉ cần chạy lại. Có vi phạm hoặc lệch chi phí thì thoát với mã 1.
+solvers/ucs.py đã cài, công cụ so thêm tổng chi phí với UCS thật. Chi phí lấy từ problem.step_cost():
+mặc định hàm chi phí V13 (bloxorz.costs.compute_step_cost) như GUI và experiments/run.py, --cost unit thì
+1 mỗi bước. Có vi phạm hoặc lệch chi phí thì thoát với mã 1.
 """
 from __future__ import annotations
 
@@ -26,6 +28,7 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from bloxorz.costs import compute_step_cost  # noqa: E402
 from bloxorz.level import LevelError, load_level  # noqa: E402
 from bloxorz.problem import Problem  # noqa: E402
 from solvers import ALGORITHMS  # noqa: E402
@@ -35,6 +38,13 @@ from solvers.heuristics import make_heuristic  # noqa: E402
 
 HEURISTICS = {"manhattan": "h_M", "pattern": "h_P"}
 EPS = 1e-9
+COSTS = {"energy": compute_step_cost, "unit": None}   # cùng tên với --cost của experiments/run.py
+
+
+def same_cost(a: float, b: float) -> bool:
+    """Hai tổng chi phí bằng nhau. Chi phí V13 là số lẻ, cộng theo thứ tự khác nhau thì lệch ở chữ số cuối,
+    nên so tương đối thay cho hiệu tuyệt đối."""
+    return a == b or math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-6)
 
 
 class _AStarZero(AStar):
@@ -98,9 +108,9 @@ def consistency_violations(problem: Problem, heuristics: Dict[str, object]) -> D
     return {"states": len(seen), "edges": edges, "violations": violations}
 
 
-def check_level(path: Path) -> List[dict]:
+def check_level(path: Path, cost_fn=compute_step_cost) -> List[dict]:
     level = load_level(path, path.stem)
-    problem = Problem(level)
+    problem = Problem(level, cost_fn=cost_fn)
     reference = run(_AStarZero(), problem)
     ref_cost = reference.path_cost if reference.status == SOLVED else math.inf
     real_ucs = ucs_cost(problem)
@@ -132,8 +142,8 @@ def check_level(path: Path) -> List[dict]:
             "states": space["states"],
             "edges": space["edges"],
             "time_ms": elapsed_ms,
-            "cost_ok": abs(cost - ref_cost) < EPS or cost == ref_cost == math.inf,
-            "ucs_ok": real_ucs is None or abs(cost - real_ucs) < EPS or cost == real_ucs == math.inf,
+            "cost_ok": same_cost(cost, ref_cost),
+            "ucs_ok": real_ucs is None or same_cost(cost, real_ucs),
             "not_more_nodes": result.expanded <= reference.expanded,
         })
     return rows
@@ -145,13 +155,15 @@ def main(argv: List[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("dirs", nargs="*", default=["levels/original"], help="thư mục chứa file màn")
     parser.add_argument("--csv", help="ghi bảng kết quả ra file CSV")
+    parser.add_argument("--cost", choices=COSTS, default="energy",
+                        help="hàm chi phí: energy là V13 (mặc định), unit là 1 mỗi bước")
     args = parser.parse_args(argv[1:])
 
     rows, skipped = [], []
     for directory in args.dirs:
         for path in sorted(Path(directory).glob("*.json")):
             try:
-                rows += check_level(path)
+                rows += check_level(path, COSTS[args.cost])
             except LevelError as exc:
                 skipped.append(f"{path}: {exc}")
 
