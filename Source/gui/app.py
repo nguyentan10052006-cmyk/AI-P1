@@ -275,7 +275,8 @@ class Game(Entity):
         elif key == "f1":
             self.hud.toggle_help()
         elif key == "enter":
-            self.popup.press_primary()
+            if not self.hud.overlay_open:   # hộp kết thúc nằm dưới lớp phủ thì Enter không bấm hộ nút của nó
+                self.popup.press_primary()
         elif key == "t":
             self.camera_ctrl.toggle_top_down()
         elif key == "f":
@@ -298,6 +299,7 @@ class Game(Entity):
     def solve(self, name: str) -> None:
         if self.level is None or self.job is not None:
             return
+        self._end_turn()
         self.hud.clear_results()
         self.popup.hide()   # kết quả mới thay cho hộp kết thúc của lượt trước
         self.job, self.job_name = start_solver(ALGORITHMS[name], self._problem(), SOLVE_TIMEOUT), name
@@ -307,10 +309,17 @@ class Game(Entity):
     def compare(self) -> None:
         if self.level is None or self.job is not None:
             return
+        self._end_turn()
         self.hud.clear_results()
         self.popup.hide()   # kết quả mới thay cho hộp kết thúc của lượt trước
         self.job, self.job_name = start_compare(self._problem(), timeout_s=SOLVE_TIMEOUT), ""
         self.hud.set_running(True)
+
+    def _end_turn(self) -> None:
+        """Trước khi giải hoặc So sánh: khối đang tự lăn lời giải cũ, hoặc vừa thắng/rơi (hộp kết thúc có thể
+        còn đang chờ hiện) thì chơi lại từ đầu; ván đang chơi tay dở thì giữ nguyên."""
+        if self.replay is not None or self.over:
+            self.restart()
 
     def _problem(self) -> Problem:
         """Bài toán cho solver: luôn tính từ trạng thái đầu của màn, chi phí theo COST_FN."""
@@ -337,6 +346,8 @@ class Game(Entity):
             self._poll_job()
         if self.replay is not None:
             self._replay_step()
+        # Hủy dừng được cả solver lẫn khối đang tự lăn (README, chương 4 §4.9)
+        self.hud.set_cancel_enabled(self.job is not None or self.replay is not None)
 
     def _poll_job(self) -> None:
         job = self.job
@@ -436,7 +447,7 @@ class Game(Entity):
     # ---- hộp kết thúc màn ----
 
     def _show_win(self, turn: int, solver: str) -> None:
-        if turn != self.turn:   # đã chơi lại hoặc đổi màn trước khi hộp kịp hiện
+        if turn != self.turn or self.job is not None:   # đã chơi lại, đổi màn hoặc đã bấm giải trước khi hộp kịp hiện
             return
         par, extra = self.level.par, self.steps - self.level.par
         if extra <= 0:
@@ -452,7 +463,7 @@ class Game(Entity):
                         "Enter: màn tiếp   ·   R: chơi lại   ·   Esc: đóng", x=self.board_center_x)
 
     def _show_fall(self, turn: int, reason: str) -> None:
-        if turn != self.turn:
+        if turn != self.turn or self.job is not None:
             return
         title, why = FALL_TEXTS.get(reason, FALL_DEFAULT)
         self.popup.show("fall", title, [(why, color.white), (f"Đã đi {self.steps} bước.", THEME["muted"])],

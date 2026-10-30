@@ -56,6 +56,9 @@ LINE_H = 0.0202           # chiều cao một dòng chữ ở DETAILS_SCALE
 DETAILS_SPACING = 1.25    # giãn dòng phần chi tiết cho dễ đọc
 DETAILS_LINE_H = LINE_H * DETAILS_SPACING
 STATUS_WRAP, DETAILS_WRAP = 30, 40   # số ký tự mỗi dòng trước khi xuống hàng, vừa bề rộng PANEL_W
+# Dòng trạng thái ngắt theo bề rộng đo bằng font thật (Hud._wrap_status): chừa chỗ cho chữ "H: ẩn" cùng dòng
+HINT_GAP = 0.012          # khoảng cách giữa dòng trạng thái và chữ "H: ẩn"
+TABLE_Y = -0.054          # đỉnh bảng So sánh và phần chi tiết khi dòng trạng thái chỉ có một dòng
 ROW_H = 0.027             # chiều cao một dòng của bảng So sánh
 TABLE_SCALE = 0.64
 DOT_SIZE = 0.013          # chấm trạng thái trước dòng đầu của khung kết quả
@@ -208,9 +211,13 @@ class Hud(Entity):
         self.dot = Entity(parent=self.panel, model=Circle(resolution=20, radius=0.5), scale=DOT_SIZE,
                           position=(PAD + DOT_SIZE / 2 + 0.002, -PAD - 0.0125, -0.01), color=color.white)
         self._running = False
-        self.details = Text(" ", parent=self.panel, position=(PAD, -0.054), origin=(-0.5, 0.5), scale=DETAILS_SCALE,
+        self.details = Text(" ", parent=self.panel, position=(PAD, TABLE_Y), origin=(-0.5, 0.5), scale=DETAILS_SCALE,
                             line_height=DETAILS_SPACING, color=COLORS["muted"], wordwrap=DETAILS_WRAP)
-        self.table = Entity(parent=self.panel, position=(PAD, -0.054))
+        self.table = Entity(parent=self.panel, position=(PAD, TABLE_Y))
+        self._content_bottom = -PAD   # đáy nội dung lần _fit_panel() gần nhất, để dời theo dòng trạng thái
+        self._char_w: Dict[str, float] = {}   # bề rộng từng ký tự của dòng trạng thái, đo lần đầu gặp
+        self._bars_w = self._probe_width("||")
+        self._status_line_h = self.status.size * STATUS_SCALE   # Text.height = số dòng × line_height × size
         self.cells: List[List[Text]] = []   # ô của bảng So sánh, dựng lần đầu khi cần
 
         # ---- bảng chọn màn, bảng phím tắt ----
@@ -349,18 +356,29 @@ class Hud(Entity):
     # ---- trạng thái nút và kết quả ----
 
     def set_running(self, running: bool) -> None:
-        """Đang có solver chạy: tắt các nút giải và So sánh, bật nút Hủy (tắt thì xám, không chỉ mờ)."""
+        """Đang có solver chạy: tắt các nút giải và So sánh, bật nút Hủy (tắt thì xám, không chỉ mờ).
+
+        Nút Hủy còn bật cả khi khối đang tự lăn: app.py gọi set_cancel_enabled() mỗi khung hình."""
         self._running = running
         if not running:
             self.highlight_solver(None)
             self.dot.alpha = 1.0
-        for name in (*SOLVE_NAMES, "compare", "cancel"):
-            button = self.buttons[name]
-            enabled = not running if name != "cancel" else running
-            button.disabled = not enabled
-            tint = button.base_color if enabled else COLORS["disabled"]
-            button.color, button.highlight_color = tint, tint.tint(0.15) if enabled else tint
-            button.text_entity.alpha = 1.0 if enabled else 0.4
+        for name in (*SOLVE_NAMES, "compare"):
+            self._set_enabled(self.buttons[name], not running)
+        self.set_cancel_enabled(running)
+
+    def set_cancel_enabled(self, enabled: bool) -> None:
+        """Bật nút Hủy khi đang có solver chạy hoặc khối đang tự lăn theo lời giải."""
+        button = self.buttons["cancel"]
+        if button.disabled == enabled:
+            self._set_enabled(button, enabled)
+
+    @staticmethod
+    def _set_enabled(button: Button, enabled: bool) -> None:
+        button.disabled = not enabled
+        tint = button.base_color if enabled else COLORS["disabled"]
+        button.color, button.highlight_color = tint, tint.tint(0.15) if enabled else tint
+        button.text_entity.alpha = 1.0 if enabled else 0.4
 
     def highlight_solver(self, name: Optional[str]) -> None:
         """Khung sáng trượt tới nút của thuật toán đang chạy; A* (h_M) của So sánh dùng chung nút A*; None thì ẩn."""
@@ -389,16 +407,56 @@ class Hud(Entity):
                 self.indicator.alpha = 0.5 + 0.5 * pulse
 
     def show_status(self, text: str, tint: Optional[color.Color] = None) -> None:
-        """Dòng đầu của khung kết quả; chuỗi rỗng thì ẩn cả khung."""
-        text = _wrap(text, STATUS_WRAP)
+        """Dòng đầu của khung kết quả; chuỗi rỗng thì ẩn cả khung.
+
+        Dòng trạng thái dài xuống hàng thì bảng So sánh và phần chi tiết dời xuống theo, không bị đè."""
+        has_table = any(cell.text for row in self.cells for cell in row)
+        text = self._wrap_status(text, self.table_panel_w if has_table else PANEL_W)
         if self.status.text != text:
             self.status.text = text
         self.status.color = tint or color.white
         self.dot.color = _with_alpha(tint or COLORS["accent"], self.dot.alpha)
-        if not self.details.text.strip() and not any(cell.text for row in self.cells for cell in row):
+        delta = TABLE_Y - (_line_count(text) - 1) * self._status_line_h - self.table.y
+        if abs(delta) > 1e-6:
+            self.table.y += delta
+            self.details.y += delta
+            self._fit_panel(self._content_bottom + delta)
+        if not self.details.text.strip() and not has_table:
             # chỉ có dòng trạng thái (đang tìm, hoặc lỗi dài nhiều dòng)
             self._fit_panel(-PAD - _line_count(text) * LINE_H * 1.4, PANEL_W)
         self._sync_panel()
+
+    def _wrap_status(self, text: str, panel_w: float) -> str:
+        """Ngắt dòng trạng thái theo từ để mỗi dòng vừa khung rộng panel_w, không chạm chữ "H: ẩn" ở mép phải.
+
+        Đo bằng font thật vì font tỉ lệ: cùng số ký tự, "Mở rộng" rộng hơn "lời giải" (ngắt theo số ký tự
+        như _wrap() thì dòng có nhiều chữ hoa, chữ có dấu vẫn tràn)."""
+        room = panel_w - PAD - self.hide_hint.width * self.hide_hint.scale_x - HINT_GAP - (PAD + DOT_GAP)
+        lines = []
+        for paragraph in text.split("\n"):
+            line = ""
+            for word in paragraph.split(" "):
+                candidate = f"{line} {word}" if line else word
+                if line and self._status_width(candidate) > room:
+                    lines.append(line)
+                    line = word
+                else:
+                    line = candidate
+            lines.append(line)
+        return "\n".join(lines)
+
+    def _status_width(self, line: str) -> float:
+        for char in line:
+            if char not in self._char_w:
+                # kẹp giữa hai vạch: Text bỏ khoảng trắng ở đầu và cuối nên đo riêng " " sẽ ra 0
+                self._char_w[char] = self._probe_width(f"|{char}|") - self._bars_w
+        return sum(self._char_w[char] for char in line)
+
+    def _probe_width(self, text: str) -> float:
+        probe = Text(text, parent=self, scale=STATUS_SCALE, font=FONT_SEMIBOLD)
+        width = probe.width * STATUS_SCALE
+        destroy(probe)
+        return width
 
     def toggle_panel(self) -> None:
         """Phím H: ẩn hoặc hiện lại khung kết quả (bàn được căn lại theo)."""
@@ -417,6 +475,7 @@ class Hud(Entity):
 
         Bề rộng đổi trong lúc khung đang hiện thì báo app.py căn lại bàn theo mép phải mới của khung."""
         width = self.panel_w if width is None else width
+        self._content_bottom = content_bottom
         height = min(PANEL_TOP - PANEL_BOTTOM, -content_bottom + PAD)
         if abs(height - self._panel_h) < 1e-4 and abs(width - self.panel_w) < 1e-4:
             return

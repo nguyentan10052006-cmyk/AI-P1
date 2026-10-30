@@ -111,8 +111,9 @@ class BoardView(Entity):
             target_color = COLORS["bridge"] if opened else _with_alpha(COLORS["bridge"], CLOSED_BRIDGE_ALPHA)
             target_y = base_y if opened else base_y - CLOSED_BRIDGE_DROP
             changed = self._open is not None and opened != (cell in self._open)
+            # dừng hoạt ảnh cầu của lượt trước (bấm R lúc cầu đang mở/đóng dở), kẻo nó ghi đè hình vừa đặt
+            self._stop(slab)
             if duration > 0 and changed:
-                self._stop(slab)
                 if opened:
                     slab.y = base_y - BRIDGE_RISE
                 slab.animate_color(target_color, duration=duration, curve=curve.out_quad)

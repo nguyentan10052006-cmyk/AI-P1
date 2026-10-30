@@ -70,6 +70,7 @@ class ResultPopup(Entity):
              hint: str, x: float = 0.0) -> None:
         """kind: "win" hoặc "fall" (màu dải trên cùng và tiêu đề). lines: tối đa 2 dòng (chữ, màu)."""
         stop_animations(self.box)
+        stop_animations(self)   # move_to() còn dở sẽ kéo hộp khỏi vị trí vừa đặt
         self._drag = None
         if self.user_position is not None:
             self.position = self._clamp(self.user_position)
@@ -112,6 +113,7 @@ class ResultPopup(Entity):
         if not self.enabled:
             return
         if key == "left mouse down" and mouse.hovered_entity is self.handle:
+            stop_animations(self)
             self._drag = self.position - Vec3(mouse.x, mouse.y, self.z)
         elif key == "left mouse up":
             self._drag = None

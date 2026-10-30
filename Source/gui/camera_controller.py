@@ -128,6 +128,7 @@ class CameraController:
         min_dist = max(5.0, self.base_distance * 0.45)
         max_dist = self.base_distance * 2.3
         self.target_distance = max(min_dist, min(max_dist, self.target_distance - delta * (self.size * 0.12)))
+        self._notify_change()   # khung kết quả đang hiện thì app.py đo và căn lại bàn theo khoảng cách mới
 
     def update(self) -> None:
         """Gọi mỗi frame: nhận kéo chuột phải (trừ khi đang nhìn từ đỉnh) rồi nội suy về góc đích."""
