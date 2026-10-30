@@ -39,6 +39,7 @@ Trên Windows, chạy bằng `python main.py` chứ không chạy `gui/app.py` t
 | F | Đặt lại camera về chính diện, 52° |
 | Giữ chuột phải và kéo, con lăn chuột | Chỉnh góc nhìn (trong giới hạn trên), thu phóng |
 | H | Ẩn/hiện khung kết quả |
+| Ctrl+K | Mở/đóng lưới chọn màn (chấm xanh đánh dấu màn đã thắng) |
 | Esc | Đóng lưới chọn màn |
 
 Camera luôn nhìn từ trên xuống, từ phía người chơi, và không lệch quá 40° sang hai bên, nên phím ↑ luôn đẩy khối về phía trên màn hình. Góc đã chọn được giữ khi đổi màn. Các nút camera ở cột phải làm được việc như các phím trên.
@@ -71,7 +72,7 @@ Mục tiêu: lăn khối 1×1×2 tới lỗ vuông đích và **đứng thẳng*
 | Cầu mở | ô gỗ nâu | Đi như sàn |
 | Cầu đóng | ô sẫm | Như ô trống: đi vào là rơi |
 
-Khi công tắc tác động, khối tách hay ghép, giao diện hiện một dòng thông báo ngắn dưới dòng thắng thua.
+Khối lật quanh cạnh đáy như game gốc; khối nằm mà một đầu hụt khỏi sàn thì đổ nghiêng qua mép rồi rơi. Khi công tắc tác động, khối tách hay ghép, giao diện hiện một dòng thông báo ngắn dưới dòng thắng thua. Góc trái trên có bộ đếm FPS.
 
 ## Luật chơi và các giả định
 

@@ -1,6 +1,6 @@
 ## 4. Cài đặt và giao diện
 
-> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp ngày 29/10/2026 trên bản ghép thử nhánh chính (a3d988b, đã có giao diện V21) với nhánh `integration/M2` (04d8a9a, có bộ nạp màn V03, UCS, hàm chi phí); đây cũng là nội dung của nhánh tích hợp `thu/test-main-m2`, trên đó cả 33 màn nạp được.
+> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp ngày 29/10/2026 trên bản ghép thử nhánh chính (a3d988b, đã có giao diện V21) với nhánh `integration/M2` (04d8a9a, có bộ nạp màn V03, UCS, hàm chi phí); đây cũng là nội dung của nhánh tích hợp `thu/test-main-m2`, trên đó cả 33 màn nạp được. Ảnh chụp trước khi đổi đồ họa ngày 30/10 (hộp vát cạnh, khối lật, bóng mềm); cần chụp lại trước khi nộp.
 
 ### 4.1. Công nghệ
 
@@ -85,7 +85,7 @@ Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô
 | Cầu mở | `B` (hoặc `b` sau khi mở) | Khối hộp màu gỗ |
 | Cầu đóng | `b` (hoặc `B` sau khi đóng) | Khối hộp sẫm, gần trong suốt, nhìn rõ chỗ có cầu |
 
-Khối 1×1×2 màu trắng có viền xanh sáng để nổi trên sàn xám, và có ba tư thế (Hình 4.2). Kích thước khối nhỏ hơn ô một chút để luôn thấy viền giữa khối và sàn. Cảnh không dùng bóng đổ: bóng của khối phủ lên ô làm màu ô khó phân biệt, nhất là ô dễ vỡ và cầu đóng.
+Khối 1×1×2 màu trắng có viền xanh sáng để nổi trên sàn xám, và có ba tư thế (Hình 4.2). Kích thước khối nhỏ hơn ô một chút để luôn thấy viền giữa khối và sàn. Ô và khối là hộp vát cạnh, mặt bên tối hơn mặt trên, nên bàn có độ dày mà không cần đèn mạnh. Cảnh không dùng bóng đổ thật: bóng của khối phủ lên ô làm màu ô khó phân biệt, nhất là ô dễ vỡ và cầu đóng. Thay vào đó, dưới mỗi khối có một vệt bóng mềm, nhạt dần khi khối nhấc lên, đủ để thấy khối đang chạm sàn. Cạnh ô và khối được khử răng cưa (multisample 4×).
 
 ![Hình 4.2](hinh/h4-2-ba-tu-the.png)
 
@@ -97,13 +97,13 @@ Khi công tắc tác động, cầu bị điều khiển đổi màu dần giữ
 
 *Hình 4.3. Màn 2, bước 2: khối nằm vừa chạm công tắc mềm nên cặp cầu bên trái mở; cặp cầu bên phải vẫn đóng cho tới khi khối đứng lên công tắc nặng (dấu X đỏ).*
 
-Khi khối đứng lên công tắc tách, hai khối con bay ra từ chỗ khối cũ tới hai ô định sẵn (Hình 4.4). Khối con đang điều khiển màu trắng, viền xanh rõ; khối còn lại màu xám, viền mờ; phím Space đổi khối. Engine luôn sắp hai khối con theo thứ tự ô, nên sau mỗi bước, giao diện tìm lại khối vừa đi theo ô mới của nó để giữ đúng khối người chơi đang điều khiển. Hai khối con kề nhau thì tự ghép lại, có thông báo.
+Khi khối đứng lên công tắc tách, hai khối con bay theo đường vòng cung từ chỗ khối cũ tới hai ô định sẵn (Hình 4.4). Khối con đang điều khiển màu trắng, viền xanh rõ; khối còn lại màu xám, viền mờ; phím Space đổi khối. Engine luôn sắp hai khối con theo thứ tự ô, nên sau mỗi bước, giao diện tìm lại khối vừa đi theo ô mới của nó để giữ đúng khối người chơi đang điều khiển. Hai khối con kề nhau thì tự ghép lại, có thông báo.
 
 ![Hình 4.4](hinh/h4-4-tach-khoi.png)
 
 *Hình 4.4. Màn 8 sau khi tách: khối con sáng màu là khối đang điều khiển (ghi "KHỐI CON 1/2" cạnh số bước).*
 
-Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đứng thẳng trên ô dễ vỡ. Giao diện hiện lý do rơi; với ô dễ vỡ, ô cam rơi cùng khối (Hình 4.5) và được dựng lại khi bấm R.
+Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đứng thẳng trên ô dễ vỡ. Giao diện hiện lý do rơi; với ô dễ vỡ, ô cam rơi cùng khối (Hình 4.5) và được dựng lại khi bấm R. Khối nằm mà chỉ một đầu hụt thì đổ nghiêng qua mép ô còn đỡ rồi mới rơi, không xuyên qua sàn; khi đã tách, chỉ khối con bị hụt rơi. Khối mờ dần khi rơi xuống dưới bàn. Việc chọn kiểu đổ chỉ dựa vào hình (ô nào còn tấm đỡ); quyết định có rơi hay không vẫn do `rules.step()`.
 
 ![Hình 4.5](hinh/h4-5-o-de-vo.png)
 
@@ -119,15 +119,18 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 | N / P | Màn sau / màn trước |
 | Q / E, Z / X, T, F, chuột phải, con lăn | Đổi góc nhìn (mục 4.7) |
 | H | Ẩn hoặc hiện khung kết quả (mục 4.7) |
+| Ctrl+K | Mở hoặc đóng lưới chọn màn |
 | Esc | Đóng lưới chọn màn |
 
-Một lượt đi diễn ra theo thứ tự: phím được đổi thành hành động và gửi vào `rules.step()`; khối trượt tới vị trí ngay sau khi lăn; sau đó giao diện cập nhật cầu, hiện thông báo sự kiện, rồi vẽ trạng thái cuối (tách, ghép, rơi hoặc thắng). Trong lúc hoạt ảnh chạy, phím mới bị bỏ qua, để trạng thái giao diện đang giữ không đi trước hình đang vẽ. Mỗi lần chơi lại hoặc đổi màn, giao diện tăng một số đếm lượt; lệnh hẹn giờ nào của lượt cũ còn sót lại thấy số đếm đã đổi thì bỏ qua, nên bấm R giữa lúc khối đang lăn không làm trạng thái cũ ghi đè lên màn vừa chơi lại.
+Một lượt đi diễn ra theo thứ tự: phím được đổi thành hành động và gửi vào `rules.step()`; khối lật 90° quanh cạnh đáy theo hướng đi, tới vị trí ngay sau khi lăn (khối được gắn tạm vào một trục đặt ở cạnh đó rồi xoay trục; lật xong thì đặt lại đúng vị trí và góc theo trạng thái, nên sai số không dồn qua các bước); sau đó giao diện cập nhật cầu, hiện thông báo sự kiện, rồi vẽ trạng thái cuối (tách, ghép, rơi hoặc thắng). Trong lúc hoạt ảnh chạy, phím mới bị bỏ qua, để trạng thái giao diện đang giữ không đi trước hình đang vẽ. Mỗi lần chơi lại hoặc đổi màn, giao diện tăng một số đếm lượt; lệnh hẹn giờ nào của lượt cũ còn sót lại thấy số đếm đã đổi thì bỏ qua, nên bấm R giữa lúc khối đang lăn không làm trạng thái cũ ghi đè lên màn vừa chơi lại.
 
-Mọi đối tượng của một màn gắn vào một gốc chung; đổi màn thì hủy gốc này, nên bàn cũ không còn sót lại. Đây là một trong các lỗi hay gặp với Ursina mà nhóm khóa trước ghi lại [8].
+Mọi đối tượng của một màn gắn vào một gốc chung; đổi màn thì hủy gốc này, nên bàn cũ không còn sót lại. Đây là một trong các lỗi hay gặp với Ursina mà nhóm khóa trước ghi lại [8]. Ursina 7 còn một lỗi tương tự với hoạt ảnh hẹn giờ (`animate(..., delay=...)`): lần hẹn không được ghi lại nên không hủy được, và nếu đổi màn trước lúc tới giờ thì nó chạy trên đối tượng đã bị hủy, làm cửa sổ dừng. Giao diện dùng hàm hẹn giờ riêng (`gui/anim.py`), hủy được và tự bỏ qua khi đối tượng đã bị hủy.
+
+Khi vào màn, các ô trồi lên lần lượt theo đường chéo rồi khối rơi xuống chỗ xuất phát; công tắc lún xuống khi tác động; cầu vừa mở trồi lên, cầu vừa đóng mờ đi và lún xuống; khi thắng, viền ô đích lóe sáng và một vòng sáng lan ra. Trong lúc khối rơi xuống chỗ xuất phát, phím lăn bị bỏ qua như mọi hoạt ảnh khác.
 
 ### 4.6. Giải tự động và So sánh
 
-Cột nút bên phải gồm Màn mới, Chơi lại, Chọn màn (Hình 4.9), bốn nút Giải bằng BFS, DFS, UCS, A*, nút So sánh, nút Hủy và nhóm nút camera.
+Cột nút bên phải gồm Màn mới, Chơi lại, Chọn màn (Hình 4.9), bốn nút Giải bằng BFS, DFS, UCS, A*, nút So sánh, nút Hủy và nhóm nút camera. Trong lúc giải, một vệt sáng bên trái cột nút chỉ vào nút của thuật toán đang chạy (khi So sánh, vệt sáng trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
 
 **Chạy thuật toán không làm đơ giao diện.** Ursina vẽ mọi thứ trong một vòng lặp duy nhất, nên nếu chạy thuật toán ngay trong vòng lặp đó thì cửa sổ đứng yên suốt lúc tìm. Khi bấm một nút Giải, giao diện gọi `runner.start_solver()`; hàm này mở một tiến trình con chạy thuật toán rồi trả về ngay. Mỗi khung hình, giao diện gọi `poll()` để hỏi kết quả mà không phải chờ; không dùng callback từ tiến trình khác, vì Ursina không an toàn khi đối tượng bị sửa ngoài luồng chính. Dùng tiến trình chứ không dùng luồng vì Python không dừng ngang được một luồng: quá 60 giây hoặc khi bấm Hủy, tiến trình con bị dừng hẳn. Trong lúc chờ, khung kết quả hiện tên thuật toán và số giây đã chạy, các nút Giải mờ đi và nút Hủy sáng lên (Hình 4.7). Khi đo trong lúc thuật toán chạy, khung hình chậm nhất khoảng 55 ms, tức cửa sổ vẫn phản hồi.
 
@@ -153,7 +156,7 @@ Thời gian và bộ nhớ trên giao diện chỉ để tham khảo, vì tiến
 
 ![Hình 4.9](hinh/h4-9-chon-man.png)
 
-*Hình 4.9. Lưới chọn màn: màn đang mở tô màu xanh; bấm một mã màn để chuyển thẳng tới màn đó, thuật toán đang chạy (nếu có) bị hủy. Bấm ra ngoài lưới hoặc Esc để đóng.*
+*Hình 4.9. Lưới chọn màn: màn đang mở tô màu xanh; bấm một mã màn để chuyển thẳng tới màn đó, thuật toán đang chạy (nếu có) bị hủy. Bấm ra ngoài lưới, Esc hoặc Ctrl+K để đóng. Màn đã thắng trong lần chạy này có chấm xanh ở góc nút.*
 
 ### 4.7. Camera và bố cục màn hình
 
@@ -189,10 +192,13 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 | Đổi qua mọi nấc Q/E, Z/X, T rồi F (29/10) | Camera dừng đúng nấc, hình không bị xoay nghiêng; F về chính diện 52° |
 | Khung kết quả hiện, rồi bấm H (29/10) | Bàn thu vào phần còn trống, không bị che; ẩn khung thì bàn về cỡ đầy đủ |
 | Cài trong môi trường ảo mới theo README | Cài đúng phiên bản, test qua, cửa sổ mở được |
+| Giải bằng BFS rồi tự lăn trên cả 33 màn, với hoạt ảnh lật khối mới (30/10) | 33/33 màn thắng đúng số bước tối ưu |
+| Bấm phím ngẫu nhiên mỗi khung hình (lăn, R, N, P, Space, camera, Ctrl+K) xen với Giải, So sánh, Hủy; 17 lần × 35 giây (30/10) | Không lỗi, không treo (trước khi sửa hoạt ảnh hẹn giờ: 4/12 lần dừng vì lỗi `!is_empty()`) |
+| Lăn ra mép ở màn 1 (một đầu hụt, rồi hụt cả hai đầu), tách và ghép ở màn 8, đứng lên ô dễ vỡ, rồi bấm R (30/10) | Khối đổ nghiêng qua mép, không xuyên sàn; chỉ khối con hụt rơi; ô dễ vỡ được dựng lại |
 
 ### 4.9. Hạn chế
 
-- Khối trượt giữa hai vị trí chứ chưa lật quanh cạnh như game gốc.
+- Chấm đánh dấu màn đã thắng chỉ giữ trong một lần chạy chương trình, chưa lưu ra file.
 - Chưa có màn hướng dẫn chú giải các loại ô và phím; người chơi xem Bảng 4.1, dòng phím tắt cuối màn hình hoặc README.
 - Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
 - Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.

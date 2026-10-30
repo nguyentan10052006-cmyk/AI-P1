@@ -4,10 +4,12 @@ Chỉ vẽ và gọi lại các hàm do app.py truyền vào; không giữ trạ
 """
 from __future__ import annotations
 
+import math
 import textwrap
+import time
 from typing import Callable, Dict, List, Mapping, Optional, Sequence
 
-from ursina import Button, Entity, Text, Vec3, camera, color, window
+from ursina import Button, Circle, Entity, Text, camera, color, curve, window
 
 # Tên hiện trên nút và trong bảng So sánh, theo khóa của solvers.ALGORITHMS
 LABELS = {"bfs": "BFS", "dfs": "DFS", "ucs": "UCS", "astar": "A*", "astar_m": "A* (h_M)"}
@@ -32,9 +34,13 @@ BUTTON_W, BUTTON_H, GAP = 0.2, 0.045, 0.008
 PANEL_TOP, PANEL_BOTTOM, PANEL_W = 0.36, -0.44, 0.53
 PAD = 0.015               # lề trong của khung
 LINE_H = 0.022            # chiều cao một dòng chữ scale 0.85
+DETAILS_SPACING = 1.25    # giãn dòng phần chi tiết cho dễ đọc
+DETAILS_LINE_H = LINE_H * DETAILS_SPACING
 STATUS_WRAP, DETAILS_WRAP = 38, 46   # số ký tự mỗi dòng trước khi xuống hàng, vừa bề rộng khung
 ROW_H = 0.03              # chiều cao một dòng của bảng So sánh
 TABLE_SCALE = 0.72
+DOT_SIZE = 0.013          # chấm trạng thái trước dòng đầu của khung kết quả
+DOT_GAP = 0.022           # dòng trạng thái lùi sang phải chừng này để chừa chỗ cho chấm
 # vị trí cột đo theo bề rộng thật của chữ ở TABLE_SCALE, cách nhau 0.012; cột Chi phí rộng hơn để vừa
 # chi phí lẻ theo hàm chi phí V13 (ví dụ DFS màn 23: 1524.13)
 TABLE_COLUMNS = (("Thuật toán", 0.0), ("Kết quả", 0.103), ("Bước", 0.195), ("Chi phí", 0.25),
@@ -57,6 +63,10 @@ def outcome_summary(outcome: Mapping) -> tuple[str, color.Color]:
 def _wrap(text: str, width: int) -> str:
     """Ngắt dòng trước khi gán vào Text: wordwrap của Ursina không áp dụng khi đổi .text sau lúc tạo."""
     return "\n".join("\n".join(textwrap.wrap(line, width)) or line for line in text.split("\n"))
+
+
+def _with_alpha(base: color.Color, alpha: float) -> color.Color:
+    return color.Color(base[0], base[1], base[2], alpha)
 
 
 def _line_count(text: str) -> int:
@@ -105,6 +115,10 @@ class Hud(Entity):
             add(name, f"Giải bằng {LABELS[name]}", lambda name=name: on_solve(name), COLORS["solve"])
         add("compare", "So sánh", on_compare, COLORS["solve"])
         add("cancel", "Hủy", on_cancel, COLORS["cancel"])
+        # Vệt sáng bên trái cột nút, trượt tới nút của thuật toán đang chạy (GAME_UI_UX_SPECIFICATION §3.2)
+        self.indicator = Entity(parent=self, model="quad", color=COLORS["accent"], enabled=False,
+                                x=self.dock_left - 0.009, scale=(0.005, BUTTON_H * 0.8))
+        self._highlighted: Optional[str] = None
 
         # Cụm điều khiển Camera 3D (GAME_UI_UX_SPECIFICATION.md §4): mỗi hàng hai nút nhỏ
         y -= GAP * 2
@@ -142,13 +156,20 @@ class Hud(Entity):
         Text("H: ẩn", parent=self.panel, position=(PANEL_W - PAD, -PAD), origin=(0.5, 0.5), scale=0.7,
              color=COLORS["muted"])
         # text=" ": Ursina 7 lỗi khi đặt wordwrap cho Text rỗng; lỗi của solver có thể dài nên phải xuống dòng
-        self.status = Text(" ", parent=self.panel, position=(PAD, -PAD), origin=(-0.5, 0.5), wordwrap=STATUS_WRAP)
+        self.status = Text(" ", parent=self.panel, position=(PAD + DOT_GAP, -PAD), origin=(-0.5, 0.5),
+                           wordwrap=STATUS_WRAP)
+        # Chấm trạng thái: màu theo kết quả, nhấp nháy khi đang giải (§3.4)
+        self.dot = Entity(parent=self.panel, model=Circle(resolution=20, radius=0.5), scale=DOT_SIZE,
+                          position=(PAD + DOT_SIZE / 2 + 0.002, -PAD - 0.0125, -0.01), color=color.white)
+        self._running = False
         self.details = Text(" ", parent=self.panel, position=(PAD, -0.06), origin=(-0.5, 0.5), scale=0.85,
+                            line_height=DETAILS_SPACING,
                             color=COLORS["muted"], wordwrap=DETAILS_WRAP)
         self.table = Entity(parent=self.panel, position=(PAD, -0.06))
         self.cells: List[List[Text]] = []   # ô của bảng So sánh, dựng lần đầu khi cần
         self.current_level = 0
         self.picker_buttons: List[Button] = []
+        self.solved_marks: List[Entity] = []   # chấm xanh trên nút các màn đã thắng trong lần chạy này
         self.picker = self._build_picker(level_ids)
         self.set_current_level(0)
         self.set_running(False)
@@ -168,13 +189,19 @@ class Hud(Entity):
         Button(parent=picker, model="quad", color=COLORS["panel"], scale=(width, height), z=0.01,
                highlight_color=COLORS["panel"], pressed_color=COLORS["panel"])   # chặn click lọt xuống lớp phủ
         Text(parent=picker, text="Chọn màn", origin=(0, 0), y=height / 2 - 0.035, z=-0.01, scale=1.1)
+        Text(parent=picker, text="Ctrl+K hoặc Esc để đóng  ·  chấm xanh: màn đã thắng", origin=(0, 0),
+             y=-height / 2 + 0.03, z=-0.01, scale=0.7, color=COLORS["muted"])
         self.picker_buttons.clear()
+        self.solved_marks.clear()
         for i, level_id in enumerate(level_ids):
             r, c = divmod(i, cols)
             btn = Button(text=level_id, parent=picker, z=-0.01, scale=size * 0.85, color=COLORS["button"],
                          text_size=0.8, position=((c - (cols - 1) / 2) * size, height / 2 - 0.1 - r * size),
                          highlight_scale=HOVER_SCALE * 1.05, on_click=lambda i=i: self._pick(i))
             self.picker_buttons.append(btn)
+            self.solved_marks.append(Entity(parent=btn, model=Circle(resolution=16, radius=0.5),
+                                            color=COLORS["ok"], scale=0.16, position=(0.33, 0.33, -0.02),
+                                            enabled=False))
         return picker
 
     def set_current_level(self, index: int) -> None:
@@ -196,6 +223,11 @@ class Hud(Entity):
     def close_picker(self) -> None:
         self.picker.enabled = False
 
+    def mark_solved(self, index: int) -> None:
+        """Đánh dấu màn đã thắng (chơi tay hoặc khối tự lăn) bằng chấm xanh trên lưới chọn màn."""
+        if 0 <= index < len(self.solved_marks):
+            self.solved_marks[index].enabled = True
+
     def _pick(self, index: int) -> None:
         self.picker.enabled = False
         self.set_current_level(index)
@@ -203,18 +235,42 @@ class Hud(Entity):
 
     def set_camera_view(self, name: str) -> None:
         """Cập nhật nhãn góc camera trên HUD khi người chơi xoay hoặc đổi góc."""
-        if hasattr(self, "cam_label") and self.cam_label:
-            self.cam_label.text = name
+        self.cam_label.text = name
 
     # ---- trạng thái nút và kết quả ----
 
     def set_running(self, running: bool) -> None:
         """Đang có solver chạy: tắt các nút Solve và So sánh, bật nút Hủy."""
+        self._running = running
+        if not running:
+            self.highlight_solver(None)
+            self.dot.alpha = 1.0
         for name in (*SOLVE_NAMES, "compare"):
             self.buttons[name].disabled = running
             self.buttons[name].alpha = 0.4 if running else 1.0
         self.buttons["cancel"].disabled = not running
         self.buttons["cancel"].alpha = 1.0 if running else 0.4
+
+    def highlight_solver(self, name: Optional[str]) -> None:
+        """Vệt sáng trượt tới nút của thuật toán đang chạy; A* (h_M) của So sánh dùng chung nút A*; None thì ẩn."""
+        button = self.buttons.get("astar" if name == "astar_m" else name) if name else None
+        if button is None:
+            self.indicator.enabled = False
+            self._highlighted = None
+            return
+        if name == self._highlighted:
+            return
+        if not self.indicator.enabled:
+            self.indicator.y = button.y
+            self.indicator.enabled = True
+        else:
+            self.indicator.animate_y(button.y, duration=0.2, curve=curve.out_quad)
+        self._highlighted = name
+
+    def update(self) -> None:
+        """Mỗi khung hình: chấm trạng thái nhấp nháy khi đang giải."""
+        if self._running and self.panel.enabled:
+            self.dot.alpha = 0.35 + 0.65 * abs(math.sin(time.time() * 4))
 
     def show_status(self, text: str, tint: Optional[color.Color] = None) -> None:
         """Dòng đầu của khung kết quả; chuỗi rỗng thì ẩn cả khung."""
@@ -222,6 +278,7 @@ class Hud(Entity):
         if self.status.text != text:
             self.status.text = text
         self.status.color = tint or color.white
+        self.dot.color = _with_alpha(tint or COLORS["accent"], self.dot.alpha)
         if not self.details.text.strip() and not any(cell.text for row in self.cells for cell in row):
             # chỉ có dòng trạng thái (đang tìm, hoặc lỗi dài nhiều dòng)
             self._fit_panel(-PAD - _line_count(text) * LINE_H * 1.25)
@@ -265,7 +322,7 @@ class Hud(Entity):
                      f"Đã thăm {outcome['visited']}",
                      f"Thời gian {seconds}  ·  bộ nhớ {memory}"]
             self.details.text = "\n".join(lines)
-            self._fit_panel(self.details.y - len(lines) * LINE_H)
+            self._fit_panel(self.details.y - len(lines) * DETAILS_LINE_H)
 
     def show_compare(self, names: Sequence[str], results: Mapping[str, Mapping], running: Optional[str],
                      elapsed: float) -> None:
@@ -307,4 +364,4 @@ class Hud(Entity):
                 if cell.text != text:
                     cell.text = text
                 cell.color = tint
-        self._fit_panel(self.details.y - _line_count(details) * LINE_H if errors else self.table.y - len(rows) * ROW_H)
+        self._fit_panel(self.details.y - _line_count(details) * DETAILS_LINE_H if errors else self.table.y - len(rows) * ROW_H)

@@ -1,5 +1,6 @@
 """Cửa sổ GUI Ursina: vẽ bàn (V18), chơi tay bằng engine thật (V19), thông báo và hoạt ảnh ô đặc biệt (V20),
-nút Solve, So sánh, Hủy và khối tự lăn theo lời giải (V21).
+nút Solve, So sánh, Hủy và khối tự lăn theo lời giải (V21); khối lật quanh cạnh, đổ nghiêng khi rơi,
+mở màn, khử răng cưa (GAME_UI_UX_SPECIFICATION §6, §9).
 
 Chạy trong Source/: python main.py [mã màn, ví dụ 05], hoặc python -m gui.app [mã màn]
 """
@@ -11,6 +12,7 @@ from typing import List, Optional, Union
 
 from ursina import (AmbientLight, DirectionalLight, Entity, Mesh, Text, Ursina, Vec3, camera, color, curve, destroy,
                     invoke, time, window)
+from panda3d.core import AntialiasAttrib, loadPrcFileData
 from ursina.shaders import unlit_shader
 
 from bloxorz.costs import compute_step_cost
@@ -44,13 +46,17 @@ KEY_DIRS = {
     "left arrow": Dir.LEFT, "a": Dir.LEFT,
     "right arrow": Dir.RIGHT, "d": Dir.RIGHT,
 }
-MOVE_TIME = 0.14   # giây cho một lần lăn
-FALL_TIME = 0.7
+MOVE_TIME = 0.17   # giây cho một lần lật khối
+FALL_TIME = 0.8
 WIN_TIME = 0.45
-SPLIT_TIME = 0.3   # hai khối con bay tới ô đích của công tắc tách
-BRIDGE_TIME = 0.25
+SPLIT_TIME = 0.36  # hai khối con bay theo vòng cung tới ô đích của công tắc tách
+BRIDGE_TIME = 0.3
+SPAWN_TIME = 0.4   # khối rơi xuống chỗ xuất phát khi vào màn hoặc chơi lại
 NOTICE_TIME = 2.0  # thông báo sự kiện tự tắt sau chừng này giây
-REPLAY_PAUSE = 0.12   # giây nghỉ giữa hai bước khi khối tự lăn theo lời giải
+NOTICE_FADE = 0.3
+NOTICE_Y = 0.31
+REPLAY_PAUSE = 0.06   # giây nghỉ giữa hai bước khi khối tự lăn theo lời giải
+FPS_INTERVAL = 0.5    # giây giữa hai lần cập nhật bộ đếm FPS
 SOLVE_TIMEOUT = 60.0  # docs/07 §6 quy tắc 3
 # Hàm chi phí V13 cho nút Giải và So sánh (docs/04 §2: path_cost tính bằng hàm chi phí của UCS).
 # Tạm bật ngày 30/10, chờ nhóm chốt; đổi thành None để quay về chi phí 1 mỗi bước.
@@ -88,8 +94,11 @@ class Game(Entity):
                          color=THEME["muted"])
         self.message = Text(parent=camera.ui, origin=(0, 0), y=0.38, scale=2)
         # Ngay dưới dòng thắng/thua; góc trái dưới dành cho khung kết quả của solver (hud.py)
-        self.notice = Text(parent=camera.ui, origin=(0, 0), y=0.31, scale=1.3, color=THEME["warn"])
+        self.notice = Text(parent=camera.ui, origin=(0, 0), y=NOTICE_Y, scale=1.3, color=THEME["warn"])
         self._notice_id = 0
+        self.fps = Text(parent=camera.ui, position=window.top_left + Vec3(0.02, -0.112, 0), scale=0.7,
+                        color=THEME["muted"])
+        self._fps_frames, self._fps_time = 0, 0.0
         # Solver chạy ở tiến trình riêng; GUI chỉ giữ job và gọi poll() trong update() (docs/07 §6 quy tắc 2)
         self.job: Optional[Union[SolveJob, CompareJob]] = None
         self.job_name = ""                       # khóa ALGORITHMS của nút Solve đang chạy; rỗng khi So sánh
@@ -131,9 +140,10 @@ class Game(Entity):
         self.board = BoardView(self.level)
         self.board.fit_camera(self.camera_ctrl)
         self.block = BlockView(self.level.initial_state(), parent=self.board)
-        self.restart()
+        intro = self.board.play_intro()
+        self.restart(spawn_delay=intro * 0.7)   # khối rơi xuống khi phần lớn các ô đã vào chỗ
 
-    def restart(self) -> None:
+    def restart(self, spawn_delay: float = 0.0) -> None:
         if self.level is None:
             return
         self.turn += 1
@@ -141,9 +151,12 @@ class Game(Entity):
         self.state = self.level.initial_state()
         self.active_cube = 0
         self.steps = 0
-        self.busy = self.over = False
+        self.over = False
         self.board.reset(self.state.open_bridges)
-        self.block.show(self.state)
+        # khối rơi xuống chỗ xuất phát; bỏ qua phím tới khi khối chạm sàn (khối tự lăn cũng chờ, docs/07 §7)
+        self.busy = True
+        self.block.spawn(self.state, SPAWN_TIME, delay=spawn_delay)
+        invoke(self._unbusy, self.turn, delay=spawn_delay + SPAWN_TIME)
         self.message.text = ""
         self.show_notice("")
         self._update_info()
@@ -182,15 +195,28 @@ class Game(Entity):
                 self.moves.animate_scale(1.3, duration=0.12, curve=curve.out_quad)
 
     def show_notice(self, text: str) -> None:
-        """Dòng thông báo sự kiện ở cuối màn hình; tự tắt sau NOTICE_TIME giây."""
+        """Dòng thông báo sự kiện dưới dòng thắng/thua: trượt xuống khi hiện, mờ dần sau NOTICE_TIME giây."""
         self._notice_id += 1
+        for animation in self.notice.animations:
+            animation.kill()
+        self.notice.animations.clear()
         self.notice.text = text
+        self.notice.alpha, self.notice.y = 1.0, NOTICE_Y
         if text:
+            self.notice.alpha, self.notice.y = 0.0, NOTICE_Y + 0.02
+            self.notice.animate("alpha", 1.0, duration=0.18, curve=curve.out_quad)
+            self.notice.animate_y(NOTICE_Y, duration=0.18, curve=curve.out_quad)
             invoke(self._clear_notice, self._notice_id, delay=NOTICE_TIME)
 
     def _clear_notice(self, notice_id: int) -> None:
         if notice_id == self._notice_id:   # chưa có thông báo mới đè lên
+            self.notice.animate("alpha", 0.0, duration=NOTICE_FADE, curve=curve.in_quad)
+            invoke(self._erase_notice, notice_id, delay=NOTICE_FADE)
+
+    def _erase_notice(self, notice_id: int) -> None:
+        if notice_id == self._notice_id:
             self.notice.text = ""
+            self.notice.alpha = 1.0
 
     # ---- phím ----
 
@@ -213,6 +239,8 @@ class Game(Entity):
             self.hud.toggle_panel()
         elif key == "escape":
             self.hud.close_picker()
+        elif key == "control+k":
+            self.hud.toggle_picker()
         elif key == "t":
             self.camera_ctrl.toggle_top_down()
         elif key == "f":
@@ -238,6 +266,7 @@ class Game(Entity):
         self.hud.clear_results()
         self.job, self.job_name = start_solver(ALGORITHMS[name], self._problem(), SOLVE_TIMEOUT), name
         self.hud.set_running(True)
+        self.hud.highlight_solver(name)
 
     def compare(self) -> None:
         if self.level is None or self.job is not None:
@@ -266,6 +295,7 @@ class Game(Entity):
 
     def update(self) -> None:
         self.camera_ctrl.update()
+        self._update_fps()
         if self.job is not None:
             self._poll_job()
         if self.replay is not None:
@@ -282,6 +312,7 @@ class Game(Entity):
                 self.hud.show_status("Đã hủy So sánh" if job.cancelled else f"So sánh xong trên {self.level.name}")
             else:
                 self.hud.show_status(f"So sánh: {LABELS[job.running]} đang tìm… {job.elapsed:.1f} s")
+                self.hud.highlight_solver(job.running)
             return
         outcome = job.poll()
         if outcome is None:
@@ -319,7 +350,8 @@ class Game(Entity):
         result = step(self.level, before, Action(direction, cube))
         self.steps += 1
         self.busy = True
-        self.block.show(result.moved, self._follow(before, direction, result.moved), duration=MOVE_TIME)
+        self.block.roll(before, direction, result.moved, self._follow(before, direction, result.moved),
+                        MOVE_TIME, active_before=cube)
         self._update_info()
         invoke(self._settle, self.turn, before, direction, result, delay=MOVE_TIME)
 
@@ -328,13 +360,18 @@ class Game(Entity):
         if turn != self.turn:   # đã bấm R hoặc đổi màn trong lúc khối đang lăn
             return
         self.board.set_open_bridges(result.state.open_bridges, duration=BRIDGE_TIME)
+        for event in result.events:
+            if event["type"] in ("switch", "split"):
+                self.board.press_switch(event["at"] if event["type"] == "switch" else event["from"])
         self._announce(result.events)
         if result.status == FELL:
             fell = next(e for e in result.events if e["type"] == "fell")
             if fell["reason"] == "fragile":
                 self.board.break_tile(fell["at"], FALL_TIME)
             self.over = True
-            self.block.drop(12, FALL_TIME)
+            hanging = [cell for cell in result.state.cells()
+                       if not self.board.supports(cell, result.state.open_bridges)]
+            self.block.fall(result.state, hanging, FALL_TIME)
             self.message.text = FALL_MESSAGES.get(fell["reason"], "Rơi khỏi bàn!") + " Bấm R để chơi lại"
             self.message.color = THEME["bad"]
             invoke(self._unbusy, turn, delay=FALL_TIME)
@@ -342,17 +379,29 @@ class Game(Entity):
         self.state = result.state
         self.active_cube = self._follow(before, direction, self.state)
         split = any(e["type"] == "split" for e in result.events)
-        self.block.show(self.state, self.active_cube, duration=SPLIT_TIME if split else 0.0)
+        if split:
+            self.block.split(self.state, self.active_cube, SPLIT_TIME)
+        else:
+            self.block.show(self.state, self.active_cube, pulse=any(e["type"] == "merge" for e in result.events))
         self._update_info()
         if result.status == WON:
             self.over = True
-            self.block.drop(2.2, WIN_TIME)
+            self.block.sink(WIN_TIME)
+            self.board.celebrate_goal()
+            self.hud.mark_solved(self.index)
             self.message.text = f"Thắng sau {self.steps} bước! (tối ưu {self.level.par})"
             self.message.color = THEME["ok"]
         if split:
             invoke(self._unbusy, turn, delay=SPLIT_TIME)
         else:
             self.busy = False
+
+    def _update_fps(self) -> None:
+        self._fps_frames += 1
+        self._fps_time += time.dt
+        if self._fps_time >= FPS_INTERVAL:
+            self.fps.text = f"FPS {round(self._fps_frames / self._fps_time)}"
+            self._fps_frames, self._fps_time = 0, 0.0
 
     def _unbusy(self, turn: int) -> None:
         if turn == self.turn:
@@ -409,7 +458,10 @@ def run(level_id: str = "01") -> int:
     ids = [p.stem for p in paths]
     start = ids.index(level_id) if level_id in ids else 0
 
+    # Khử răng cưa 4× cho cạnh ô và khối; phải đặt trước khi mở cửa sổ
+    loadPrcFileData("", "framebuffer-multisample 1\nmultisamples 4")
     app = Ursina(title="Bloxorz Solver", development_mode=False)
+    app.render.setAntialias(AntialiasAttrib.MMultisample)
     setup_scene()
     Game(paths, start)
     app.run()
