@@ -13,7 +13,7 @@ Mỗi người viết chương của mình thành một file ở đây (hoặc g
 | 3.2 DFS | `3.2-dfs.md` | TV2 | Chưa có |
 | 3.3 UCS và hàm chi phí | `3.3-ucs.md` | TV3 | Chưa có |
 | 3.4 A* và heuristic | [3.4-astar.md](3.4-astar.md) | TV4 | **Nháp đủ mục**; cập nhật số liệu sau khi chốt hàm chi phí (V13) |
-| 4. Cài đặt và giao diện | `4-cai-dat-giao-dien.md` | TV5 | Chưa có |
+| 4. Cài đặt và giao diện | [4-cai-dat-giao-dien.md](4-cai-dat-giao-dien.md) | TV5 | **Nháp đủ mục**, 10 hình; chụp lại Hình 4.6–4.8 nếu nhóm giữ hàm chi phí V13 (cột Chi phí đổi) |
 | 5.1–5.3, 5.5 Thực nghiệm | `5-thuc-nghiem.md` | TV2 | Chưa có |
 | 5.4 Nhận xét A* | [5.4-nhan-xet-astar.md](5.4-nhan-xet-astar.md) | TV4 | Nháp với số liệu tạm; thay bằng số liệu chính thức của TV2 |
 | 5.4 Nhận xét BFS, DFS, UCS | | TV1, TV2, TV3 | Chưa có |

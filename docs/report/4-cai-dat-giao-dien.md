@@ -147,6 +147,8 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 
 *Hình 4.8. Kết quả So sánh trên màn 23: BFS, UCS và A* với cả hai heuristic cùng tìm được lời giải 75 bước; DFS tìm được lời giải dài 1187 bước, đúng với việc DFS không bảo đảm đường ngắn nhất.*
 
+Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (docs/04 §2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 100,96, còn UCS và A* đi 75 bước khác tốn 99,96.
+
 Thời gian và bộ nhớ trên giao diện chỉ để tham khảo, vì tiến trình con luôn bật `tracemalloc` để đo bộ nhớ, và việc này làm chậm thuật toán. Số liệu ở chương 5 lấy từ script thực nghiệm.
 
 ![Hình 4.9](hinh/h4-9-chon-man.png)
