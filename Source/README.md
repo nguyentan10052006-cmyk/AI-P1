@@ -75,7 +75,7 @@ Mục tiêu: lăn khối 1×1×2 tới lỗ vuông đích và **đứng thẳng*
 | Cầu mở | ô gỗ nâu | Đi như sàn |
 | Cầu đóng | ô sẫm | Như ô trống: đi vào là rơi |
 
-Khối lật quanh cạnh đáy như game gốc; khối nằm mà một đầu hụt khỏi sàn thì đổ nghiêng qua mép rồi rơi. Khi công tắc tác động, khối tách hay ghép, giao diện hiện một dòng thông báo ngắn dưới dòng thắng thua. Góc trái trên có bộ đếm FPS.
+Khối lật quanh cạnh đáy như game gốc; khối nằm mà một đầu hụt khỏi sàn thì đổ nghiêng qua mép rồi rơi. Khi công tắc tác động, khối tách hay ghép, giao diện hiện một dòng thông báo ngắn dưới dòng thắng thua. Góc trái dưới có bộ đếm FPS.
 
 ## Luật chơi và các giả định
 
@@ -181,6 +181,11 @@ Source/
     block_view.py      khối và hai khối con; hoạt ảnh lăn, tách, ghép, rơi
     hud.py             các nút, lưới chọn màn, khung kết quả, bảng So sánh
     camera_controller.py  góc nhìn: các nấc nghiêng, nhìn từ đỉnh, thu phóng, căn bàn khi khung kết quả hiện
+    popup.py           hộp kết thúc màn (thắng, rơi), kéo thả được
+    theme.py           font Be Vietnam Pro, thẻ kiểu kính mờ dùng chung
+    meshes.py          mesh hộp vát cạnh cho ô và khối
+    anim.py            hoạt ảnh hẹn giờ dừng được (tránh lỗi của Ursina khi đổi màn)
+    fonts/             font Be Vietnam Pro và giấy phép OFL
   levels/original/     33 màn gốc (JSON)
   levels/gen/          bộ màn tự sinh S1–S3 cho thực nghiệm
   experiments/         run.py: script đo (CSV); gen_levels.py: sinh levels/gen/;

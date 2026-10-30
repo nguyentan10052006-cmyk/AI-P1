@@ -19,7 +19,8 @@ Source/
   main.py            điểm vào: mở giao diện
   bloxorz/           engine luật chơi (state.py, level.py, rules.py, problem.py, costs.py, maze.py)
   solvers/           BFS, DFS, UCS, A*, heuristic; runner.py chạy solver ở tiến trình riêng
-  gui/               giao diện Ursina (app.py, board_view.py, block_view.py, hud.py, camera_controller.py)
+  gui/               giao diện Ursina (app.py, board_view.py, block_view.py, hud.py, camera_controller.py,
+                     popup.py, theme.py, meshes.py, anim.py; fonts/)
   levels/original/   33 màn gốc (JSON)
   tests/             unit test
 ```
@@ -36,7 +37,7 @@ Quy tắc này có hai hệ quả. Thứ nhất, **chơi tay và thuật toán d
 
 `step()` trả về `StepResult` gồm trạng thái mới, kết quả (`ok`, `fell`, `won`), vị trí ngay sau khi lăn (dùng cho hoạt ảnh) và danh sách sự kiện theo thứ tự xảy ra: công tắc tác động, ô dễ vỡ vỡ, tách, ghép, rơi, thắng. Giao diện chỉ đọc các trường này để vẽ.
 
-Năm file của `gui/` chia việc như sau:
+Các file của `gui/` chia việc như sau:
 
 | File | Việc |
 |---|---|
@@ -45,6 +46,10 @@ Năm file của `gui/` chia việc như sau:
 | `hud.py` | Các nút, lưới chọn màn, khung kết quả và bảng So sánh |
 | `camera_controller.py` | Góc nhìn: các nấc nghiêng, góc nhìn đỉnh, thu phóng, căn bàn khi khung kết quả hiện (mục 4.7) |
 | `app.py` | Cửa sổ, phím, vòng `update()`; nối phím với `rules.step()` và nút với `runner` |
+| `popup.py` | Hộp kết thúc màn (thắng, rơi) với các nút hành động tiếp theo; kéo thả được |
+| `theme.py` | Font Be Vietnam Pro (thư mục `fonts/`) và thẻ kiểu kính mờ dùng chung |
+| `meshes.py` | Mesh hộp vát cạnh cho ô và khối, tạo một lần rồi dùng lại |
+| `anim.py` | Hoạt ảnh hẹn giờ dừng được, an toàn khi đổi màn (lỗi của Ursina 7, mục 4.5) |
 
 Tọa độ: ô ở hàng r, cột c có tâm tại x = c, z = −r trong không gian 3D, trục y hướng lên. Camera luôn đặt phía z âm, nhìn xuống bàn, nên phím ↑ (hàng giảm) luôn đẩy khối ra xa người xem.
 
@@ -208,10 +213,10 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 ### 4.9. Hạn chế
 
 - Chấm đánh dấu màn đã thắng chỉ giữ trong một lần chạy chương trình, chưa lưu ra file.
+- Chưa có màn hướng dẫn chú giải các loại ô và phím; người chơi xem Bảng 4.1, dòng phím tắt cuối màn hình hoặc README.
+- Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
+- Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.
 
 #### Nguồn đề xuất thêm vào danh mục tài liệu tham khảo
 
 [13] The Be Vietnam Pro Project Authors, *Be Vietnam Pro*, giấy phép SIL Open Font License 1.1. [Trực tuyến]. Địa chỉ: https://github.com/bettergui/BeVietnamPro
-- Chưa có màn hướng dẫn chú giải các loại ô và phím; người chơi xem Bảng 4.1, dòng phím tắt cuối màn hình hoặc README.
-- Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
-- Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.
