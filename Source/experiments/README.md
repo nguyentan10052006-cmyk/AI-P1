@@ -2,6 +2,26 @@
 
 Script đo, kiểm tra, vẽ hình và sinh bảng cho chương 5 của báo cáo. Cách đo và cách trình bày theo `docs/04-thuc-nghiem.md`; file này chỉ ghi lệnh và thứ tự chạy.
 
+## Cài đặt
+
+Python 3.11 (docs/07 §4). Trong `Source/`:
+
+```bash
+python -m pip install -r requirements.txt   # gồm matplotlib==3.10.9 cho charts.py và tables.py
+python -c "import matplotlib; print(matplotlib.__version__)"   # kiểm tra: phải in 3.10.9
+```
+
+- `run.py`, `check_results.py`, `compare_runs.py` chỉ dùng thư viện chuẩn.
+- `charts.py` và `tables.py` cần `matplotlib`. Thiếu matplotlib thì hai script này báo `ModuleNotFoundError`, và test của chúng tự bỏ qua.
+
+Vẽ hình và sinh bảng nhanh từ một `summary.csv` có sẵn:
+
+```bash
+python -m experiments.charts --summary <summary.csv> --out <thư mục hình>   # 8 hình H1–H6, H8, H9, mỗi hình kèm CSV
+python -m experiments.tables --summary <summary.csv> --out <file .md>       # T3, T4, T5, Phụ lục A
+python -m experiments.check_results <summary.csv>                           # K1–K8
+```
+
 | File | Việc | Chủ |
 |---|---|---|
 | `run.py` | Đo: mỗi lần chạy một tiến trình con, giới hạn 60 giây, thời gian lấy trung vị 5 lần, bộ nhớ đo một lần riêng; ghi `raw.csv`, `summary.csv`, `run_info.json` | TV2 (V23) |
@@ -9,7 +29,7 @@ Script đo, kiểm tra, vẽ hình và sinh bảng cho chương 5 của báo cá
 | `charts.py` | Hình H1–H6, H8, H9, mỗi hình kèm một CSV số liệu (04 §7.2); cần `matplotlib` | TV2 (V25) |
 | `compare_runs.py` | So hai lần chạy để kiểm tra tái lập: số đếm phải trùng hẳn, thời gian và bộ nhớ chỉ báo tỉ lệ | TV2 (V24) |
 | `tables.py` | Bảng T3, T4, T5 và Phụ lục A dạng Markdown (04 §7.1); cần `matplotlib` (dùng chung hàm đọc với `charts.py`) | TV2 (V25) |
-| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40). Bản của TV3 nằm trên `feature/trong/V12-ucs` (tên file `s1_010`, `s2_04`, `s3_10`) và **thay** bản tạm của TV2 trên nhánh tích hợp này (`S1-010`, …) |
+| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40), trên `feature/trong/V12-ucs`, chưa vào nhánh chính (tên file `s1_010`, `s2_04`, `s3_10`). `charts.py` đọc cả tên này lẫn dạng `S1-010`, `S2-k04` |
 | `convert_original_levels.py` | Sinh 33 màn gốc trong `levels/original/` | TV2 (V07) |
 
 Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
@@ -28,9 +48,9 @@ Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
 
 Còn thiếu điều kiện nào thì số liệu chỉ là nháp, không đưa vào báo cáo.
 
-- [ ] Hàm chi phí V13 đã chốt **và được dùng khi chạy**. TV3 đã cài `bloxorz/costs.py` (`compute_step_cost`, nhánh `feature/trong/V12-ucs`), nhưng `Problem` mặc định vẫn có chi phí 1 (`DEFAULT_COST_FN = None`). Nhóm phải quyết cách nối V13 vào `run.py`, GUI và `tools/check_heuristics.py`; sau đó kiểm `run_info.json` và cột `path_cost` có đúng là chi phí V13 không.
+- [ ] Hàm chi phí V13 đã chốt **và được dùng khi chạy**. TV3 đã cài `bloxorz/costs.py` (`compute_step_cost`, nhánh `feature/trong/V12-ucs`), nhưng `Problem` mặc định vẫn có chi phí 1 (`DEFAULT_COST_FN = None`). Nhóm phải quyết cách nối V13 vào `run.py`, GUI và `tools/check_heuristics.py`. TV5 đã có đề xuất trên nhánh thử `thu/test-main-m2` (commit `3cc0e01`, ghi rõ "chờ nhóm chốt"): `run.py --cost energy|unit`, dòng lệnh mặc định `energy`, ghi `cost` vào `run_info.json`; GUI dùng `compute_step_cost`. Sau khi chốt, kiểm `run_info.json` và cột `path_cost` có đúng là chi phí V13 không.
 - [ ] `tools/check_heuristics.py` cho 0 vi phạm với hàm chi phí V13.
-- [ ] Nhánh chính đã có: bộ nạp màn có `links` (V03), UCS (V12), $h_P$ (V16), các sửa của V23 (PR #13), bộ màn S1–S3 (V40), và các script trong bảng trên.
+- [ ] Nhánh chính đã có: bộ nạp màn có `links` (V03), UCS (V12), $h_P$ (V16), bộ màn S1–S3 (V40), và các script trong bảng trên. Các sửa của V23 (PR #13) và GUI V21 (PR #15) đã vào nhánh chính.
 - [ ] Nhóm đã chốt định dạng file kết quả (Q1–Q7); nếu có đổi thì `docs/04` đã sửa theo, qua PR.
 - [ ] Máy chạy: một máy cho toàn bộ, cắm sạc, tắt ứng dụng nặng (04 §4).
 - [ ] Working tree sạch. `git status` không có file `.py` chưa commit trong `Source/`, nếu không `run.py` sẽ ghi commit kèm hậu tố `-dirty`.
