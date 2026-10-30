@@ -18,9 +18,10 @@ Góc đã chọn được giữ khi đổi màn; chỉ F mới đặt lại.
 from __future__ import annotations
 
 import math
-from typing import Callable, Optional, Sequence
+from typing import Callable, Iterable, List, Optional, Sequence
 
-from ursina import Vec3, camera, mouse, time
+from panda3d.core import Point2, Point3
+from ursina import Vec3, application, camera, mouse, scene, time, window
 
 MAX_YAW = 40.0
 YAW_PRESETS = (-MAX_YAW, -20.0, 0.0, 20.0, MAX_YAW)
@@ -103,6 +104,24 @@ class CameraController:
         dương là sang phải). Dịch bằng film offset của lens nên góc nhìn không đổi, chỉ hình trượt ngang."""
         self.target_frame_scale = scale
         self.target_film_shift = film_shift
+
+    def project_unframed(self, points: Iterable[Vec3]) -> List[float]:
+        """Hoành độ trên màn hình (đơn vị camera.ui) của các điểm, khi camera ở góc đích và chưa căn theo khung
+        kết quả (set_frame(1, 0)). Dùng để biết bàn có bị khung che không và cần dịch, thu bao nhiêu.
+        Điểm nằm sau camera thì bỏ qua."""
+        saved = (self.yaw, self.pitch, self.distance, self.frame_scale, self.film_shift)
+        self.yaw, self.pitch, self.distance = self.target_yaw, self.target_pitch, self.target_distance
+        self.frame_scale, self.film_shift = 1.0, 0.0
+        self._apply_position()
+        xs: List[float] = []
+        for point in points:
+            local = application.base.cam.getRelativePoint(scene, Point3(point.x, point.y, point.z))
+            screen = Point2()
+            if camera.lens.project(local, screen):
+                xs.append(screen.x * window.aspect_ratio / 2)
+        self.yaw, self.pitch, self.distance, self.frame_scale, self.film_shift = saved
+        self._apply_position()
+        return xs
 
     def zoom(self, delta: float) -> None:
         """Thu phóng (delta > 0: lại gần, delta < 0: ra xa)."""

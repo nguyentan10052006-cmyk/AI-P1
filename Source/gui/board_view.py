@@ -179,6 +179,12 @@ class BoardView(Entity):
         rows, cols = self._extent_cache
         return Vec3((cols[0] + cols[1]) / 2, 0, -(rows[0] + rows[1]) / 2)
 
+    def corners(self) -> List[Vec3]:
+        """Góc mặt trên của mọi ô có trên bàn, để đo bàn chiếm chỗ nào trên màn hình. Không dùng hộp bao chữ
+        nhật: màn gốc nhiều chỗ trống, góc hộp bao chiếu ra xa hơn bàn thật."""
+        half = TILE_SIZE / 2
+        return [Vec3(c + dx, 0, -r + dz) for (r, c) in self._roots for dx in (-half, half) for dz in (-half, half)]
+
     def fit_camera(self, camera_controller) -> None:
         """Căn camera theo kích thước bàn, nhìn từ phía z âm để phím ↑ đẩy khối ra xa (docs/07 §4)."""
         rows, cols = self._extent_cache

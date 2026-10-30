@@ -127,7 +127,7 @@ class Game(Entity):
                        on_tilt_cam=self.camera_ctrl.tilt_preset,
                        on_toggle_top_down=self.camera_ctrl.toggle_top_down,
                        on_reset_cam=self.camera_ctrl.reset_view)
-        self.camera_ctrl.on_view_change = self.hud.set_camera_view
+        self.camera_ctrl.on_view_change = self._on_view_change
         self.hud.on_panel_change = self._frame_board
         self.load(start_index)
 
@@ -177,24 +177,34 @@ class Game(Entity):
         self._update_info()
 
     def _frame_board(self, panel_visible: bool) -> None:
-        """Khung kết quả hiện thì thu bàn vào vùng trống giữa khung và cột nút; ẩn thì trả về cỡ đầy đủ.
+        """Khung kết quả hiện thì chỉ dời hoặc thu bàn khi bàn thật sự bị khung che; ẩn thì trả về như cũ.
 
-        Bàn vốn được căn giữa vùng [mép trái màn hình, mép trái cột nút]. Lùi camera xa k lần thì hình
-        co về tâm màn hình k lần, sau đó dịch ngang (film offset) cho tâm bàn tới giữa vùng còn trống.
+        Đo hoành độ trên màn hình của các góc ô ở góc nhìn hiện tại (chưa căn), được đoạn [L, R]. Vùng trống
+        là [A, B] giữa mép phải khung và mép trái cột thẻ. Lùi camera xa k lần thì hình co về tâm màn hình k lần
+        (k = 1 nếu bàn đã vừa vùng trống), sau đó dịch ngang s (film offset) ít nhất có thể để [L/k + s, R/k + s]
+        nằm trong [A, B]. Bàn vốn không chạm khung thì k = 1, s = 0: không đổi gì.
         """
-        left, right = window.left.x + 0.02, self.hud.dock_left
-        center_x = 0.0
-        if panel_visible:
-            inner_left = self.hud.panel_right + 0.02
-            scale = (right - left) / (right - inner_left)
-            center_x = (inner_left + right) / 2
-            shift = center_x - (left + right) / 2 / scale
-            self.camera_ctrl.set_frame(scale, shift / window.aspect_ratio)
-        else:
+        if not panel_visible or self.board is None:
             self.camera_ctrl.set_frame(1.0, 0.0)
+            center_x = 0.0
+        else:
+            xs = self.camera_ctrl.project_unframed(self.board.corners())
+            left, right = min(xs), max(xs)
+            area_left, area_right = self.hud.panel_right + 0.03, self.hud.dock_left - 0.02
+            scale = max(1.0, (right - left) / (area_right - area_left))
+            low, high = area_left - left / scale, area_right - right / scale
+            shift = min(max(0.0, low), high)
+            self.camera_ctrl.set_frame(scale, shift / window.aspect_ratio)
+            center_x = (left + right) / 2 / scale + shift
         self.board_center_x = center_x
         self.notice.animate_x(center_x, duration=0.2, curve=curve.out_quad)   # thông báo và hộp kết thúc
         self.popup.move_to(center_x)                                         # nằm giữa vùng bàn
+
+    def _on_view_change(self, name: str) -> None:
+        """Đổi góc camera: cập nhật nhãn; khung kết quả đang hiện thì đo và căn lại bàn ở góc mới."""
+        self.hud.set_camera_view(name)
+        if self.hud.panel.enabled and self.board is not None:
+            self._frame_board(True)
 
     def _update_info(self) -> None:
         level = self.level
@@ -289,6 +299,7 @@ class Game(Entity):
         if self.level is None or self.job is not None:
             return
         self.hud.clear_results()
+        self.popup.hide()   # kết quả mới thay cho hộp kết thúc của lượt trước
         self.job, self.job_name = start_solver(ALGORITHMS[name], self._problem(), SOLVE_TIMEOUT), name
         self.hud.set_running(True)
         self.hud.highlight_solver(name)
@@ -297,6 +308,7 @@ class Game(Entity):
         if self.level is None or self.job is not None:
             return
         self.hud.clear_results()
+        self.popup.hide()   # kết quả mới thay cho hộp kết thúc của lượt trước
         self.job, self.job_name = start_compare(self._problem(), timeout_s=SOLVE_TIMEOUT), ""
         self.hud.set_running(True)
 

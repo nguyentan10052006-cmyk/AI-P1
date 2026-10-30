@@ -17,7 +17,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from ursina import Button, Circle, Entity, Quad, Text, camera, color, curve, destroy, window
 
-from gui.theme import FONT_BOLD, FONT_REGULAR, FONT_SEMIBOLD, card, heading
+from gui.theme import FONT_BOLD, FONT_REGULAR, FONT_SEMIBOLD, card, heading, resize_card
 
 # Tên hiện trên nút và trong bảng So sánh, theo khóa của solvers.ALGORITHMS
 LABELS = {"bfs": "BFS", "dfs": "DFS", "ucs": "UCS", "astar": "A*", "astar_m": "A* (h_M)"}
@@ -48,14 +48,16 @@ SOLVE_H = 0.052
 CAM_H = 0.04
 # Khung kết quả là cột dọc bên trái, dưới tên màn và số bước, trên dòng phím tắt; khi khung hiện,
 # camera căn bàn vào vùng trống giữa khung và cột thẻ (app.py) nên khung không che bàn
-PANEL_TOP, PANEL_BOTTOM, PANEL_W = 0.34, -0.44, 0.53
+# Khung gọn: rộng PANEL_W khi hiện kết quả một thuật toán, rộng vừa bảng khi So sánh (Hud._fit_panel)
+PANEL_TOP, PANEL_BOTTOM, PANEL_W = 0.34, -0.44, 0.38
 PAD = 0.016               # lề trong của khung
-LINE_H = 0.022            # chiều cao một dòng chữ scale 0.85
+STATUS_SCALE, DETAILS_SCALE = 0.92, 0.78
+LINE_H = 0.0202           # chiều cao một dòng chữ ở DETAILS_SCALE
 DETAILS_SPACING = 1.25    # giãn dòng phần chi tiết cho dễ đọc
 DETAILS_LINE_H = LINE_H * DETAILS_SPACING
-STATUS_WRAP, DETAILS_WRAP = 36, 44   # số ký tự mỗi dòng trước khi xuống hàng, vừa bề rộng khung
-ROW_H = 0.03              # chiều cao một dòng của bảng So sánh
-TABLE_SCALE = 0.72
+STATUS_WRAP, DETAILS_WRAP = 30, 40   # số ký tự mỗi dòng trước khi xuống hàng, vừa bề rộng PANEL_W
+ROW_H = 0.027             # chiều cao một dòng của bảng So sánh
+TABLE_SCALE = 0.64
 DOT_SIZE = 0.013          # chấm trạng thái trước dòng đầu của khung kết quả
 DOT_GAP = 0.022           # dòng trạng thái lùi sang phải chừng này để chừa chỗ cho chấm
 # Cột của bảng So sánh: (tiêu đề, các chuỗi dài nhất có thể hiện trong cột). Vị trí cột tính lúc dựng HUD
@@ -191,23 +193,24 @@ class Hud(Entity):
 
         # ---- khung kết quả (cột trái) ----
         self.table_x, table_w = self._table_layout()
-        self.panel_w = max(PANEL_W, table_w + 2 * PAD)   # khung nới theo bảng So sánh nếu font rộng hơn
+        self.table_panel_w = max(PANEL_W, table_w + 2 * PAD)   # bề rộng khung khi hiện bảng So sánh
+        self.panel_w = PANEL_W
         self.panel = Entity(parent=self, position=(window.left.x + MARGIN, PANEL_TOP), enabled=False)
         self.panel_right = self.panel.x + self.panel_w
-        self._panel_h = 0.0
-        self.panel_bg = card(self.panel, 0, 0, self.panel_w, 0.08)
-        Text("H: ẩn", parent=self.panel, position=(self.panel_w - PAD, -PAD), origin=(0.5, 0.5), scale=0.68,
-             color=COLORS["muted"])
+        self._panel_h = 0.08
+        self.panel_bg = card(self.panel, 0, 0, self.panel_w, self._panel_h)
+        self.hide_hint = Text("H: ẩn", parent=self.panel, position=(self.panel_w - PAD, -PAD), origin=(0.5, 0.5),
+                              scale=0.64, color=COLORS["muted"])
         # text=" ": Ursina 7 lỗi khi đặt wordwrap cho Text rỗng; lỗi của solver có thể dài nên phải xuống dòng
         self.status = Text(" ", parent=self.panel, position=(PAD + DOT_GAP, -PAD), origin=(-0.5, 0.5),
-                           wordwrap=STATUS_WRAP, font=FONT_SEMIBOLD)
+                           wordwrap=STATUS_WRAP, font=FONT_SEMIBOLD, scale=STATUS_SCALE)
         # Chấm trạng thái: màu theo kết quả, nhấp nháy khi đang giải (§3.4)
         self.dot = Entity(parent=self.panel, model=Circle(resolution=20, radius=0.5), scale=DOT_SIZE,
-                          position=(PAD + DOT_SIZE / 2 + 0.002, -PAD - 0.0135, -0.01), color=color.white)
+                          position=(PAD + DOT_SIZE / 2 + 0.002, -PAD - 0.0125, -0.01), color=color.white)
         self._running = False
-        self.details = Text(" ", parent=self.panel, position=(PAD, -0.06), origin=(-0.5, 0.5), scale=0.85,
+        self.details = Text(" ", parent=self.panel, position=(PAD, -0.054), origin=(-0.5, 0.5), scale=DETAILS_SCALE,
                             line_height=DETAILS_SPACING, color=COLORS["muted"], wordwrap=DETAILS_WRAP)
-        self.table = Entity(parent=self.panel, position=(PAD, -0.06))
+        self.table = Entity(parent=self.panel, position=(PAD, -0.054))
         self.cells: List[List[Text]] = []   # ô của bảng So sánh, dựng lần đầu khi cần
 
         # ---- bảng chọn màn, bảng phím tắt ----
@@ -394,7 +397,7 @@ class Hud(Entity):
         self.dot.color = _with_alpha(tint or COLORS["accent"], self.dot.alpha)
         if not self.details.text.strip() and not any(cell.text for row in self.cells for cell in row):
             # chỉ có dòng trạng thái (đang tìm, hoặc lỗi dài nhiều dòng)
-            self._fit_panel(-PAD - _line_count(text) * LINE_H * 1.25)
+            self._fit_panel(-PAD - _line_count(text) * LINE_H * 1.4, PANEL_W)
         self._sync_panel()
 
     def toggle_panel(self) -> None:
@@ -409,18 +412,21 @@ class Hud(Entity):
             if self.on_panel_change is not None:
                 self.on_panel_change(visible)
 
-    def _fit_panel(self, content_bottom: float) -> None:
-        """Thẻ nền vừa đủ phủ nội dung, tính từ mép trên của khung. Dựng lại mesh bo góc khi đổi chiều cao để
-        góc không bị kéo méo."""
+    def _fit_panel(self, content_bottom: float, width: Optional[float] = None) -> None:
+        """Thẻ nền vừa đủ phủ nội dung (tính từ mép trên của khung), rộng width (None: giữ bề rộng cũ).
+
+        Bề rộng đổi trong lúc khung đang hiện thì báo app.py căn lại bàn theo mép phải mới của khung."""
+        width = self.panel_w if width is None else width
         height = min(PANEL_TOP - PANEL_BOTTOM, -content_bottom + PAD)
-        if abs(height - self._panel_h) < 1e-4:
+        if abs(height - self._panel_h) < 1e-4 and abs(width - self.panel_w) < 1e-4:
             return
-        self._panel_h = height
-        radius = 0.012 / height
-        for entity, extra in ((self.panel_bg, 0.0), (self.panel_bg.edge, 0.003)):
-            entity.model = Quad(radius=radius, aspect=(self.panel_w + extra) / (height + extra))
-            entity.origin = (-0.5, 0.5)   # đổi model thì Ursina bỏ origin cũ: đặt lại để mép trên trái giữ nguyên
-            entity.scale_y = height + extra
+        width_changed = abs(width - self.panel_w) >= 1e-4
+        self._panel_h, self.panel_w = height, width
+        resize_card(self.panel_bg, width, height, 0, 0)
+        self.hide_hint.x = width - PAD
+        self.panel_right = self.panel.x + width
+        if width_changed and self.panel.enabled and self.on_panel_change is not None:
+            self.on_panel_change(True)
 
     def clear_results(self) -> None:
         self.panel_hidden = False   # kết quả mới luôn hiện, kể cả khi trước đó đã bấm H
@@ -444,7 +450,7 @@ class Hud(Entity):
                      f"Đã thăm {outcome['visited']}",
                      f"Thời gian {seconds}  ·  bộ nhớ {memory}"]
             self.details.text = "\n".join(lines)
-            self._fit_panel(self.details.y - len(lines) * DETAILS_LINE_H)
+            self._fit_panel(self.details.y - len(lines) * DETAILS_LINE_H, PANEL_W)
 
     def show_compare(self, names: Sequence[str], results: Mapping[str, Mapping], running: Optional[str],
                      elapsed: float) -> None:
@@ -489,4 +495,4 @@ class Hud(Entity):
                     cell.text = text
                 cell.color = tint
         self._fit_panel(self.details.y - _line_count(details) * DETAILS_LINE_H if errors
-                        else self.table.y - len(rows) * ROW_H)
+                        else self.table.y - len(rows) * ROW_H, self.table_panel_w)

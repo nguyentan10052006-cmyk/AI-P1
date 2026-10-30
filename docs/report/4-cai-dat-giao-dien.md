@@ -134,7 +134,7 @@ Khi vào màn, các ô trồi lên lần lượt theo đường chéo rồi kh�
 
 Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
 
-**Hộp kết thúc màn.** Khi thắng hoặc rơi, sau khi hoạt ảnh gần xong, một hộp hiện giữa vùng bàn (không che khung kết quả và cột nút). Khi thắng, hộp ghi số bước so với số bước tối ưu, và tên thuật toán nếu khối vừa tự lăn theo lời giải; nút chính là Màn tiếp. Khi rơi, hộp ghi lý do (ô dễ vỡ, cầu đóng, hụt khỏi bàn) theo sự kiện của engine; nút chính là Chơi lại. Enter bấm nút chính, Esc đóng hộp; chơi lại hay đổi màn thì hộp tự đóng.
+**Hộp kết thúc màn.** Khi thắng hoặc rơi, sau khi hoạt ảnh gần xong, một hộp hiện giữa vùng bàn (không che khung kết quả và cột nút). Khi thắng, hộp ghi số bước so với số bước tối ưu, và tên thuật toán nếu khối vừa tự lăn theo lời giải; nút chính là Màn tiếp. Khi rơi, hộp ghi lý do (ô dễ vỡ, cầu đóng, hụt khỏi bàn) theo sự kiện của engine; nút chính là Chơi lại. Enter bấm nút chính, Esc đóng hộp; chơi lại hay đổi màn thì hộp tự đóng. Hộp kéo thả được: giữ chuột trái ở chỗ bất kỳ trên hộp (trừ các nút, có dấu tay nắm ở mép trên) rồi kéo; hộp không ra khỏi màn hình, và các lần sau hiện lại ở chỗ đã kéo tới. Bấm Giải hoặc So sánh thì hộp của lượt trước đóng lại.
 
 **Chạy thuật toán không làm đơ giao diện.** Ursina vẽ mọi thứ trong một vòng lặp duy nhất, nên nếu chạy thuật toán ngay trong vòng lặp đó thì cửa sổ đứng yên suốt lúc tìm. Khi bấm một nút Giải, giao diện gọi `runner.start_solver()`; hàm này mở một tiến trình con chạy thuật toán rồi trả về ngay. Mỗi khung hình, giao diện gọi `poll()` để hỏi kết quả mà không phải chờ; không dùng callback từ tiến trình khác, vì Ursina không an toàn khi đối tượng bị sửa ngoài luồng chính. Dùng tiến trình chứ không dùng luồng vì Python không dừng ngang được một luồng: quá 60 giây hoặc khi bấm Hủy, tiến trình con bị dừng hẳn. Trong lúc chờ, khung kết quả hiện tên thuật toán và số giây đã chạy, các nút Giải mờ đi và nút Hủy sáng lên (Hình 4.7). Khi đo trong lúc thuật toán chạy, khung hình chậm nhất khoảng 55 ms, tức cửa sổ vẫn phản hồi.
 
@@ -177,7 +177,9 @@ Camera chuyển góc mượt bằng nội suy mỗi khung hình. Khi nghiêng ng
 
 *Hình 4.10. Màn 23 ở ba góc nhìn: nghiêng trái 40° (cao 52°), nghiêng phải 20° hạ thấp còn 30°, và nhìn từ đỉnh. Ở cả ba góc, phím ↑ vẫn đẩy khối về phía trên màn hình.*
 
-**Bố cục khi khung kết quả hiện.** Khung kết quả nằm ở cột bên trái, cột nút ở bên phải. Khi khung hiện, camera lùi xa và dời hình sang phải (bằng độ lệch ống kính, góc nhìn không đổi) để bàn nằm gọn giữa khung và cột nút, không bị che (Hình 4.6, 4.8). Phím H ẩn khung để xem bàn ở cỡ đầy đủ; kết quả lần giải mới luôn hiện lại khung.
+**Bố cục khi khung kết quả hiện.** Khung kết quả nằm ở cột bên trái, gọn theo nội dung: rộng vừa các chỉ số khi giải bằng một thuật toán, rộng vừa bảng khi So sánh (vị trí cột tính theo bề rộng chữ thật). Bàn chỉ bị dời hoặc thu khi thật sự bị khung che: giao diện chiếu các góc ô qua camera để biết bàn chiếm đoạn nào trên màn hình. Nếu bàn đã nằm ngoài khung thì giữ nguyên; nếu chạm khung thì ưu tiên dời ngang (bằng độ lệch ống kính, góc nhìn không đổi), chỉ khi dời không đủ mới lùi camera, và chỉ lùi vừa đủ để bàn nằm gọn giữa khung và cột nút (Hình 4.6, 4.8). Đổi góc camera trong lúc khung đang hiện thì bàn được đo và căn lại. Phím H ẩn khung; kết quả lần giải mới luôn hiện lại khung.
+
+Khung kết quả, hộp kết thúc và các thẻ nút có nền hơi trong (vẫn thấy lờ mờ bàn phía sau), viền mảnh, một dải sáng rất nhẹ ở mép trên mờ dần xuống và bóng mềm phía dưới, để tách khỏi nền mà không che hẳn bàn.
 
 ### 4.8. Kiểm thử giao diện
 
@@ -198,6 +200,8 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 | Cài trong môi trường ảo mới theo README | Cài đúng phiên bản, test qua, cửa sổ mở được |
 | Giải bằng BFS rồi tự lăn trên cả 33 màn, với hoạt ảnh lật khối mới (30/10) | 33/33 màn thắng đúng số bước tối ưu |
 | Bấm phím ngẫu nhiên mỗi khung hình (lăn, R, N, P, Space, camera, Ctrl+K) xen với Giải, So sánh, Hủy; 17 lần × 35 giây (30/10) | Không lỗi, không treo (trước khi sửa hoạt ảnh hẹn giờ: 4/12 lần dừng vì lỗi `!is_empty()`) |
+| Kéo hộp kết thúc bằng chuột (giả lập), kéo ra ngoài màn hình, bấm vào nút trong hộp (30/10) | Hộp đi theo chuột, dừng ở mép màn hình; bấm nút không kéo hộp; lần thắng sau hộp hiện ở chỗ đã kéo |
+| Khung kết quả hiện ở màn 23 (một thuật toán, rồi So sánh) (30/10) | Bàn giữ nguyên cỡ khi không bị che; khi So sánh chỉ thu vừa đủ |
 | Thắng ở màn 1; bấm F1, Esc; rơi ở màn 1 (30/10) | Khối thu vừa miệng lỗ và nhìn thấy trong lòng lỗ; hộp thắng ghi đúng số bước; hộp rơi ghi đúng lý do |
 | Lăn ra mép ở màn 1 (một đầu hụt, rồi hụt cả hai đầu), tách và ghép ở màn 8, đứng lên ô dễ vỡ, rồi bấm R (30/10) | Khối đổ nghiêng qua mép, không xuyên sàn; chỉ khối con hụt rơi; ô dễ vỡ được dựng lại |
 

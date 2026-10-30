@@ -58,7 +58,7 @@ Camera luôn nhìn từ trên xuống, từ phía người chơi, và không l�
 
 Mỗi lần giải có bốn kết quả: giải được, không có lời giải, hết giờ (quá 60 giây thì tiến trình bị dừng), lỗi hoặc đã hủy. Trong lúc thuật toán chạy, cửa sổ vẫn phản hồi và nút Hủy dùng được. Khi khung kết quả hiện, bàn tự thu vào phần màn hình còn trống nên không bị che; bấm H để ẩn khung. Thời gian và bộ nhớ hiện trên giao diện chỉ để tham khảo; số liệu trong báo cáo lấy từ script thực nghiệm.
 
-Khi thắng hoặc rơi, một hộp thông báo hiện giữa vùng bàn: số bước so với tối ưu (hoặc lý do rơi) và các nút Màn tiếp, Chơi lại, Chọn màn. Các nút camera nằm trong thẻ "Góc nhìn".
+Khi thắng hoặc rơi, một hộp thông báo (kéo thả được bằng chuột) hiện giữa vùng bàn: số bước so với tối ưu (hoặc lý do rơi) và các nút Màn tiếp, Chơi lại, Chọn màn. Các nút camera nằm trong thẻ "Góc nhìn".
 
 ## Cách chơi
 
