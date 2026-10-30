@@ -264,6 +264,24 @@ class ExperimentRunTests(unittest.TestCase):
         self.assertTrue(label.endswith("-dirty") and reasons)
         self.assertIn("đã theo dõi bị sửa: lv.json", reasons[0])   # tên file đầy đủ, không mất ký tự đầu
 
+    def test_energy_cost_uses_cost_function(self):
+        """--cost energy: S##G đi R R tốn 1.12 (đứng → nằm) + 1.62 (nằm → đứng) theo bloxorz/costs.py."""
+        info = exp.run_experiment([self.levels], ["bfs"], self.out, repeat=1, log=quiet, cost="energy")
+        self.assertEqual(info["cost"], "energy")
+        _, summary = read_csv(self.out / "summary.csv")
+        self.assertEqual((summary[0]["status"], summary[0]["steps"]), ("solved", "2"))
+        self.assertAlmostEqual(float(summary[0]["path_cost"]), 2.74)
+
+    def test_energy_cost_flags_unit_cost_solver(self):
+        """Solver báo chi phí 1 mỗi bước trong khi bài toán dùng hàm chi phí: phát lại phải ra invalid."""
+        exp.run_experiment([self.levels], ["tests.fakes:FakeSolver"], self.out, repeat=1, log=quiet, cost="energy")
+        _, summary = read_csv(self.out / "summary.csv")
+        self.assertEqual(summary[0]["status"], "invalid")
+
+    def test_unknown_cost_rejected(self):
+        with self.assertRaises(ValueError):
+            exp.run_experiment([self.levels], ["bfs"], self.out, repeat=1, log=quiet, cost="free")
+
     def test_f3_run_info_records_level_hashes(self):
         info = exp.run_experiment([self.levels], ["tests.fakes:FakeSolver"], self.out, repeat=1, log=quiet)
         entry = info["level_files"][0]

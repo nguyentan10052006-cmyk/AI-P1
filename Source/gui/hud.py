@@ -35,9 +35,10 @@ LINE_H = 0.022            # chiều cao một dòng chữ scale 0.85
 STATUS_WRAP, DETAILS_WRAP = 38, 46   # số ký tự mỗi dòng trước khi xuống hàng, vừa bề rộng khung
 ROW_H = 0.03              # chiều cao một dòng của bảng So sánh
 TABLE_SCALE = 0.72
-# vị trí cột đo theo bề rộng thật của chữ ở TABLE_SCALE, cách nhau 0.012
+# vị trí cột đo theo bề rộng thật của chữ ở TABLE_SCALE, cách nhau 0.012; cột Chi phí rộng hơn để vừa
+# chi phí lẻ theo hàm chi phí V13 (ví dụ DFS màn 23: 1524.13)
 TABLE_COLUMNS = (("Thuật toán", 0.0), ("Kết quả", 0.103), ("Bước", 0.195), ("Chi phí", 0.25),
-                 ("Mở rộng", 0.317), ("Giây", 0.401), ("MB", 0.46))
+                 ("Mở rộng", 0.332), ("Giây", 0.416), ("MB", 0.475))
 
 
 def outcome_summary(outcome: Mapping) -> tuple[str, color.Color]:

@@ -3,6 +3,7 @@
 Cách chạy (trong Source/):
     python -m experiments.run                                     # 5 thuật toán × levels/original, ghi vào experiments/
     python -m experiments.run --levels levels/original/01.json --algorithms bfs,dfs --repeat 5
+    python -m experiments.run --cost unit --out <thư mục ra>       # chi phí 1 mỗi bước, để so với hàm chi phí V13
     python -m experiments.run --algorithms tests.fakes:FakeSolver --levels <thư mục màn thử> --out <thư mục ra>
 
 Cách đo (docs/04 §4):
@@ -66,6 +67,11 @@ LEVELS_ROOT = SOURCE_DIR / "levels"
 DEFAULT_LEVELS = LEVELS_ROOT / "original"
 DEFAULT_OUT = SOURCE_DIR / "experiments"
 DEFAULT_ALGORITHMS = ("bfs", "dfs", "ucs", "astar", "astar_m")
+# Hàm chi phí (docs/04 §2: path_cost của cả 4 thuật toán tính bằng hàm chi phí của UCS).
+# "energy" là bloxorz.costs.compute_step_cost (V13); "unit" là 1 mỗi bước, như trước khi nối V13.
+# Dòng lệnh mặc định "energy"; run_experiment() mặc định "unit" cho các test dùng solver giả.
+# Tạm bật ngày 30/10, chờ TV2, TV3 chốt lại.
+COSTS = ("energy", "unit")
 
 SOLVED, NO_SOLUTION, TIMEOUT, INVALID, ERROR = "solved", "no_solution", "timeout", "invalid", "error"
 
@@ -99,8 +105,10 @@ def action_text(action) -> str:
     return letter if action.cube is None else f"{letter}{action.cube + 1}"
 
 
-def measure_once(level_path: str, level_id: str, spec: str, measure_memory: bool) -> Dict[str, Any]:
+def measure_once(level_path: str, level_id: str, spec: str, measure_memory: bool,
+                 cost: str = "unit") -> Dict[str, Any]:
     """Một lần đo theo khung ở docs/04 §4. Chạy trong tiến trình con."""
+    from bloxorz.costs import compute_step_cost
     from bloxorz.level import load_level
     from bloxorz.problem import Problem
     from solvers.base import NO_SOLUTION as SR_NO_SOLUTION, SOLVED as SR_SOLVED, SearchResult
@@ -108,7 +116,8 @@ def measure_once(level_path: str, level_id: str, spec: str, measure_memory: bool
     solver_cls = resolve_solver(spec)
     gc.collect()
     t0 = time.perf_counter_ns()
-    problem = Problem(load_level(Path(level_path), level_id))
+    problem = Problem(load_level(Path(level_path), level_id),
+                      cost_fn=compute_step_cost if cost == "energy" else None)
     solver = solver_cls()
     if measure_memory:
         tracemalloc.start()
@@ -155,9 +164,9 @@ def measure_once(level_path: str, level_id: str, spec: str, measure_memory: bool
     return out
 
 
-def _child(conn, level_path: str, level_id: str, spec: str, measure_memory: bool) -> None:
+def _child(conn, level_path: str, level_id: str, spec: str, measure_memory: bool, cost: str) -> None:
     try:
-        conn.send(measure_once(level_path, level_id, spec, measure_memory))
+        conn.send(measure_once(level_path, level_id, spec, measure_memory, cost))
     except BaseException as exc:  # màn lỗi, solver ném lỗi, chưa cài (NotImplementedError)…
         conn.send({"status": ERROR, "error": f"{type(exc).__name__}: {exc}"})
     finally:
@@ -167,7 +176,7 @@ def _child(conn, level_path: str, level_id: str, spec: str, measure_memory: bool
 # ---------- trong tiến trình cha ----------
 
 def run_isolated(level_path: Path, level_id: str, spec: str, measure_memory: bool,
-                 timeout_s: float) -> Dict[str, Any]:
+                 timeout_s: float, cost: str = "unit") -> Dict[str, Any]:
     """Chạy measure_once trong tiến trình con riêng.
 
     Chờ đồng thời trên ống dẫn kết quả và trên sentinel của tiến trình: tiến trình con thoát mà chưa gửi
@@ -175,7 +184,7 @@ def run_isolated(level_path: Path, level_id: str, spec: str, measure_memory: boo
     khi tiến trình con vẫn còn chạy lúc hết timeout_s.
     """
     parent_conn, child_conn = _CONTEXT.Pipe(duplex=False)
-    process = _CONTEXT.Process(target=_child, args=(child_conn, str(level_path), level_id, spec, measure_memory),
+    process = _CONTEXT.Process(target=_child, args=(child_conn, str(level_path), level_id, spec, measure_memory, cost),
                                daemon=True)
     started = time.perf_counter()
     process.start()
@@ -417,11 +426,14 @@ def machine_info() -> Dict[str, Any]:
 
 def run_experiment(level_paths: Sequence[Path], algorithms: Sequence[str], out_dir: Path, repeat: int = 5,
                    timeout_s: float = 60.0, force: bool = False, log=print,
-                   memory_timeout_s: Optional[float] = None) -> Dict[str, Any]:
+                   memory_timeout_s: Optional[float] = None, cost: str = "unit") -> Dict[str, Any]:
     """Chạy toàn bộ và ghi raw.csv, summary.csv, run_info.json vào out_dir. Trả về run_info.
 
     memory_timeout_s: giới hạn riêng cho lần đo bộ nhớ (tracemalloc làm chậm); None thì bằng timeout_s.
+    cost: "energy" (hàm chi phí V13) hoặc "unit" (1 mỗi bước), xem COSTS.
     """
+    if cost not in COSTS:
+        raise ValueError(f"cost phải là một trong {COSTS}")
     if repeat < 1:
         raise ValueError("repeat phải >= 1")
     if timeout_s <= 0:
@@ -462,14 +474,14 @@ def run_experiment(level_paths: Sequence[Path], algorithms: Sequence[str], out_d
                     continue
                 timed = []
                 for run in range(1, repeat + 1):
-                    outcome = run_isolated(path, info["level"], spec, False, timeout_s)
+                    outcome = run_isolated(path, info["level"], spec, False, timeout_s, cost)
                     timed.append(outcome)
                     raw_writer.writerow(raw_row(base, run, "time", outcome))
                     if outcome["status"] in (TIMEOUT, ERROR):
                         break   # các lần sau cũng sẽ như vậy; không tốn thêm timeout_s mỗi lần
                 memory = None
                 if timed[-1]["status"] in (SOLVED, NO_SOLUTION):
-                    memory = run_isolated(path, info["level"], spec, True, memory_timeout_s)
+                    memory = run_isolated(path, info["level"], spec, True, memory_timeout_s, cost)
                     raw_writer.writerow(raw_row(base, repeat + 1, "memory", memory))
                 raw_file.flush()
                 row = summarize(base, timed, memory, warnings, memory_failures)
@@ -486,6 +498,7 @@ def run_experiment(level_paths: Sequence[Path], algorithms: Sequence[str], out_d
         "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "commit": commit, "dirty_reasons": dirty_reasons,
         "repeat": repeat, "timeout_s": timeout_s, "memory_timeout_s": memory_timeout_s,
+        "cost": cost,
         "levels": [str(p) for p in levels], "level_files": level_files, "algorithms": list(algorithms),
         "argv": sys.argv, "machine": machine_info(), "warnings": warnings, "memory_failures": memory_failures,
         "method": "docs/04 §4: tiến trình spawn riêng mỗi lần chạy; thời gian = trung vị perf_counter_ns, "
@@ -511,6 +524,8 @@ def main(argv=None) -> int:
     parser.add_argument("--memory-timeout", type=float, default=None,
                         help="giây cho lần đo bộ nhớ (mặc định bằng --timeout; tracemalloc làm chậm)")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="thư mục ghi kết quả (mặc định experiments/)")
+    parser.add_argument("--cost", choices=COSTS, default="energy",
+                        help="hàm chi phí: energy (bloxorz/costs.py, mặc định) hoặc unit (1 mỗi bước)")
     parser.add_argument("--force", action="store_true", help="ghi đè raw.csv, summary.csv, run_info.json đã có")
     args = parser.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):  # console Windows mặc định cp1252, không in được tiếng Việt
@@ -520,7 +535,7 @@ def main(argv=None) -> int:
     algorithms = [a.strip() for a in args.algorithms.split(",") if a.strip()]
     try:
         info = run_experiment(args.levels, algorithms, args.out, args.repeat, args.timeout, args.force,
-                              memory_timeout_s=args.memory_timeout)
+                              memory_timeout_s=args.memory_timeout, cost=args.cost)
     except (FileExistsError, FileNotFoundError, ValueError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 1

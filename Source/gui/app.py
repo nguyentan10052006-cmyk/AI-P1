@@ -13,6 +13,7 @@ from ursina import (AmbientLight, DirectionalLight, Entity, Mesh, Text, Ursina, 
                     invoke, time, window)
 from ursina.shaders import unlit_shader
 
+from bloxorz.costs import compute_step_cost
 from bloxorz.level import Level, LevelError, load_level
 from bloxorz.problem import Problem
 from bloxorz.rules import FELL, WON, StepResult, step
@@ -51,6 +52,9 @@ BRIDGE_TIME = 0.25
 NOTICE_TIME = 2.0  # thông báo sự kiện tự tắt sau chừng này giây
 REPLAY_PAUSE = 0.12   # giây nghỉ giữa hai bước khi khối tự lăn theo lời giải
 SOLVE_TIMEOUT = 60.0  # docs/07 §6 quy tắc 3
+# Hàm chi phí V13 cho nút Giải và So sánh (docs/04 §2: path_cost tính bằng hàm chi phí của UCS).
+# Tạm bật ngày 30/10, chờ nhóm chốt; đổi thành None để quay về chi phí 1 mỗi bước.
+COST_FN = compute_step_cost
 
 SWITCH_KINDS = {"soft": "Công tắc mềm", "heavy": "Công tắc nặng", "split": "Công tắc tách"}
 # Công tắc dùng "links" với hiệu ứng khác nhau cho từng cầu có effect rỗng (V03)
@@ -224,7 +228,7 @@ class Game(Entity):
             self.block.show(self.state, self.active_cube)
             self._update_info()
         elif key in KEY_DIRS:
-            self.roll(KEY_DIRS[key])   # camera không lệch quá ±20° nên hướng phím luôn khớp màn hình
+            self.roll(KEY_DIRS[key])   # camera không lệch quá ±40° (dưới 45°) nên hướng phím luôn khớp màn hình
 
     # ---- Solve, So sánh, Hủy (V21) ----
 
@@ -232,15 +236,19 @@ class Game(Entity):
         if self.level is None or self.job is not None:
             return
         self.hud.clear_results()
-        self.job, self.job_name = start_solver(ALGORITHMS[name], Problem(self.level), SOLVE_TIMEOUT), name
+        self.job, self.job_name = start_solver(ALGORITHMS[name], self._problem(), SOLVE_TIMEOUT), name
         self.hud.set_running(True)
 
     def compare(self) -> None:
         if self.level is None or self.job is not None:
             return
         self.hud.clear_results()
-        self.job, self.job_name = start_compare(Problem(self.level), timeout_s=SOLVE_TIMEOUT), ""
+        self.job, self.job_name = start_compare(self._problem(), timeout_s=SOLVE_TIMEOUT), ""
         self.hud.set_running(True)
+
+    def _problem(self) -> Problem:
+        """Bài toán cho solver: luôn tính từ trạng thái đầu của màn, chi phí theo COST_FN."""
+        return Problem(self.level, cost_fn=COST_FN)
 
     def cancel(self) -> None:
         """Nút Hủy: dừng solver đang chạy (lần poll() sau trả kết quả đã hủy) hoặc dừng khối đang tự lăn."""
