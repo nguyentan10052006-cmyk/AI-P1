@@ -1,11 +1,14 @@
 """Kiểm tra experiments/check_results.py (docs/04 §6) bằng các dòng summary tổng hợp, không phải số liệu thật."""
+import contextlib
+import io
 import json
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.check_results import check, level_pars, load, main, original_stems
+from experiments.check_results import (check, cost_mode, cost_status, level_pars, load, main, original_stems,
+                                       run_info_for)
 from experiments.run import SUMMARY_COLUMNS
 
 
@@ -77,6 +80,19 @@ class CheckResultsTests(unittest.TestCase):
         self.assertEqual(level_pars(rows, root), {"original/01": 7, "01": 7, "gen/S1-010": 12, "S1-010": 12})
         self.assertEqual(original_stems(root), ["01"])
 
+    def test_path_cost_compared_relatively(self):
+        """Chi phí V13 là số lẻ: lời giải rất dài (35 287 bước) lệch tuyệt đối 1e-5 nhưng tương đối 3e-10 do thứ tự
+        cộng, không phải lỗi; lệch 0,01 thì là lỗi."""
+        rows = self.good()
+        for r in rows[:5]:
+            r.update(path_cost="35287.0")
+        rows[3].update(path_cost="35287.00001")   # A* (h_P)
+        rows[0].update(path_cost="35286.99999")   # BFS rẻ hơn UCS một chút do thứ tự cộng
+        v = verdicts(rows, {"original/01": 7})
+        self.assertEqual((v["K4"], v["K5"]), ("PASS", "PASS"))
+        rows[3].update(path_cost="35287.01")
+        self.assertEqual(verdicts(rows, {"original/01": 7})["K4"], "FAIL")
+
     def test_missing_data_is_not_run_not_pass(self):
         rows = [row("original/01", "bfs", steps=7, cost=7, expanded=48)]
         v = verdicts(rows, {"original/01": 7})
@@ -115,6 +131,41 @@ class LoadTests(unittest.TestCase):
                     load(path)
                 self.assertIn(message, str(caught.exception))
                 self.assertEqual(main([str(path)]), 2)
+
+    def test_cost_mode_read_from_run_info(self):
+        path = self.write(self.base())
+        self.assertIsNone(cost_mode(run_info_for(path)))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            main([str(path)])
+        self.assertIn("Chế độ chi phí: KHÔNG RÕ", out.getvalue())
+        (path.parent / "run_info.json").write_text(json.dumps({"cost": "energy"}), encoding="utf-8")
+        self.assertEqual(cost_mode(run_info_for(path)), "energy")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            main([str(path)])
+        self.assertIn("Chế độ chi phí: energy", out.getvalue())
+        (path.parent / "run_info.json").write_text("{hỏng", encoding="utf-8")
+        self.assertIsNone(run_info_for(path))
+
+    def test_cost_status_explains_every_unknown_case(self):
+        path = self.write(self.base())
+        info = path.parent / "run_info.json"
+        cases = [(None, (None, "không có run_info.json")),
+                 ("{hỏng", (None, "không đọc được")),
+                 (json.dumps({"commit": "abc"}), (None, "không có khóa cost")),
+                 (json.dumps({"cost": "free"}), (None, "'free', không thuộc")),
+                 (json.dumps({"cost": "unit"}), ("unit", ""))]
+        for content, (mode, why) in cases:
+            with self.subTest(content=content):
+                if content is None:
+                    info.unlink(missing_ok=True)
+                else:
+                    info.write_text(content, encoding="utf-8")
+                got_mode, got_why = cost_status(path)
+                self.assertEqual(got_mode, mode)
+                self.assertIn(why, got_why)
+                self.assertEqual(cost_mode(run_info_for(path)), mode)   # giá trị lạ không được đoán thành energy/unit
 
     def test_unsolved_rows_may_have_empty_numbers(self):
         rows = self.base()

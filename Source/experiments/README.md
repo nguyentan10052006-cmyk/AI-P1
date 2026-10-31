@@ -29,7 +29,7 @@ python -m experiments.check_results <summary.csv>                           # K1
 | `charts.py` | Hình H1–H6, H8, H9, mỗi hình kèm một CSV số liệu (04 §7.2); cần `matplotlib` | TV2 (V25) |
 | `compare_runs.py` | So hai lần chạy để kiểm tra tái lập: số đếm phải trùng hẳn, thời gian và bộ nhớ chỉ báo tỉ lệ | TV2 (V24) |
 | `tables.py` | Bảng T3, T4, T5 và Phụ lục A dạng Markdown (04 §7.1); cần `matplotlib` (dùng chung hàm đọc với `charts.py`) | TV2 (V25) |
-| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40), trên `feature/trong/V12-ucs`, chưa vào nhánh chính (tên file `s1_010`, `s2_04`, `s3_10`). `charts.py` đọc cả tên này lẫn dạng `S1-010`, `S2-k04` |
+| `gen_levels.py` | Sinh bộ màn tự sinh S1–S3 vào `levels/gen/` (04 §8) | TV3 (V40). Tên file `s1_010`, `s2_04`, `s3_10`; `charts.py` đọc cả tên này lẫn dạng `S1-010`, `S2-k04` |
 | `convert_original_levels.py` | Sinh 33 màn gốc trong `levels/original/` | TV2 (V07) |
 
 Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
@@ -42,15 +42,25 @@ Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
 
 `charts.py` liệt kê các cặp không `solved`, vì các cặp này không có trên hình.
 
+Các công cụ đọc chế độ chi phí (`cost`: `energy` là V13, `unit` là 1 mỗi bước) từ `run_info.json` cạnh `summary.csv`:
+- `check_results.py` và `charts.py` in ra chế độ này;
+- `tables.py` ghi nó ở đầu file bảng;
+- `charts.py` ghi nó vào chú thích góc dưới phải mỗi hình;
+- `compare_runs.py` từ chối so hai lần chạy khác chế độ.
+
+Khi không xác định được chế độ, công cụ nêu lý do (thiếu file, file hỏng, thiếu khóa `cost`, giá trị lạ) và không đoán.
+
+**Giới hạn:** chế độ chi phí ghi cho cả lần chạy, trong `run_info.json`, không có trên từng dòng của `summary.csv` (schema 16 cột của 04 §5 không đổi). Vì vậy đừng ghép `summary.csv` của nhiều lần chạy thành một file: công cụ không phát hiện được hai chế độ lẫn trong cùng một file.
+
 ## Chạy chính thức
 
 ### 0. Điều kiện trước khi chạy
 
 Còn thiếu điều kiện nào thì số liệu chỉ là nháp, không đưa vào báo cáo.
 
-- [ ] Hàm chi phí V13 đã chốt **và được dùng khi chạy**. TV3 đã cài `bloxorz/costs.py` (`compute_step_cost`, nhánh `feature/trong/V12-ucs`), nhưng `Problem` mặc định vẫn có chi phí 1 (`DEFAULT_COST_FN = None`). Nhóm phải quyết cách nối V13 vào `run.py`, GUI và `tools/check_heuristics.py`. TV5 đã có đề xuất trên nhánh thử `thu/test-main-m2` (commit `3cc0e01`, ghi rõ "chờ nhóm chốt"): `run.py --cost energy|unit`, dòng lệnh mặc định `energy`, ghi `cost` vào `run_info.json`; GUI dùng `compute_step_cost`. Sau khi chốt, kiểm `run_info.json` và cột `path_cost` có đúng là chi phí V13 không.
-- [ ] `tools/check_heuristics.py` cho 0 vi phạm với hàm chi phí V13.
-- [ ] Nhánh chính đã có: bộ nạp màn có `links` (V03), UCS (V12), $h_P$ (V16), bộ màn S1–S3 (V40), và các script trong bảng trên. Các sửa của V23 (PR #13) và GUI V21 (PR #15) đã vào nhánh chính.
+- [ ] Hàm chi phí V13 được dùng khi chạy. Trên nhánh chính từ PR #18: `bloxorz/costs.py` (`compute_step_cost`, TV3) được truyền vào ở từng chỗ gọi: `run.py --cost energy` (mặc định của dòng lệnh), GUI, `server/api.py`, `tools/check_heuristics.py` (mặc định `energy`). `Problem` tự nó vẫn mặc định chi phí 1 (`DEFAULT_COST_FN = None`), nên **luôn kiểm `"cost": "energy"` trong `run_info.json`**. Lệnh `check_results`, `charts`, `tables`, `compare_runs` in chế độ chi phí đọc từ file này.
+- [ ] `tools/check_heuristics.py` cho 0 vi phạm với hàm chi phí V13 (mặc định `--cost energy`), trên cả `levels/original` và `levels/gen`.
+- [ ] Nhánh chính đã có: bộ nạp màn có `links` (V03), UCS (V12), $h_P$ (V16), bộ màn S1–S3 (V40), các script trong bảng trên (PR #17), sửa V23 (PR #13), GUI V21 (PR #15, #18).
 - [ ] Nhóm đã chốt định dạng file kết quả (Q1–Q7); nếu có đổi thì `docs/04` đã sửa theo, qua PR.
 - [ ] Máy chạy: một máy cho toàn bộ, cắm sạc, tắt ứng dụng nặng (04 §4).
 - [ ] Working tree sạch. `git status` không có file `.py` chưa commit trong `Source/`, nếu không `run.py` sẽ ghi commit kèm hậu tố `-dirty`.
@@ -61,21 +71,23 @@ Còn thiếu điều kiện nào thì số liệu chỉ là nháp, không đưa 
 cd Source
 python -m unittest                                   # phải OK; skip chỉ chấp nhận khi biết lý do
 python -m experiments.convert_original_levels --check # 33 màn gốc khớp nguồn
-python -m unittest tests.test_gen_levels           # S1–S3 (test của TV3; bản V40 của TV3 không có --check)
-python tools/check_heuristics.py                     # 0 vi phạm với hàm chi phí đã chốt
+python -m unittest tests.test_gen_levels           # S1–S3 (test của TV3; gen_levels.py không có --check)
+python tools/check_heuristics.py                     # 33 màn gốc, 0 vi phạm, chi phí V13 (--cost energy)
+python tools/check_heuristics.py levels/gen          # 14 màn tự sinh
 ```
 
 ### 2. Đo
 
 ```bash
-python -m experiments.run --levels levels/original levels/gen   # ghi vào experiments/ như 04 §5
+python -m experiments.run --levels levels/original levels/gen --cost energy   # ghi vào experiments/ như 04 §5; --cost ghi rõ dù đã là mặc định
 ```
 
 - **Phạm vi:** 47 màn (33 gốc và 14 tự sinh) × 5 cấu hình = 235 cặp; mỗi cặp 5 lần đo thời gian và 1 lần đo bộ nhớ.
 - **Thời gian:** lần chạy thử ngày 28/10 trên máy TV2 mất khoảng 8,5 phút.
 - **Kết quả** là `experiments/raw.csv`, `summary.csv`, `run_info.json`. Mở `run_info.json` và kiểm:
   - `commit` không có hậu tố `-dirty`, `dirty_reasons` rỗng;
-  - `warnings` rỗng, `memory_failures` rỗng.
+  - `warnings` rỗng, `memory_failures` rỗng;
+  - `cost` là `energy`.
 
 ### 3. Kiểm tra chéo
 
@@ -110,7 +122,7 @@ Clone sạch repo ở đúng commit của lần chạy chính thức (trên cùn
 ```bash
 git clone <repo> tai-lap && cd tai-lap && git checkout <commit trong run_info.json>
 cd Source
-python -m experiments.run --levels levels/original levels/gen --out experiments/tai-lap
+python -m experiments.run --levels levels/original levels/gen --cost energy --out experiments/tai-lap
 python -m experiments.compare_runs <Source/experiments/summary.csv của lần chính thức> experiments/tai-lap/summary.csv
 ```
 

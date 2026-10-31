@@ -34,7 +34,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from experiments.check_results import NUMERIC, REQUIRED_WHEN_SOLVED  # noqa: E402
+from experiments.check_results import NUMERIC, REQUIRED_WHEN_SOLVED, cost_line, cost_status  # noqa: E402
 from experiments.run import SUMMARY_COLUMNS  # noqa: E402
 
 SOURCE_DIR = Path(__file__).resolve().parent.parent
@@ -150,6 +150,11 @@ def short(level: str) -> str:
     return level.rsplit("/", 1)[-1]
 
 
+# Chú thích góc dưới phải mỗi hình, đặt trong make_charts(): chế độ chi phí của lần chạy. Số nút, thời gian và bộ nhớ
+# của UCS, A* phụ thuộc hàm chi phí, nên hình tách khỏi báo cáo vẫn phải cho biết vẽ theo chế độ nào.
+_FOOTNOTE = ""
+
+
 class Figure:
     """Một hình: PNG cộng CSV số liệu đã vẽ."""
 
@@ -159,6 +164,8 @@ class Figure:
 
     def save(self, fig, out_dir: Path) -> Tuple[Path, Path]:
         png, data = out_dir / f"{self.key}.png", out_dir / f"{self.key}.csv"
+        if _FOOTNOTE:
+            fig.text(0.995, 0.005, _FOOTNOTE, ha="right", va="bottom", fontsize=7, color=INK_2)
         fig.savefig(png, dpi=150, facecolor=SURFACE)
         plt.close(fig)
         columns = list(self.table[0]) if self.table else []
@@ -340,7 +347,10 @@ FIGURES = {"H1": h1, "H2": h2, "H3": h3, "H4": h4, "H5": h5, "H6": h6, "H8": h8,
 
 
 def make_charts(summary: Path, out_dir: Path, force: bool = False, only: Sequence[str] = ()) -> Dict[str, Dict]:
-    """Vẽ các hình; trả về {mã hình: {'png', 'csv'} hoặc {'skipped': lý do}}."""
+    """Vẽ các hình; trả về {mã hình: {'png', 'csv'} hoặc {'skipped': lý do}}.
+
+    Mỗi hình có chú thích chế độ chi phí đọc từ run_info.json cạnh summary.csv ("không rõ" nếu không đọc được)."""
+    global _FOOTNOTE
     rows = read_summary(summary)
     keys = list(only) or list(FIGURES)
     unknown = [k for k in keys if k not in FIGURES]
@@ -351,9 +361,14 @@ def make_charts(summary: Path, out_dir: Path, force: bool = False, only: Sequenc
     if existing and not force:
         raise FileExistsError("không ghi đè hình đã có (dùng --force nếu chắc chắn): " + ", ".join(existing))
     report: Dict[str, Dict] = {}
-    for key in keys:
-        saved, reason = FIGURES[key](rows, out_dir)
-        report[key] = {"png": str(saved[0]), "csv": str(saved[1])} if saved else {"skipped": reason}
+    mode, _ = cost_status(summary)
+    _FOOTNOTE = f"Chế độ chi phí: {mode or 'không rõ'} · {summary.name}"
+    try:
+        for key in keys:
+            saved, reason = FIGURES[key](rows, out_dir)
+            report[key] = {"png": str(saved[0]), "csv": str(saved[1])} if saved else {"skipped": reason}
+    finally:
+        _FOOTNOTE = ""
     return report
 
 
@@ -373,6 +388,7 @@ def main(argv=None) -> int:
     except (FileNotFoundError, FileExistsError, ChartDataError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 1
+    print(cost_line(args.summary))
     for key, info in report.items():
         print(f"{key}: {info.get('png') or 'bỏ qua — ' + info['skipped']}")
     excluded = [f"{r['level']}/{r['algorithm']}={r['status']}" for r in read_summary(args.summary)
