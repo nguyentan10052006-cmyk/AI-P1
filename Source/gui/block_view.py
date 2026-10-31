@@ -14,10 +14,11 @@ Cách vẽ:
 """
 from __future__ import annotations
 
-from typing import Iterable, List, Optional, Sequence, Tuple
+from math import exp
+from typing import Callable, Iterable, List, Optional, Sequence, Tuple
 
 from panda3d.core import CullFaceAttrib
-from ursina import Entity, Vec3, color, curve, destroy
+from ursina import Entity, Vec3, color, curve, destroy, time
 from ursina.shaders import lit_with_shadows_shader, unlit_shader
 
 from bloxorz.state import DELTA, Cell, Dir, Orient, State
@@ -47,6 +48,26 @@ COLORS = {
 }
 EDGE_ALPHA = {"active": 0.9, "idle": 0.25}
 ROLL_CURVE = curve.in_out_sine
+# Rơi khỏi mép: khối xoay quanh mép ô tới 90° rồi rời mép, rơi tự do mà vẫn giữ đà quay và đà ngang lúc rời
+# (không dừng lại rồi rơi từ vận tốc 0). Quá 90° mà vẫn xoay quanh mép thì khối sẽ quặt vào gầm bàn.
+ROLL_OFF_END_SPEED = 1.25   # tốc độ quay lúc rời mép, tính theo tốc độ trung bình của cả lần lăn
+
+
+def _roll_off_curve(s: float) -> float:
+    """Lăn ra khỏi mép: bắt đầu từ vận tốc 0 như lần lăn thường, nhưng không dừng ở 90° mà còn quay với
+    ROLL_OFF_END_SPEED lần tốc độ trung bình (in_sine là 1,57 lần: rời mép quá mạnh, khối như bị hút xuống).
+    Đa thức bậc ba f(0) = 0, f'(0) = 0, f(1) = 1, f'(1) = ROLL_OFF_END_SPEED."""
+    k = ROLL_OFF_END_SPEED
+    return (k - 2) * s ** 3 + (3 - k) * s ** 2
+
+
+TUMBLE_CURVE = _roll_off_curve
+ROLL_OFF_STRETCH = 1.4   # lăn ra khỏi mép chậm hơn lần lăn thường chừng này lần: đà rời mép nhẹ, nhìn rõ khối đổ
+TIP_SHARE = 0.4      # khối nằm hụt một ô: phần thời gian đổ nghiêng quanh mép trước khi rời mép
+GRAVITY = 18.0       # đơn vị/giây² khi rơi tự do (cách điệu cho hợp nhịp hoạt ảnh, không theo tỉ lệ thật)
+SPIN_DAMP = 3.0      # tốc độ quay giảm dần theo e^(-k·t) sau khi rời mép, để khối không quay tít
+DRIFT_DAMP = 3.5     # đà ngang cũng giảm dần, khối không văng quá xa khỏi bàn (khoảng 2–3 ô)
+PUSH = 1.5           # đơn vị/giây đẩy thêm ra phía ngoài lúc rời mép, để khối không cọ vào thành ô
 SHADOW_SOFT = 1.55   # bóng rộng hơn đáy khối chừng này lần, mép mờ dần
 SHADOW_FADE = 2.5    # khối cao hơn mặt sàn chừng này đơn vị thì bóng mờ hẳn
 SINK_TOP = -0.12     # thắng: mặt trên của khối dừng ở độ sâu này, trong lòng lỗ đích (ô dày 0.3)
@@ -95,6 +116,23 @@ def tip_axis(from_cell: Cell, to_cell: Cell) -> Tuple[str, float]:
     return "rotation_x", 90 if r2 < r1 else -90
 
 
+class _Tumble:
+    """Một lần rơi khỏi mép: xoay quanh trục ở mép ô (pivot) rồi bay tự do (flight). Thời gian tính từng khung."""
+
+    def __init__(self, piece: Entity, axis: str, angle: float, pivot_time: float,
+                 curve_fn: Callable[[float], float], flight_time: float, outward: Vec3) -> None:
+        self.piece, self.axis, self.angle = piece, axis, angle
+        self.pivot_time, self.curve, self.flight_time = pivot_time, curve_fn, flight_time
+        self.outward = outward
+        self.t = 0.0
+        self.released = False
+        # điền lúc rời mép
+        self.origin = Vec3(0, 0, 0)    # tâm khối lúc rời mép (hệ tọa độ của BlockView)
+        self.spin = 0.0                # độ/giây lúc rời mép
+        self.drift = Vec3(0, 0, 0)     # vận tốc ngang lúc rời mép
+        self.fall_speed = 0.0          # vận tốc đứng lúc rời mép (âm: đi xuống)
+
+
 class BlockView(Entity):
     """Một khối nguyên và hai khối con; chỉ bật những khối đang có trên bàn."""
 
@@ -108,6 +146,7 @@ class BlockView(Entity):
         self._pivot: Optional[Entity] = None
         self._rolled: Optional[Entity] = None    # khối đang gắn vào trục
         self._pending: Optional[Tuple[State, Optional[int]]] = None   # trạng thái cần đặt khi lật xong
+        self._tumble: Optional[_Tumble] = None   # đang rơi khỏi mép (do update() điều khiển từng khung)
         self.show(state)
 
     @property
@@ -164,10 +203,15 @@ class BlockView(Entity):
     # ---- một lần lăn ----
 
     def roll(self, before: State, direction: Dir, moved: State, active_after: Optional[int],
-             duration: float, active_before: Optional[int] = None) -> None:
+             duration: float, active_before: Optional[int] = None,
+             hanging: Iterable[Cell] = (), fall_time: float = 0.0) -> bool:
         """Lật khối (hoặc khối con active_before) 90° quanh cạnh đáy theo direction, tới vị trí moved.
 
         moved là vị trí ngay sau khi lăn, trước khi công tắc hay ghép khối được xử lý (StepResult.moved).
+        hanging: các ô của moved không có sàn đỡ (khối sẽ rơi). Nếu mọi ô khối vừa lăn tới đều hụt thì khối
+        lăn thẳng ra khỏi mép rồi rơi luôn, liền một chuyển động, xong sau duration + fall_time giây (như lăn
+        thường rồi fall()); khi đó trả về True và
+        không cần gọi fall() nữa. Còn lại trả về False (lăn thường; rơi, nếu có, do fall() vẽ sau).
         """
         self.show(before, active_before)
         if before.orient is Orient.SPLIT:
@@ -177,11 +221,22 @@ class BlockView(Entity):
         else:
             piece, cells = self.body, before.cells()
         axis, angle = ROLL_AXIS[direction]
+        hanging = set(hanging)
+        dr, dc = DELTA[direction]
+        landing = [(r + dr, c + dc) for r, c in cells] if before.orient is Orient.SPLIT else list(moved.cells())
+        if hanging and all(cell in hanging for cell in landing):
+            dx, dz = _world_delta(direction)
+            # lăn chậm hơn nhưng cú rơi vẫn kết thúc đúng lúc cũ (duration + fall_time), app hẹn giờ theo mốc đó
+            pivot_time = min(duration * ROLL_OFF_STRETCH, duration + fall_time * 0.5)
+            self._start_tumble(piece, roll_pivot(cells, direction), axis, angle, pivot_time, TUMBLE_CURVE,
+                               duration + fall_time - pivot_time, Vec3(dx, 0, dz))
+            return True
         self._pivot = Entity(parent=self, position=roll_pivot(cells, direction))
         piece.world_parent = self._pivot
         self._rolled = piece
         self._pending = (moved, active_after)
         self._pivot.animate(axis, angle, duration=duration, curve=ROLL_CURVE)
+        return False
 
     def _finish_roll(self, apply_pending: bool = True) -> None:
         """Gỡ khối khỏi trục quay; apply_pending thì đặt khối đúng vị trí sau lần lăn."""
@@ -191,7 +246,7 @@ class BlockView(Entity):
         self._stop(self._pivot)
         self._rolled.world_parent = self
         destroy(self._pivot)
-        self._pivot = self._rolled = self._pending = None
+        self._pivot = self._rolled = self._pending = self._tumble = None
         if apply_pending and pending is not None:
             self.show(*pending)
 
@@ -213,8 +268,9 @@ class BlockView(Entity):
             animate_later(cube, "y", target.y, duration / 2, duration / 2, curve.in_quad)
 
     def fall(self, state: State, unsupported: Iterable[Cell], duration: float) -> None:
-        """Khối rơi. Khối nằm hụt đúng một ô thì đổ nghiêng qua mép rồi mới rơi, không xuyên qua sàn;
-        đã tách thì chỉ khối con bị hụt rơi; còn lại (đứng trên ô trống, ô dễ vỡ, hụt cả hai ô) rơi thẳng.
+        """Khối rơi sau khi đã lăn xong. Khối nằm hụt đúng một ô thì đổ nghiêng qua mép (nhanh dần từ thế cân
+        bằng) rồi rời mép, rơi tiếp mà vẫn giữ đà quay; đã tách thì chỉ khối con bị hụt rơi; còn lại (ô dễ vỡ,
+        cầu đóng ngay dưới khối sau khi bấm công tắc) rơi thẳng. Lăn ra khỏi mép thì roll() đã vẽ cả cú rơi.
         """
         self._finish_roll()
         self.show(state)
@@ -231,16 +287,64 @@ class BlockView(Entity):
             resting = cells[0] if cells[1] == hanging else cells[1]
             axis, angle = tip_axis(resting, hanging)
             a, b = cell_to_world(resting), cell_to_world(hanging)
-            self._pivot = Entity(parent=self, position=(a + b) / 2)
-            self.body.world_parent = self._pivot
-            self._rolled, self._pending = self.body, None
-            tip = duration * 0.4
-            self._pivot.animate(axis, angle, duration=tip, curve=curve.in_quad)
-            animate_later(self._pivot, axis, angle * 2.2, duration - tip, tip, curve.linear)
-            animate_later(self._pivot, "y", -12, duration - tip, tip, curve.in_quad)
-            self._fade(self.body, duration - tip, delay=tip)
+            tip = duration * TIP_SHARE
+            self._start_tumble(self.body, (a + b) / 2, axis, angle, tip, curve.in_quad, duration - tip,
+                               (b - a).normalized())
             return
         self._drop(self.body, duration)
+
+    # ---- rơi khỏi mép ----
+
+    def _start_tumble(self, piece: Entity, pivot: Vec3, axis: str, angle: float, pivot_time: float,
+                      curve_fn: Callable[[float], float], flight_time: float, outward: Vec3) -> None:
+        """Gắn piece vào trục ở mép ô; update() xoay trục angle độ trong pivot_time giây theo curve_fn, rồi
+        cho khối rời mép và rơi tự do flight_time giây. outward: hướng ngang từ sàn ra khoảng trống."""
+        self._pivot = Entity(parent=self, position=pivot)
+        piece.world_parent = self._pivot
+        self._rolled, self._pending = piece, None
+        self._tumble = _Tumble(piece, axis, angle, max(pivot_time, 1e-3), curve_fn, flight_time, outward)
+
+    def _advance_tumble(self, dt: float) -> None:
+        tumble = self._tumble
+        if tumble is None or self._pivot is None:
+            return
+        tumble.t += dt
+        if not tumble.released:
+            s = min(tumble.t / tumble.pivot_time, 1.0)
+            setattr(self._pivot, tumble.axis, tumble.angle * tumble.curve(s))
+            if s < 1.0:
+                return
+            self._release(tumble)
+        # Rơi tự do theo công thức đóng (không cộng dồn theo dt nên không tích sai số): quay quanh tâm khối với
+        # tốc độ giảm dần, trôi ngang chậm dần, rơi đứng nhanh dần đều.
+        tau = min(tumble.t - tumble.pivot_time, tumble.flight_time)
+        spun = (1 - exp(-SPIN_DAMP * tau)) / SPIN_DAMP
+        drifted = (1 - exp(-DRIFT_DAMP * tau)) / DRIFT_DAMP
+        setattr(self._pivot, tumble.axis, tumble.spin * spun)
+        self._pivot.position = (tumble.origin + tumble.drift * drifted
+                                + Vec3(0, tumble.fall_speed * tau - GRAVITY * tau * tau / 2, 0))
+
+    def _release(self, tumble: _Tumble) -> None:
+        """Khối rời mép: chuyển trục quay về tâm khối, giữ nguyên tốc độ quay và vận tốc tâm khối lúc đó."""
+        piece, pivot = tumble.piece, self._pivot
+        h = 1e-3
+        spin = tumble.angle * (tumble.curve(1.0) - tumble.curve(1.0 - h)) / h / tumble.pivot_time   # độ/giây
+        # Vận tốc tâm khối: lùi trục lại đúng góc đã quay trong 1 ms rồi đo, khỏi phụ thuộc quy ước chiều quay
+        setattr(pivot, tumble.axis, tumble.angle - spin * h)
+        before = Vec3(*piece.getPos(self))
+        setattr(pivot, tumble.axis, tumble.angle)
+        center = Vec3(*piece.getPos(self))
+        velocity = (center - before) / h
+
+        flight = Entity(parent=self, position=center)
+        piece.world_parent = flight
+        destroy(pivot)
+        self._pivot = flight
+        tumble.released = True
+        tumble.origin, tumble.spin = center, spin
+        tumble.drift = Vec3(velocity.x, 0, velocity.z) + tumble.outward * PUSH
+        tumble.fall_speed = velocity.y
+        self._fade(piece, tumble.flight_time * 0.7, delay=tumble.flight_time * 0.3)
 
     def sink(self, duration: float) -> None:
         """Thắng: khối đứng thu vừa miệng lỗ đích rồi lọt xuống, dừng lại khi mặt trên nằm trong lòng lỗ
@@ -270,6 +374,7 @@ class BlockView(Entity):
     # ---- mỗi khung hình: bóng dưới khối ----
 
     def update(self) -> None:
+        self._advance_tumble(time.dt)
         for piece in self.pieces:
             shadow = self.shadows[id(piece)]
             shadow.enabled = piece.enabled

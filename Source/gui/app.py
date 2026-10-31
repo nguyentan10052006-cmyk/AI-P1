@@ -403,13 +403,19 @@ class Game(Entity):
         result = step(self.level, before, Action(direction, cube))
         self.steps += 1
         self.busy = True
-        self.block.roll(before, direction, result.moved, self._follow(before, direction, result.moved),
-                        MOVE_TIME, active_before=cube)
+        # Ô khối vừa lăn tới mà không có sàn (lăn ra khỏi mép): báo trước cho block để lăn và rơi liền một mạch
+        hanging = [cell for cell in result.moved.cells()
+                   if not self.board.supports(cell, result.moved.open_bridges)] if result.status == FELL else []
+        tumbled = self.block.roll(before, direction, result.moved, self._follow(before, direction, result.moved),
+                                  MOVE_TIME, active_before=cube, hanging=hanging, fall_time=FALL_TIME)
         self._update_info()
-        invoke(self._settle, self.turn, before, direction, result, delay=MOVE_TIME)
+        invoke(self._settle, self.turn, before, direction, result, tumbled, delay=MOVE_TIME)
 
-    def _settle(self, turn: int, before: State, direction: Dir, result: StepResult) -> None:
-        """Sau khi lăn xong: cập nhật cầu, rồi tách, ghép, thắng hoặc rơi theo kết quả của engine."""
+    def _settle(self, turn: int, before: State, direction: Dir, result: StepResult, tumbled: bool = False) -> None:
+        """Sau khi lăn xong: cập nhật cầu, rồi tách, ghép, thắng hoặc rơi theo kết quả của engine.
+
+        tumbled: khối đã lăn ra khỏi mép và đang rơi (BlockView.roll() vẽ), không gọi fall() nữa.
+        """
         if turn != self.turn:   # đã bấm R hoặc đổi màn trong lúc khối đang lăn
             return
         self.board.set_open_bridges(result.state.open_bridges, duration=BRIDGE_TIME)
@@ -422,9 +428,10 @@ class Game(Entity):
             if fell["reason"] == "fragile":
                 self.board.break_tile(fell["at"], FALL_TIME)
             self.over = True
-            hanging = [cell for cell in result.state.cells()
-                       if not self.board.supports(cell, result.state.open_bridges)]
-            self.block.fall(result.state, hanging, FALL_TIME)
+            if not tumbled:
+                hanging = [cell for cell in result.state.cells()
+                           if not self.board.supports(cell, result.state.open_bridges)]
+                self.block.fall(result.state, hanging, FALL_TIME)
             invoke(self._show_fall, turn, fell["reason"], delay=FALL_TIME * 0.7)
             invoke(self._unbusy, turn, delay=FALL_TIME)
             return
