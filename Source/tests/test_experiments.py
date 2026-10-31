@@ -290,7 +290,9 @@ class ExperimentRunTests(unittest.TestCase):
     def test_f3_run_info_records_level_hashes(self):
         info = exp.run_experiment([self.levels], ["tests.fakes:FakeSolver"], self.out, repeat=1, log=quiet)
         entry = info["level_files"][0]
-        self.assertEqual((entry["id"], entry["git"]), ("tiny", "outside"))
+        self.assertEqual(entry["id"], "tiny")
+        # "unknown" khi Source/ không nằm trong repo Git (giải nén từ file nộp .zip) hoặc máy không cài Git
+        self.assertIn(entry["git"], ("outside", "unknown"))
         self.assertEqual(entry["sha256"], exp.file_sha256(self.levels / "tiny.json"))
         self.assertTrue(info["commit"].endswith("-dirty") or info["commit"] == "")   # đầu vào ngoài repo
         crlf = self.tmp / "crlf.json"

@@ -156,7 +156,14 @@ python tools/check_heuristics.py                   # kiểm tra h_M, h_P chấp 
 
 Mỗi lần đo chạy trong một tiến trình riêng, có giới hạn thời gian (mặc định 60 giây). Thời gian là trung vị của 5 lần chạy không bật `tracemalloc`; bộ nhớ đo ở một lần chạy riêng. Kết quả gồm `raw.csv` (mỗi lần chạy một dòng), `summary.csv` (mỗi cặp màn, thuật toán một dòng, cột theo docs/04 §5) và `run_info.json` (cấu hình máy, commit, hàm chi phí). Mặc định không ghi đè kết quả cũ; thêm `--force` nếu chắc chắn.
 
-_(TV2 bổ sung lệnh vẽ biểu đồ khi có script V25.)_
+Kiểm tra chéo, vẽ hình và sinh bảng cho chương 5 (cần `matplotlib`; thứ tự chạy chính thức: `experiments/README.md`):
+
+```bash
+python -m experiments.check_results experiments/summary.csv   # K1–K8 (docs/04 §6)
+python -m experiments.charts       # đọc experiments/summary.csv, ghi experiments/figures/ (H1–H6, H8, H9)
+python -m experiments.tables       # đọc experiments/summary.csv, ghi experiments/tables.md (T3–T5, Phụ lục A)
+python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>   # kiểm tra tái lập
+```
 
 ## Cấu trúc thư mục
 
@@ -189,7 +196,9 @@ Source/
   levels/original/     33 màn gốc (JSON)
   levels/gen/          bộ màn tự sinh S1–S3 cho thực nghiệm
   experiments/         run.py: script đo (CSV); gen_levels.py: sinh levels/gen/;
-                       convert_original_levels.py: chuyển 33 màn từ dữ liệu bloxorz_gba
+                       convert_original_levels.py: chuyển 33 màn từ dữ liệu bloxorz_gba;
+                       check_results.py: kiểm tra chéo K1–K8; charts.py: vẽ hình; tables.py: sinh bảng;
+                       compare_runs.py: so hai lần chạy (kiểm tra tái lập); README.md: lệnh và thứ tự chạy
   tools/
     check_heuristics.py  kiểm tra h_M, h_P bằng số liệu trên 33 màn: chấp nhận được, nhất quán, cùng chi phí với UCS
     draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/
