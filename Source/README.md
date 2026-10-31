@@ -41,6 +41,7 @@ Trên Windows, chạy bằng `python main.py` chứ không chạy `gui/app.py` t
 | H | Ẩn/hiện khung kết quả |
 | Ctrl+K | Mở/đóng lưới chọn màn (chấm xanh đánh dấu màn đã thắng) |
 | Enter | Bấm nút chính của hộp kết thúc màn (Màn tiếp hoặc Chơi lại) |
+| G | Bảng chú giải các loại ô (hoặc nút "Chú giải") |
 | F1 | Bảng tất cả phím tắt |
 | Esc | Đóng hộp kết thúc màn, lưới chọn màn hoặc bảng phím tắt |
 

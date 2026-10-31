@@ -3,10 +3,11 @@
 Chỉ vẽ và gọi lại các hàm do app.py truyền vào; không giữ trạng thái chơi, không gọi solver (docs/07 §5).
 
 Bố cục (GAME_UI_UX_SPECIFICATION §3):
-- Thanh điều hướng ở góc phải trên: Màn đầu, < Trước, Chọn màn, Sau >, Chơi lại.
+- Thanh điều hướng ở góc phải trên: Chú giải, Màn đầu, < Trước, Chọn màn, Sau >, Chơi lại.
 - Cột phải gồm hai thẻ: "TÌM LỜI GIẢI" (lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh và Hủy) và
   "GÓC NHÌN" (nhãn góc hiện tại và 6 nút camera). Nhóm theo việc, việc hay dùng ở trên.
-- Khung kết quả ở cột trái; bảng chọn màn và bảng phím tắt (F1) hiện giữa màn hình.
+- Khung kết quả ở cột trái; bảng chọn màn, bảng phím tắt (F1) và bảng chú giải các loại ô (G) hiện giữa
+  màn hình.
 """
 from __future__ import annotations
 
@@ -15,8 +16,11 @@ import textwrap
 import time
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from ursina import Button, Circle, Entity, Quad, Text, camera, color, curve, destroy, window
+from ursina import Button, Circle, Entity, Mesh, Quad, Text, Vec3, camera, color, curve, destroy, window
 
+from gui.block_view import COLORS as BLOCK_COLORS
+from gui.board_view import CLOSED_BRIDGE_ALPHA, TILE_SHADE
+from gui.board_view import COLORS as TILE_COLORS
 from gui.theme import FONT_BOLD, FONT_REGULAR, FONT_SEMIBOLD, card, heading, resize_card
 
 # Tên hiện trên nút và trong bảng So sánh, theo khóa của solvers.ALGORITHMS
@@ -40,8 +44,8 @@ HOVER_SCALE = 1.03          # nút phóng nhẹ khi rê chuột (GAME_UI_UX_SPEC
 MARGIN = 0.02               # lề với mép màn hình
 GAP = 0.008                 # khoảng cách giữa hai nút
 NAV_H = 0.044
-NAV_BUTTONS = (("new", "Màn đầu", 0.1), ("prev", "‹ Trước", 0.092), ("pick", "Chọn màn", 0.11),
-               ("next", "Sau ›", 0.085), ("restart", "Chơi lại", 0.1))
+NAV_BUTTONS = (("legend", "Chú giải", 0.1), ("new", "Màn đầu", 0.1), ("prev", "‹ Trước", 0.092),
+               ("pick", "Chọn màn", 0.11), ("next", "Sau ›", 0.085), ("restart", "Chơi lại", 0.1))
 COL_W = 0.27                # bề rộng cột thẻ bên phải
 CARD_PAD = 0.016
 SOLVE_H = 0.052
@@ -76,10 +80,30 @@ SHORT_SUMMARY = {"Không có lời giải": "Vô nghiệm"}   # ô của bảng 
 SHORTCUTS = (
     ("W A S D / mũi tên", "Lăn khối"), ("Space", "Đổi khối con khi đã tách"), ("R", "Chơi lại màn"),
     ("N / P", "Màn sau / màn trước"), ("Ctrl+K", "Mở lưới chọn màn"), ("Enter", "Nút chính của hộp kết thúc"),
-    ("H", "Ẩn / hiện khung kết quả"), ("Q / E", "Nghiêng camera trái / phải"), ("Z / X", "Hạ thấp / nâng cao góc"),
+    ("H", "Ẩn / hiện khung kết quả"), ("G", "Chú giải các loại ô"), ("Q / E", "Nghiêng camera trái / phải"),
+    ("Z / X", "Hạ thấp / nâng cao góc"),
     ("T", "Nhìn từ đỉnh"), ("F", "Góc mặc định"), ("Chuột phải + kéo", "Chỉnh góc tự do"),
     ("Con lăn chuột", "Thu phóng"), ("Esc", "Đóng hộp, lưới chọn màn"), ("F1", "Bật / tắt bảng này"),
 )
+
+# Bảng chú giải (phím G, kịch bản video docs/06 §5 đoạn 2): (mẫu ô, tên, cách hoạt động). Mẫu vẽ cùng màu và ký hiệu
+# như trên bàn (board_view.COLORS), nên đổi màu ô trên bàn thì chú giải đổi theo.
+LEGEND = (
+    ("floor", "Sàn", "Ô thường: khối đứng hay nằm đều được."),
+    ("void", "Ô trống", "Không có ô: khối lăn ra ngoài là rơi, thua."),
+    ("goal", "Lỗ đích", "Khối phải đứng thẳng trên lỗ mới thắng; nằm ngang qua lỗ thì không."),
+    ("fragile", "Ô dễ vỡ (màu cam)", "Chỉ đỡ khối nằm. Khối đứng lên thì ô vỡ và khối rơi."),
+    ("block", "Khối 1 × 1 × 2", "Ba tư thế: đứng (chiếm 1 ô), nằm ngang hoặc nằm dọc (chiếm 2 ô)."),
+    ("bridge_open", "Cầu đang mở", "Đi được như ô sàn."),
+    ("bridge_closed", "Cầu đang đóng", "Như ô trống. Công tắc làm cầu mở, đóng hoặc đổi trạng thái."),
+    ("soft", "Công tắc mềm (tròn)", "Kích hoạt khi bất kỳ phần nào của khối chạm vào, kể cả khối con."),
+    ("heavy", "Công tắc nặng (chữ X)", "Chỉ kích hoạt khi khối đứng thẳng trên nó."),
+    ("split", "Công tắc tách ( )", "Khối đứng lên thì tách đôi; Space đổi khối con, hai khối kề nhau thì ghép lại."),
+)
+LEGEND_ROWS = 5           # mỗi cột 5 mục: cột trái là ô và khối, cột phải là cầu và công tắc
+LEGEND_ROW_H = 0.094
+LEGEND_SWATCH = 0.056     # cạnh ô mẫu
+LEGEND_WRAP = 44          # số ký tự mỗi dòng giải thích
 
 
 def outcome_summary(outcome: Mapping) -> tuple[str, color.Color]:
@@ -133,8 +157,8 @@ class Hud(Entity):
         right = window.right.x - MARGIN
 
         # ---- thanh điều hướng ----
-        nav_actions = {"new": on_new_game, "prev": on_prev, "pick": self.toggle_picker, "next": on_next,
-                       "restart": on_restart}
+        nav_actions = {"legend": self.toggle_legend, "new": on_new_game, "prev": on_prev, "pick": self.toggle_picker,
+                       "next": on_next, "restart": on_restart}
         x = right - sum(w for _, _, w in NAV_BUTTONS) - GAP * (len(NAV_BUTTONS) - 1)
         nav_y = window.top.y - MARGIN - NAV_H / 2
         for key, label, width in NAV_BUTTONS:
@@ -226,6 +250,7 @@ class Hud(Entity):
         self.solved_marks: List[Entity] = []   # chấm xanh trên nút các màn đã thắng trong lần chạy này
         self.picker = self._build_picker(level_ids)
         self.help = self._build_help()
+        self.legend = self._build_legend()
         self.set_current_level(0)
         self.set_running(False)
 
@@ -311,6 +336,26 @@ class Hud(Entity):
              color=COLORS["muted"])
         return panel
 
+    def _build_legend(self) -> Entity:
+        """Bảng chú giải các loại ô (phím G hoặc nút "Chú giải"): mỗi mục một ô mẫu, tên và cách hoạt động."""
+        width, height = 1.16, LEGEND_ROWS * LEGEND_ROW_H + 0.15
+        panel = self._overlay(width, height, self.close_legend)
+        Text(parent=panel, text="Chú giải các loại ô", origin=(0, 0), y=height / 2 - 0.04, z=-0.01, scale=1.25,
+             font=FONT_BOLD)
+        for i, (kind, name, rule) in enumerate(LEGEND):
+            col, row = divmod(i, LEGEND_ROWS)
+            x = -width / 2 + 0.06 + col * width / 2
+            y = height / 2 - 0.12 - row * LEGEND_ROW_H
+            _tile_swatch(panel, kind, x, y, LEGEND_SWATCH)
+            left = x + LEGEND_SWATCH / 2 + 0.024
+            Text(parent=panel, text=name, position=(left, y + 0.022), origin=(-0.5, 0.5), z=-0.01, scale=0.8,
+                 font=FONT_SEMIBOLD)
+            Text(parent=panel, text=_wrap(rule, LEGEND_WRAP), position=(left, y - 0.002), origin=(-0.5, 0.5),
+                 z=-0.01, scale=0.66, line_height=1.25, color=COLORS["muted"])
+        Text(parent=panel, text="G hoặc Esc để đóng", origin=(0, 0), y=-height / 2 + 0.028, z=-0.01, scale=0.7,
+             color=COLORS["muted"])
+        return panel
+
     def set_current_level(self, index: int) -> None:
         """Đổi màu ô màn hiện tại sang màu xanh dương để người chơi nhận biết."""
         self.current_level = index
@@ -319,7 +364,7 @@ class Hud(Entity):
             btn.color, btn.highlight_color = tint, tint.tint(0.18)
 
     def toggle_picker(self) -> None:
-        self.help.enabled = False
+        self.help.enabled = self.legend.enabled = False
         self.picker.enabled = not self.picker.enabled
         if self.picker.enabled:
             self.set_current_level(self.current_level)
@@ -328,16 +373,23 @@ class Hud(Entity):
         self.picker.enabled = False
 
     def toggle_help(self) -> None:
-        self.picker.enabled = False
+        self.picker.enabled = self.legend.enabled = False
         self.help.enabled = not self.help.enabled
 
     def close_help(self) -> None:
         self.help.enabled = False
 
+    def toggle_legend(self) -> None:
+        self.picker.enabled = self.help.enabled = False
+        self.legend.enabled = not self.legend.enabled
+
+    def close_legend(self) -> None:
+        self.legend.enabled = False
+
     @property
     def overlay_open(self) -> bool:
-        """Đang mở lưới chọn màn hoặc bảng phím tắt."""
-        return self.picker.enabled or self.help.enabled
+        """Đang mở lưới chọn màn, bảng phím tắt hoặc bảng chú giải."""
+        return self.picker.enabled or self.help.enabled or self.legend.enabled
 
     def mark_solved(self, index: int) -> None:
         """Đánh dấu màn đã thắng (chơi tay hoặc khối tự lăn) bằng chấm xanh trên lưới chọn màn."""
@@ -555,3 +607,50 @@ class Hud(Entity):
                 cell.color = tint
         self._fit_panel(self.details.y - _line_count(details) * DETAILS_LINE_H if errors
                         else self.table.y - len(rows) * ROW_H, self.table_panel_w)
+
+
+def _shade(base: color.Color, factor: float) -> color.Color:
+    return color.Color(base[0] * factor, base[1] * factor, base[2] * factor, base[3])
+
+
+def _tile_swatch(parent: Entity, kind: str, x: float, y: float, size: float) -> None:
+    """Ô mẫu của bảng chú giải, tâm tại (x, y): mặt trên và một dải mặt bên tối hơn (như hộp vát cạnh trên bàn,
+    TILE_SHADE), rồi ký hiệu công tắc hoặc lỗ đích vẽ phẳng bằng đúng màu của board_view."""
+    def slab(tint: color.Color, alpha: float = 1.0) -> None:
+        side = Entity(parent=parent, model=Quad(radius=0.12), color=_shade(tint, TILE_SHADE[1]),
+                      scale=size, position=(x, y - size * 0.16, -0.008))
+        top = Entity(parent=parent, model=Quad(radius=0.12), color=tint, scale=size, position=(x, y, -0.01))
+        side.alpha, top.alpha = alpha, alpha
+
+    def mark(**kwargs) -> Entity:
+        return Entity(parent=parent, position=(x, y, -0.012), **kwargs)
+
+    if kind == "void":
+        Entity(parent=parent, model=Quad(radius=0.12, mode="line", thickness=1.5), color=COLORS["muted"],
+               scale=size, position=(x, y, -0.01), alpha=0.55)
+    elif kind == "goal":
+        slab(TILE_COLORS["goal_rim"])
+        mark(model="quad", color=TILE_COLORS["goal_shaft"], scale=size * 0.8)
+        mark(model=Quad(mode="line", thickness=2), color=TILE_COLORS["goal_glow"], scale=size * 0.84)
+    elif kind == "fragile":
+        slab(TILE_COLORS["fragile"])
+    elif kind == "bridge_open":
+        slab(TILE_COLORS["bridge"])
+    elif kind == "bridge_closed":
+        slab(TILE_COLORS["bridge"], CLOSED_BRIDGE_ALPHA * 2)   # trên nền tối của bảng, alpha gốc gần như không thấy
+    elif kind == "block":
+        body = mark(model=Quad(radius=0.15), color=BLOCK_COLORS["block"], scale=(size * 0.55, size * 1.1))
+        Entity(parent=body, model=Quad(radius=0.15, mode="line", thickness=2), color=BLOCK_COLORS["edge"],
+               z=-0.001)
+    else:
+        slab(TILE_COLORS["floor"])
+        if kind == "soft":
+            mark(model=Circle(resolution=32, radius=0.32), color=TILE_COLORS["soft"], scale=size)
+        elif kind == "heavy":
+            for angle in (45, -45):
+                mark(model="quad", color=TILE_COLORS["heavy"], rotation_z=angle, scale=(size * 0.72, size * 0.13))
+        elif kind == "split":
+            for start in (120, -60):   # hai cung tròn thành hình "( )" như board_view._mark_split
+                points = [Vec3(0.3 * size * math.cos(math.radians(start + i * 10)),
+                               0.3 * size * math.sin(math.radians(start + i * 10)), 0) for i in range(13)]
+                mark(model=Mesh(vertices=points, mode="line", thickness=4), color=TILE_COLORS["split"])
