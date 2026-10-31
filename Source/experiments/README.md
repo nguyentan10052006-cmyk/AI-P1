@@ -42,6 +42,14 @@ Không script nào ghi đè kết quả đã có, trừ khi thêm `--force`.
 
 `charts.py` liệt kê các cặp không `solved`, vì các cặp này không có trên hình.
 
+Các công cụ đọc chế độ chi phí (`cost`: `energy` là V13, `unit` là 1 mỗi bước) từ `run_info.json` cạnh `summary.csv`:
+- `check_results.py` và `charts.py` in ra chế độ này;
+- `tables.py` ghi nó ở đầu file bảng;
+- `charts.py` ghi nó vào chú thích góc dưới phải mỗi hình;
+- `compare_runs.py` từ chối so hai lần chạy khác chế độ.
+
+Khi không xác định được chế độ, công cụ nêu lý do (thiếu file, file hỏng, thiếu khóa `cost`, giá trị lạ) và không đoán.
+
 ## Chạy chính thức
 
 ### 0. Điều kiện trước khi chạy

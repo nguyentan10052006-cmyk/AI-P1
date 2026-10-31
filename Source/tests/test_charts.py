@@ -6,6 +6,7 @@ Số liệu ở đây chỉ để kiểm tra pipeline vẽ, không phải kết 
 import contextlib
 import csv
 import io
+from unittest import mock
 import importlib.util
 import shutil
 import tempfile
@@ -139,6 +140,24 @@ class ChartsTests(unittest.TestCase):
         with (self.out / "H9.csv").open(encoding="utf-8") as f:
             ref = [r for r in csv.DictReader(f) if r["algorithm"] == "BFS ở k = 0 × 2^k"]
         self.assertEqual([(int(r["param"]), float(r["visited"])) for r in ref], [(0, 260.0), (2, 1040.0), (4, 4160.0)])
+
+    def test_cost_mode_is_written_on_every_figure(self):
+        """Hình tách khỏi báo cáo vẫn phải cho biết vẽ theo chế độ chi phí nào (chú thích góc dưới phải)."""
+        import matplotlib.figure
+        write_summary(self.summary, synthetic_rows())
+        (self.tmp / "run_info.json").write_text('{"cost": "energy"}', encoding="utf-8")
+        notes = []
+        original = matplotlib.figure.Figure.text
+
+        def spy(fig, x, y, s, *args, **kwargs):
+            notes.append(s)
+            return original(fig, x, y, s, *args, **kwargs)
+
+        with mock.patch.object(matplotlib.figure.Figure, "text", spy):
+            report = charts.make_charts(self.summary, self.out)
+        drawn = [k for k, v in report.items() if "png" in v]
+        self.assertEqual(notes.count("Chế độ chi phí: energy · summary.csv"), len(drawn))
+        self.assertEqual(charts._FOOTNOTE, "")   # đặt lại sau khi vẽ, không lẫn sang lần gọi sau
 
     def test_unsolved_pairs_are_listed(self):
         write_summary(self.summary, synthetic_rows())

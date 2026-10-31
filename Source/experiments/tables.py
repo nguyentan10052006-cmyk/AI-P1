@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 from experiments.charts import ChartDataError, GROUPS, algorithms_in, label_of, read_summary
-from experiments.check_results import cost_mode, run_info_for, same_cost
+from experiments.check_results import cost_status, same_cost
 
 SOURCE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_SUMMARY = SOURCE_DIR / "experiments" / "summary.csv"
@@ -169,8 +169,8 @@ def appendix_a(rows: Sequence[Dict], algorithms: Sequence[str]) -> List[str]:
     return out
 
 
-def build(rows: Sequence[Dict], source: str, cost: Optional[str] = None) -> str:
-    """cost: chế độ chi phí của lần chạy (run_info.json); None là không rõ, đầu file sẽ có cảnh báo."""
+def build(rows: Sequence[Dict], source: str, cost: Optional[str] = None, why: str = "") -> str:
+    """cost: chế độ chi phí của lần chạy (run_info.json); None là không rõ, đầu file có cảnh báo kèm lý do why."""
     if not rows:
         raise ChartDataError("summary.csv không có dòng nào")
     algorithms = algorithms_in(rows)
@@ -178,8 +178,8 @@ def build(rows: Sequence[Dict], source: str, cost: Optional[str] = None) -> str:
     header = [f"<!-- Sinh bằng experiments/tables.py từ {source}; không sửa tay. -->", "",
               f"Nguồn: `{source}`, commit {', '.join(f'`{c}`' for c in commits)}, {len(rows)} dòng.", "",
               f"Chế độ chi phí: `{cost}` (energy là hàm chi phí V13, unit là 1 mỗi bước)." if cost else
-              "> **Cảnh báo:** không rõ chế độ chi phí (thiếu `run_info.json` cạnh summary.csv, hoặc run.py cũ chưa "
-              "ghi khóa `cost`); cột chi phí và bảng T4, T5 không xác định được hàm chi phí.", ""]
+              f"> **Cảnh báo:** không rõ chế độ chi phí ({why or 'không có thông tin'}); cột chi phí và bảng T4, T5 "
+              "không xác định được hàm chi phí.", ""]
     if len(commits) > 1 or any(c.endswith("-dirty") or not c for c in commits):
         header += ["> **Cảnh báo:** số liệu đến từ nhiều commit hoặc commit có thay đổi chưa lưu; "
                    "không dùng làm số liệu chính thức (04 §4).", ""]
@@ -202,7 +202,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"LỖI: không ghi đè {args.out} (dùng --force nếu chắc chắn)", file=sys.stderr)
         return 2
     try:
-        text = build(read_summary(args.summary), args.summary.name, cost_mode(run_info_for(args.summary)))
+        text = build(read_summary(args.summary), args.summary.name, *cost_status(args.summary))
     except (FileNotFoundError, ChartDataError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 1

@@ -66,6 +66,17 @@ class CompareRunsTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("KHÁC CHẾ ĐỘ CHI PHÍ", out.getvalue())
 
+    def test_strange_cost_value_is_reported_with_reason(self):
+        (self.tmp / "a").mkdir()
+        (self.tmp / "a" / "run_info.json").write_text('{"cost": "free"}', encoding="utf-8")
+        a, b = self.write("a/summary.csv", rows()), self.write("b.csv", rows())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = main([str(a), str(b)])
+        self.assertEqual(code, 0)   # số đếm vẫn so được; path_cost giống nhau nên TRÙNG
+        self.assertIn("A không rõ (run_info.json có cost = 'free'", out.getvalue())
+        self.assertIn("không loại trừ được việc chúng khác hàm chi phí", out.getvalue())
+
     def test_unknown_cost_mode_is_noted(self):
         code, out = self.run_main(rows(), rows())
         self.assertEqual(code, 0)

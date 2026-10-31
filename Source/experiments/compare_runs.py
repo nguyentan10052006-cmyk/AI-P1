@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
 
-from experiments.check_results import cost_mode, load, run_info_for
+from experiments.check_results import cost_status, load
 
 EXACT = ("status", "steps", "path_cost", "expanded", "generated", "max_frontier", "visited")
 TIMING = ("search_ms", "total_ms", "peak_mem_kb")
@@ -79,16 +79,18 @@ def main(argv=None) -> int:
     except (OSError, ValueError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 2
-    modes = cost_mode(run_info_for(args.a)), cost_mode(run_info_for(args.b))
+    (mode_a, why_a), (mode_b, why_b) = cost_status(args.a), cost_status(args.b)
+    modes = mode_a, mode_b
     commits = sorted({r["commit"] for r in rows_a}), sorted({r["commit"] for r in rows_b})
     print(f"A: {args.a} ({len(rows_a)} dòng, commit {', '.join(commits[0])})")
     print(f"B: {args.b} ({len(rows_b)} dòng, commit {', '.join(commits[1])})")
-    print(f"Chế độ chi phí: A {modes[0] or 'không rõ'}, B {modes[1] or 'không rõ'}")
+    print(f"Chế độ chi phí: A {mode_a or 'không rõ (' + why_a + ')'}, B {mode_b or 'không rõ (' + why_b + ')'}")
     if modes[0] and modes[1] and modes[0] != modes[1]:
         print("KHÁC CHẾ ĐỘ CHI PHÍ: hai lần chạy dùng hàm chi phí khác nhau nên không tương đương; không so.")
         return 1
     if not (modes[0] and modes[1]):
-        print("Lưu ý: không xác định được chế độ chi phí của cả hai lần chạy (thiếu run_info.json hoặc khóa cost).")
+        print("Lưu ý: không xác định được chế độ chi phí của cả hai lần chạy, nên không loại trừ được việc chúng khác "
+              "hàm chi phí. Cột path_cost vẫn được so, nên khác hàm chi phí sẽ hiện thành lệch, không ra TRÙNG nhầm.")
     if commits[0] != commits[1]:
         print("Lưu ý: hai lần chạy khác commit; số đếm chỉ phải trùng nếu code solver và file màn không đổi.")
     diffs, summary = compare(rows_a, rows_b)

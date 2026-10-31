@@ -7,7 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.check_results import check, cost_mode, level_pars, load, main, original_stems, run_info_for
+from experiments.check_results import (check, cost_mode, cost_status, level_pars, load, main, original_stems,
+                                       run_info_for)
 from experiments.run import SUMMARY_COLUMNS
 
 
@@ -146,6 +147,25 @@ class LoadTests(unittest.TestCase):
         self.assertIn("Chế độ chi phí: energy", out.getvalue())
         (path.parent / "run_info.json").write_text("{hỏng", encoding="utf-8")
         self.assertIsNone(run_info_for(path))
+
+    def test_cost_status_explains_every_unknown_case(self):
+        path = self.write(self.base())
+        info = path.parent / "run_info.json"
+        cases = [(None, (None, "không có run_info.json")),
+                 ("{hỏng", (None, "không đọc được")),
+                 (json.dumps({"commit": "abc"}), (None, "không có khóa cost")),
+                 (json.dumps({"cost": "free"}), (None, "'free', không thuộc")),
+                 (json.dumps({"cost": "unit"}), ("unit", ""))]
+        for content, (mode, why) in cases:
+            with self.subTest(content=content):
+                if content is None:
+                    info.unlink(missing_ok=True)
+                else:
+                    info.write_text(content, encoding="utf-8")
+                got_mode, got_why = cost_status(path)
+                self.assertEqual(got_mode, mode)
+                self.assertIn(why, got_why)
+                self.assertEqual(cost_mode(run_info_for(path)), mode)   # giá trị lạ không được đoán thành energy/unit
 
     def test_unsolved_rows_may_have_empty_numbers(self):
         rows = self.base()

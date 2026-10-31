@@ -70,6 +70,9 @@ def load(summary: Path) -> List[Dict[str, str]]:
         return rows
 
 
+KNOWN_COSTS = ("energy", "unit")   # giá trị --cost của run.py: energy là V13 (bloxorz/costs.py), unit là 1 mỗi bước
+
+
 def run_info_for(summary: Path) -> Optional[Dict[str, Any]]:
     """run_info.json cùng thư mục với summary.csv (run.py ghi cả hai), hoặc None nếu không có hay hỏng."""
     path = summary.parent / "run_info.json"
@@ -80,8 +83,30 @@ def run_info_for(summary: Path) -> Optional[Dict[str, Any]]:
 
 
 def cost_mode(info: Optional[Dict[str, Any]]) -> Optional[str]:
-    """Chế độ chi phí của lần chạy ("energy", "unit"); None nếu run_info.json không có hoặc chưa ghi (run.py cũ)."""
-    return info.get("cost") if isinstance(info, dict) else None
+    """Chế độ chi phí ("energy", "unit") ghi trong run_info; None nếu không có, hoặc là giá trị lạ (không đoán)."""
+    mode = info.get("cost") if isinstance(info, dict) else None
+    return mode if mode in KNOWN_COSTS else None
+
+
+def cost_status(summary: Path) -> Tuple[Optional[str], str]:
+    """(chế độ chi phí, lý do khi không xác định được). Lý do nêu rõ trường hợp nào, để người dùng biết cách sửa."""
+    path = summary.parent / "run_info.json"
+    if not path.exists():
+        return None, f"không có {path.name} cạnh {summary.name}"
+    try:
+        info = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return None, f"{path.name} không đọc được ({type(exc).__name__}: {exc})"
+    if not isinstance(info, dict) or "cost" not in info:
+        return None, f"{path.name} không có khóa cost, tức run.py trước khi nối V13"
+    if info["cost"] not in KNOWN_COSTS:
+        return None, f"{path.name} có cost = {info['cost']!r}, không thuộc {KNOWN_COSTS}"
+    return info["cost"], ""
+
+
+def cost_line(summary: Path) -> str:
+    mode, why = cost_status(summary)
+    return f"Chế độ chi phí: {mode}" if mode else f"Chế độ chi phí: KHÔNG RÕ ({why})"
 
 
 def same_cost(a: float, b: float) -> bool:
@@ -215,10 +240,7 @@ def main(argv=None) -> int:
     except (OSError, ValueError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 2
-    info = run_info_for(args.summary)
-    mode = cost_mode(info)
-    print(f"Chế độ chi phí: {mode}" if mode else
-          "Chế độ chi phí: KHÔNG RÕ (không có run_info.json cạnh summary.csv, hoặc run.py cũ chưa ghi khóa cost)")
+    print(cost_line(args.summary))
     results = check(rows, level_pars(rows, args.levels_root), original_stems(args.levels_root))
     for code, verdict, detail in results:
         print(f"{code} {verdict:<7} {detail}")
