@@ -100,6 +100,7 @@ UCS và A* dùng hàm chi phí không đồng nhất trong `bloxorz/costs.py` (c
 |---|---|
 | Đứng → nằm | 1.12 |
 | Nằm → đứng | 1.62 |
+| Nằm → đứng lên công tắc tách (khối tách đôi) | 1.62 |
 | Nằm → nằm (lăn quanh trục dài) | 1.21 |
 | Khối con 1×1×1 lăn | 1.10 |
 | Thêm khi có phần khối nằm trên ô dễ vỡ | +0.50 |
