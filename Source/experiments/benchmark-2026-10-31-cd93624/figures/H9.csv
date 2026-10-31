@@ -1,0 +1,37 @@
+param,algorithm,visited
+0,bfs,145.0
+2,bfs,301.0
+4,bfs,396.0
+6,bfs,412.0
+8,bfs,414.0
+10,bfs,414.0
+0,dfs,220.0
+2,dfs,276.0
+4,dfs,296.0
+6,dfs,448.0
+8,dfs,472.0
+10,dfs,470.0
+0,ucs,173.0
+2,ucs,458.0
+4,ucs,736.0
+6,ucs,814.0
+8,ucs,828.0
+10,ucs,828.0
+0,astar,60.0
+2,astar,82.0
+4,astar,88.0
+6,astar,89.0
+8,astar,89.0
+10,astar,89.0
+0,astar_m,60.0
+2,astar_m,82.0
+4,astar_m,88.0
+6,astar_m,89.0
+8,astar_m,89.0
+10,astar_m,89.0
+0,BFS ở k = 0 × 2^k,145.0
+2,BFS ở k = 0 × 2^k,580.0
+4,BFS ở k = 0 × 2^k,2320.0
+6,BFS ở k = 0 × 2^k,9280.0
+8,BFS ở k = 0 × 2^k,37120.0
+10,BFS ở k = 0 × 2^k,148480.0
