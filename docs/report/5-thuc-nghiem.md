@@ -3,7 +3,7 @@
 > Nháp của TV2 (V27), 28/10. Trạng thái từng mục:
 > - **5.1 Thiết lập, 5.2 Bộ màn:** viết đủ theo code và tài liệu hiện có. Còn trống các ô ghi *(điền từ `run_info.json`)*: lấy từ lần chạy chính thức.
 > - **5.3 Kết quả, 5.5 Kết luận:** chỉ có khung. **Chưa có số liệu chính thức**, vì còn chờ:
->   - hàm chi phí của UCS (V13, mục 3.3);
+>   - hàm chi phí của UCS (V13, mục 3.3): TV3 đã cài `bloxorz/costs.py` trên nhánh `feature/trong/V12-ucs`, nhưng chưa vào nhánh chính và chưa được dùng mặc định khi chạy;
 >   - bộ nạp màn có `links` (V03), UCS (V12) và $h_P$ (V16) vào nhánh chính;
 >   - nhóm chốt các quyết định về định dạng file kết quả.
 >
@@ -84,6 +84,9 @@ Riêng **số bước và các số đếm của BFS và DFS không phụ thuộ
 - Tổng chi phí của BFS và DFS không nhỏ hơn của UCS.
 - Số nút mở rộng của A* không lớn hơn UCS.
 - Màn không có lời giải (S3): mọi thuật toán trả `no_solution`.
+- Đủ dòng (01 NV10): 33 màn gốc × 5 cấu hình cùng các màn tự sinh, không thiếu cặp nào; mọi dòng của màn gốc là `solved`, vì màn gốc nào cũng có lời giải.
+
+Các mục trên được kiểm tự động bằng `experiments/check_results.py` (K1–K8). Kiểm tra "đặt mọi chi phí bằng 1 thì UCS bằng BFS" nằm ở test của UCS. Kiểm tra "0 vi phạm heuristic" nằm ở `tools/check_heuristics.py`.
 
 *(Ghi kết quả kiểm tra của lần chạy chính thức ở đây: số mục đạt / tổng số mục.)*
 
@@ -121,15 +124,15 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
 
 | Nhóm | Cách dựng | Tham số | Kích thước lưới | Số bước tối ưu | Câu hỏi |
 |---|---|---|---|---|---|
-| S1 Sân trống | Bàn N × N toàn sàn; xuất phát ở góc trên trái, đích ở góc dưới phải | N = 10, 25, 50, 100, 150, 200 | N × N | 12, 32, 66, 132, 200, 266 | 5 |
-| S2 Cầu | Sân 8 × 12 cố định, thêm một hàng ô cầu đóng ở mép trên; k công tắc mềm, mỗi công tắc đảo một ô cầu riêng không nằm trên đường tới đích | k = 0, 2, 4, 6, 8, 10 | 9 × 12 | 13 với mọi k | 3 |
-| S3 Không lời giải | Hai vùng sàn N × N ngăn bởi một cột ô trống. Khối không qua được khe rộng 1 ô, vì lăn về phía khe thì luôn có một phần khối trên ô trống | N = 10, 50 | N × (2N + 1) | không có lời giải | 5 |
+| S1 Sân trống | Bàn N × N toàn sàn; xuất phát ở góc trên trái (0, 0), đích ở góc dưới phải (N − 1, N − 1) | N = 10, 25, 50, 100, 150, 200 | N × N | 12, 32, 66, 132, 200, 266 | 5 |
+| S2 Cầu | Lưới 8 × 12 cố định. Hàng 0 là mép ngoài: ô trống, trừ k ô cầu đóng ở cột 1 … k. k công tắc mềm ở hàng 1, cột 1 … k; mỗi công tắc đảo ô cầu ngay trên nó. Xuất phát (3, 1), đích (3, 10); đường tới đích không qua cầu | k = 0, 2, 4, 6, 8, 10 | 8 × 12 | 6 với mọi k | 3 |
+| S3 Không lời giải | Vùng trái N × N chứa điểm xuất phát (1, 1), một cột ô trống, rồi vùng phải N × 3 chứa đích (1, N + 2). Khối không qua được khe rộng 1 ô, vì lăn về phía khe thì luôn có một phần khối trên ô trống | N = 10, 50 | N × (N + 4) | không có lời giải | 5 |
 
 Ở S2, lời giải không đổi theo k, nhưng mỗi cấu hình cầu là một trạng thái khác nhau, nên số trạng thái có thể tăng tới $2^k$ lần. Đây là cách đo trực tiếp phần không gian trạng thái do cầu tạo ra.
 
-Khi sinh, script dùng BFS kiểm tra: S1 và S2 giải được, S3 không có lời giải, và số bước tối ưu của S2 như nhau với mọi k. Chạy lại script phải ra đúng các file cũ.
+Khi sinh, script `experiments/gen_levels.py` dùng BFS tính số bước tối ưu (`par`) của từng màn; S3 không có lời giải nên `par` = 0. Test `tests/test_gen_levels.py` kiểm đủ 14 file, cấu trúc của từng nhóm, và tính giải được của một màn đại diện mỗi nhóm. Tên file: `s1_010` … `s1_200`, `s2_00` … `s2_10`, `s3_10`, `s3_50`.
 
-> **Chờ xác nhận.** Bộ màn tự sinh là việc V40 của TV3. Bản hiện tại do TV2 viết tạm (`experiments/gen_levels.py`, chưa vào nhánh chính) để chạy thử script đo. Bố cục S2 (hàng cầu nằm ngoài sân 8 × 12) và tên file (`S1-010`, `S2-k04`, `S3-050`) cần TV3 xác nhận; Bảng 5.4 sẽ sửa theo bản cuối.
+> **Nguồn của Bảng 5.4.** Bảng tả bộ màn V40 của TV3 (nhánh `feature/trong/V12-ucs`, commit `cc3fa6a`), lấy trực tiếp từ các file màn. Bộ màn này chưa vào nhánh chính; nếu TV3 đổi trước khi gộp thì sửa bảng theo. Bản tạm trước đó do TV2 viết để chạy thử script đo không còn dùng.
 
 **Tổng cộng:** 47 màn (33 gốc + 14 tự sinh) × 5 cấu hình = 235 cặp (màn, cấu hình); mỗi cặp 5 lần đo thời gian và 1 lần đo bộ nhớ.
 
