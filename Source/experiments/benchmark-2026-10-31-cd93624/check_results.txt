@@ -1,0 +1,9 @@
+Chế độ chi phí: energy
+K1 PASS    235 dòng, không có error/invalid
+K2 PASS    45 cặp: BFS = par
+K3 PASS    180 cặp: steps ≥ BFS
+K4 PASS    90 cặp: path_cost A* = UCS
+K5 PASS    90 cặp: path_cost BFS, DFS ≥ UCS
+K6 PASS    90 cặp: expanded A* ≤ UCS
+K7 PASS    10 cặp: S3 đều no_solution
+K8 PASS    235 cặp: 47 màn × 5 thuật toán, màn gốc đều solved

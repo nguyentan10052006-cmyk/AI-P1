@@ -1,0 +1,376 @@
+{
+  "started_utc": "2026-10-31T04:04:57+00:00",
+  "finished_utc": "2026-10-31T04:14:20+00:00",
+  "commit": "cd93624",
+  "dirty_reasons": [],
+  "repeat": 5,
+  "timeout_s": 60.0,
+  "memory_timeout_s": 60.0,
+  "cost": "energy",
+  "levels": [
+    "levels\\original\\01.json",
+    "levels\\original\\02.json",
+    "levels\\original\\03.json",
+    "levels\\original\\04.json",
+    "levels\\original\\05.json",
+    "levels\\original\\06.json",
+    "levels\\original\\07.json",
+    "levels\\original\\08.json",
+    "levels\\original\\09.json",
+    "levels\\original\\10.json",
+    "levels\\original\\11.json",
+    "levels\\original\\12.json",
+    "levels\\original\\13.json",
+    "levels\\original\\14.json",
+    "levels\\original\\15.json",
+    "levels\\original\\16.json",
+    "levels\\original\\17.json",
+    "levels\\original\\18.json",
+    "levels\\original\\19.json",
+    "levels\\original\\20.json",
+    "levels\\original\\21.json",
+    "levels\\original\\22.json",
+    "levels\\original\\23.json",
+    "levels\\original\\24.json",
+    "levels\\original\\25.json",
+    "levels\\original\\26.json",
+    "levels\\original\\27.json",
+    "levels\\original\\28.json",
+    "levels\\original\\29.json",
+    "levels\\original\\30.json",
+    "levels\\original\\31.json",
+    "levels\\original\\32.json",
+    "levels\\original\\33.json",
+    "levels\\gen\\s1_010.json",
+    "levels\\gen\\s1_025.json",
+    "levels\\gen\\s1_050.json",
+    "levels\\gen\\s1_100.json",
+    "levels\\gen\\s1_150.json",
+    "levels\\gen\\s1_200.json",
+    "levels\\gen\\s2_00.json",
+    "levels\\gen\\s2_02.json",
+    "levels\\gen\\s2_04.json",
+    "levels\\gen\\s2_06.json",
+    "levels\\gen\\s2_08.json",
+    "levels\\gen\\s2_10.json",
+    "levels\\gen\\s3_10.json",
+    "levels\\gen\\s3_50.json"
+  ],
+  "level_files": [
+    {
+      "id": "original/01",
+      "path": "levels\\original\\01.json",
+      "sha256": "0b3917f2f26147c3263d9284e3b016f03afe125edad84ba2afc8ec173b041452",
+      "git": "tracked"
+    },
+    {
+      "id": "original/02",
+      "path": "levels\\original\\02.json",
+      "sha256": "4de8200b0c706e56c8f6956b2a5823fab620b5042fac26bb9e104845ba8bb881",
+      "git": "tracked"
+    },
+    {
+      "id": "original/03",
+      "path": "levels\\original\\03.json",
+      "sha256": "f611ca0180bf419c5ac599efdaf3e8e682ef655be3697d2f6c3f7f30b202979d",
+      "git": "tracked"
+    },
+    {
+      "id": "original/04",
+      "path": "levels\\original\\04.json",
+      "sha256": "5a044e97081009842dfbe94ccb63037d243b699379177e605822322755c14caf",
+      "git": "tracked"
+    },
+    {
+      "id": "original/05",
+      "path": "levels\\original\\05.json",
+      "sha256": "067948950c111439f1c70ae6157620962337ee09fbea5b8f38941a01f7b26d74",
+      "git": "tracked"
+    },
+    {
+      "id": "original/06",
+      "path": "levels\\original\\06.json",
+      "sha256": "0c72c746917915f7caa5aac8b0449d94fd12be037c194b9ec606250ea86ac011",
+      "git": "tracked"
+    },
+    {
+      "id": "original/07",
+      "path": "levels\\original\\07.json",
+      "sha256": "9e9ccfb4548c1ae699863a6815a8010ed3be64b00f4c0e68d89203d4f56f1d5c",
+      "git": "tracked"
+    },
+    {
+      "id": "original/08",
+      "path": "levels\\original\\08.json",
+      "sha256": "b6f6f5b8101cf9c98c57f45f2b64bfbdf6c5dd6a29370acfccf5eae88ee61884",
+      "git": "tracked"
+    },
+    {
+      "id": "original/09",
+      "path": "levels\\original\\09.json",
+      "sha256": "df7f765befb917b8c58e47de6da1fabd093b342e080f45bd9bfc2a0770217502",
+      "git": "tracked"
+    },
+    {
+      "id": "original/10",
+      "path": "levels\\original\\10.json",
+      "sha256": "8fec2a9ece95863e84ba39eb796f004f7a1a59d7da81f44221e85af53e17996f",
+      "git": "tracked"
+    },
+    {
+      "id": "original/11",
+      "path": "levels\\original\\11.json",
+      "sha256": "27fb14d2c55f3bf1ea13f4c3aaa63db20d68d3381abfd8769a6c01a287550d00",
+      "git": "tracked"
+    },
+    {
+      "id": "original/12",
+      "path": "levels\\original\\12.json",
+      "sha256": "340113bf4d8c0eb8eccfad7b79af476066c9e991abc825768b86b497b96f98dd",
+      "git": "tracked"
+    },
+    {
+      "id": "original/13",
+      "path": "levels\\original\\13.json",
+      "sha256": "7b9c64e0ebde6b14f12988f3264915b3bf6b33b7d7609b33f917f89d94ce24f9",
+      "git": "tracked"
+    },
+    {
+      "id": "original/14",
+      "path": "levels\\original\\14.json",
+      "sha256": "5677fcfa42481b662cce2e531836a63106196a63a2542c2b4a59cee8563d0771",
+      "git": "tracked"
+    },
+    {
+      "id": "original/15",
+      "path": "levels\\original\\15.json",
+      "sha256": "38747f1a01be92ca2cee07b590e4d293956781ba0f81fc0686c88d79d2d69de7",
+      "git": "tracked"
+    },
+    {
+      "id": "original/16",
+      "path": "levels\\original\\16.json",
+      "sha256": "aa06e63399af0cd629edcad68d2bb50c16ff4727f9da4e88d94a1a5535b22853",
+      "git": "tracked"
+    },
+    {
+      "id": "original/17",
+      "path": "levels\\original\\17.json",
+      "sha256": "4d958e35b2a40e2b33b5ec6a18018e28f8488a550166adbb60c1757352d0ae55",
+      "git": "tracked"
+    },
+    {
+      "id": "original/18",
+      "path": "levels\\original\\18.json",
+      "sha256": "7aa017024ed3fb00e882665481eb480202ed93b62a56991820c27e07fe601e7f",
+      "git": "tracked"
+    },
+    {
+      "id": "original/19",
+      "path": "levels\\original\\19.json",
+      "sha256": "8426fb974ec3b0b0c8e0987a73920fb0c837efb914c298b686175666a2dbd161",
+      "git": "tracked"
+    },
+    {
+      "id": "original/20",
+      "path": "levels\\original\\20.json",
+      "sha256": "59c8d75890eea32f9d015515c135095dc1887edc6547447b0823880d9120c316",
+      "git": "tracked"
+    },
+    {
+      "id": "original/21",
+      "path": "levels\\original\\21.json",
+      "sha256": "11646d5cf17871510c4a35bea6c864f97a33d695ec6ebade26c62fb41bffecbf",
+      "git": "tracked"
+    },
+    {
+      "id": "original/22",
+      "path": "levels\\original\\22.json",
+      "sha256": "7f9a5136be5b89bd7e9c26ca9bf183622aacfb048568980f72eb8cb415c73d99",
+      "git": "tracked"
+    },
+    {
+      "id": "original/23",
+      "path": "levels\\original\\23.json",
+      "sha256": "e0d92b7f3639e76cfac04160633826eb07f1d2c912164e3b61bcf5dfee270230",
+      "git": "tracked"
+    },
+    {
+      "id": "original/24",
+      "path": "levels\\original\\24.json",
+      "sha256": "67480b4e2c8d6c6b36c3d5fddf683127405a8c75a87138bec03c7e41f1d98abf",
+      "git": "tracked"
+    },
+    {
+      "id": "original/25",
+      "path": "levels\\original\\25.json",
+      "sha256": "f9a79918de3beb02f368571081b6822db9174cae8cc27c14c187f243038ddabc",
+      "git": "tracked"
+    },
+    {
+      "id": "original/26",
+      "path": "levels\\original\\26.json",
+      "sha256": "38e73115c93e2fea745e4d193c3a0bb0b7d079483087b563567866a8e28772d9",
+      "git": "tracked"
+    },
+    {
+      "id": "original/27",
+      "path": "levels\\original\\27.json",
+      "sha256": "05404a595ecf9ed37ff4c9ccef3086975e958f3c9b12a43ec38cc791021c7581",
+      "git": "tracked"
+    },
+    {
+      "id": "original/28",
+      "path": "levels\\original\\28.json",
+      "sha256": "5fd0930be5a5e0096ab3b48b6a9bd0eb02457da7f127772557b0160e1c25b923",
+      "git": "tracked"
+    },
+    {
+      "id": "original/29",
+      "path": "levels\\original\\29.json",
+      "sha256": "4ce8686fd3a7c000c96d718be93603483632f5554b296460208197b355415795",
+      "git": "tracked"
+    },
+    {
+      "id": "original/30",
+      "path": "levels\\original\\30.json",
+      "sha256": "8ec09c402a7a8b54b5b7ee80be04a1bf03badfd357d8041b9e176e8d6e179e99",
+      "git": "tracked"
+    },
+    {
+      "id": "original/31",
+      "path": "levels\\original\\31.json",
+      "sha256": "58881589ff4c8bc42f9af755c733f94ae471ca5ebe248589ab9e187a7ab93035",
+      "git": "tracked"
+    },
+    {
+      "id": "original/32",
+      "path": "levels\\original\\32.json",
+      "sha256": "ec505c416b7e04b93eaf87580510d57b46b85c23c3cee25bcd7da59f729423df",
+      "git": "tracked"
+    },
+    {
+      "id": "original/33",
+      "path": "levels\\original\\33.json",
+      "sha256": "49263a30f1c4cec527e0cb31e765d8ce0ec8f853bcae0f4a24550b70c36584a1",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_010",
+      "path": "levels\\gen\\s1_010.json",
+      "sha256": "e0a4d047c66975686f6ceff4dc9016ec5ec5b92caedf0ae91a3bca8eb66eb70b",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_025",
+      "path": "levels\\gen\\s1_025.json",
+      "sha256": "e3ffc4907e4c6436b124c9f403d27d96fe720c3d7a2936354e771e7784401d20",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_050",
+      "path": "levels\\gen\\s1_050.json",
+      "sha256": "b654b40c1a612f9e983384da48a47b86307594a437b1ea1defb88ea93c3bdd6c",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_100",
+      "path": "levels\\gen\\s1_100.json",
+      "sha256": "dce4a8c3a1ae383c9d2c2d35b23f6a141ad268441b0f9641d071658b470ff23c",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_150",
+      "path": "levels\\gen\\s1_150.json",
+      "sha256": "92511862c358a87bdab07ffeb31e2bab1556e9554ec5a34039428f402bb5fdb0",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s1_200",
+      "path": "levels\\gen\\s1_200.json",
+      "sha256": "ebaa5c699024880bf89e33afe799825bf6b522c0e7c25fb121c2f4930d047b7e",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_00",
+      "path": "levels\\gen\\s2_00.json",
+      "sha256": "be215e43a46d25714786d57bcc9f23b24ef7ff4dd123215e66dfa26653f1d5c9",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_02",
+      "path": "levels\\gen\\s2_02.json",
+      "sha256": "911dea038d510e6e825416c1ca96659bec0e5ef504561df128d9bbac00a41a6f",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_04",
+      "path": "levels\\gen\\s2_04.json",
+      "sha256": "d224264e584b6f688828deb1519d10bb445a110b53577310c160e9a52c09ab16",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_06",
+      "path": "levels\\gen\\s2_06.json",
+      "sha256": "5e1b22749cb759958f104a204c8b72f0e9d53c5ac75811dcd30c33c2c8f36131",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_08",
+      "path": "levels\\gen\\s2_08.json",
+      "sha256": "40f95cf9bfe565c8ffa0e957943eb57d024c87b4d748d8b82f284065d8409656",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s2_10",
+      "path": "levels\\gen\\s2_10.json",
+      "sha256": "8c24299fa25db6bb9de499f0502916b3bcb3bb77d75b99aeca0e8ae8e6aa1032",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s3_10",
+      "path": "levels\\gen\\s3_10.json",
+      "sha256": "a7d4ea20dab8b1cad5bec0f7ccadceddc36068ac29e360fbe2d30cd6858859da",
+      "git": "tracked"
+    },
+    {
+      "id": "gen/s3_50",
+      "path": "levels\\gen\\s3_50.json",
+      "sha256": "876aa43d4fea07ea9aff119af01fb6624b3469dede3eb519f83328519e126a06",
+      "git": "tracked"
+    }
+  ],
+  "algorithms": [
+    "bfs",
+    "dfs",
+    "ucs",
+    "astar",
+    "astar_m"
+  ],
+  "argv": [
+    "D:\\Bloxorz-Solver\\AI-P1-bench\\Source\\experiments\\run.py",
+    "--levels",
+    "levels/original",
+    "levels/gen",
+    "--cost",
+    "energy",
+    "--repeat",
+    "5",
+    "--timeout",
+    "60",
+    "--out",
+    "D:/Bloxorz-Solver/AI-P1-benchdata/tai-lap-2026-10-31-cd93624"
+  ],
+  "machine": {
+    "python": "3.11.9",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD",
+    "cpu_count": 16,
+    "ram_gb": 15.3
+  },
+  "warnings": [],
+  "memory_failures": [],
+  "method": "docs/04 §4: tiến trình spawn riêng mỗi lần chạy; thời gian = trung vị perf_counter_ns, không bật tracemalloc; bộ nhớ = đỉnh tracemalloc ở một lần chạy riêng"
+}
