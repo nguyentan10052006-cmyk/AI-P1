@@ -1,88 +1,102 @@
 ## 1. Phân công và tiến độ
 
-> Khung của TV4 (V35), 26/10. Bảng việc sinh từ tab task (`docs/sheet/1-viec.csv`). Ngày 29/10 cả nhóm chốt cột Trạng thái và % hoàn thành trên Google Sheet (01 §8); khi đó điền họ tên, MSSV, cột % và cột Trạng thái ở đây.
+### 1.1. Thành viên và cách chia việc
 
-### 1.1. Cách chia việc
+Nhóm 9 có năm thành viên. Nhóm chia việc theo hướng mỗi người một thuật toán: bốn thành viên mỗi người phụ trách một thuật toán tìm kiếm (BFS, DFS, UCS, A*) cùng một phần dùng chung của engine, màn chơi hoặc thực nghiệm; thành viên thứ năm làm giao diện 3D. Phần dùng chung được chia thành các nhóm việc, mỗi nhóm việc có một người chủ chịu trách nhiệm và một người đọc chéo. Các mã TV1 đến TV5 được dùng trong toàn báo cáo (Bảng 1.1).
 
-Nhóm chia việc theo phương án PA2 (bien-ban #1): mỗi thành viên phụ trách một thuật toán (BFS, DFS, UCS, A*), một thành viên làm giao diện 3D. Phần dùng chung (luật chơi, màn chơi, thực nghiệm, báo cáo) chia thành 14 nhóm việc, mỗi nhóm có một người chủ và một người đọc chéo. Ngày 19/10 nhóm cân bằng lại khối lượng giữa các thành viên (bien-ban #12). Tiến độ theo dõi trên Google Sheets (bien-ban #8): mỗi tối thành viên check-in; mỗi mốc (M1 21/10, M2 25/10, M3 28/10) mọi người gộp code vào nhánh chính và demo trên nhánh chính.
+**Bảng 1.1.** Thành viên, phần việc phụ trách và % hoàn thành.
 
-**Bảng 1.1.** Vai trò của từng thành viên.
-
-| Mã | Họ tên | MSSV | Thuật toán | Phần chung phụ trách | Chương báo cáo | Đọc chéo cho | % hoàn thành |
-|---|---|---|---|---|---|---|---|
-| TV1 | … | … | BFS | NV1: hợp đồng chung, engine lõi, ghép module; NV3: tách và ghép khối; NV13: kiểm thử cài đặt, đóng gói | 2. Mô hình hóa; 3.1 BFS | TV2 | … |
-| TV2 | … | … | DFS hoặc IDS | NV4: 33 màn gốc; NV10: thực nghiệm (trừ bộ màn tự sinh) | 3.2 DFS; 5. Thực nghiệm | TV5 | … |
-| TV3 | … | … | UCS | NV2: ô dễ vỡ, công tắc, cầu; hàm chi phí; bộ nạp màn (V03); bộ màn tự sinh (V40); NV12: video | 3.3 UCS | TV1 | … |
-| TV4 | … | … | A* | Heuristic; module chạy solver nền và So sánh cho GUI (V39); NV11: ghép báo cáo | 3.4 A*; 1. Phân công; 6. Kết luận | TV3 | … |
-| TV5 | … | … | (không) | NV9: GUI 3D (trừ module chạy solver nền), README | 4. Cài đặt và giao diện | TV4 | … |
+| Mã | Họ và tên | MSSV | Thuật toán | Phần chung phụ trách | Phần báo cáo được giao | % hoàn thành |
+|---|---|---|---|---|---|---|
+| TV1 | Trần Nguyên Tân | 24120438 | BFS | Hợp đồng code chung; engine lõi (bảng lăn, rơi, thắng); tách và ghép khối; ghép module; kiểm thử cài đặt; đóng gói | Chương 2; mục 3.1, 5.4.1 | 100 % |
+| TV2 | Bùi Quang Tiến | 24120462 | DFS | Chuyển 33 màn gốc; script đo và công cụ kiểm tra số liệu; chạy thực nghiệm; bảng và biểu đồ | Mục 3.2, 5.1–5.3, 5.4.2, 5.5; Phụ lục A | 100 % |
+| TV3 | Nguyễn Bảo Trọng | 24120476 | UCS | Ô dễ vỡ, công tắc, cầu; hàm chi phí; bộ nạp và kiểm tra file màn; bộ màn tự sinh; video | Mục 3.3, 5.4.3 | 100 % |
+| TV4 | Trịnh Vỹ Triết | 24120474 | A* | Hai heuristic và chứng minh; module chạy thuật toán ở tiến trình riêng cho giao diện; ghép báo cáo | Chương 1, 6; mục 3.4, 5.4.4; tài liệu tham khảo; Phụ lục B | 100 % |
+| TV5 | Võ Quốc Trung | 24120478 | (không) | Giao diện 3D bằng Ursina; `main.py`; README và `requirements.txt` | Chương 4 | 100 % |
 
 ### 1.2. Cách tính % hoàn thành
 
-Điểm cá nhân bằng điểm nhóm nhân % hoàn thành (đề, mục 3.6), nên % tính từ bảng việc, không theo cảm giác (bien-ban #13). Mỗi việc nhận mức theo trạng thái: Chưa bắt đầu 0 %, Đã bắt đầu 50 %, Hoàn thành 100 %. % của một thành viên là trung bình mức của các việc người đó làm. Một việc chỉ được chọn Hoàn thành khi code đã ở nhánh chính, test của phần đó qua và người đọc chéo đã xem (01 §7).
+Theo đề bài [1] (mục 3.6), điểm cá nhân bằng điểm nhóm nhân với % hoàn thành của thành viên đó. Nhóm tính % hoàn thành theo bảng việc ở mục 1.4, không theo cảm nhận: % của một thành viên là tỉ lệ số việc được giao đã hoàn thành. Một việc tính là hoàn thành khi sản phẩm của nó (code, test, dữ liệu hoặc phần báo cáo) đã được gộp vào nhánh chính của repository nhóm và toàn bộ test vẫn qua. Khi nộp bài, mọi việc trong Bảng 1.3 đến 1.7 đều đạt điều kiện này, nên mỗi thành viên đạt 100 %.
 
-### 1.3. Bảng việc
+### 1.3. Tiến độ và cách làm việc
 
-**Bảng 1.2.** Việc của TV1 (10 việc).
+Nhóm làm việc trên một repository GitHub chung. Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (khoảng 250 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
 
-| ID | Việc | Mốc | Hạn | Đọc chéo | Trạng thái |
-|---|---|---|---|---|---|
-| V01 | Chốt hợp đồng chung (State, Problem, Solver, SearchResult) và GridMaze; đẩy khung code lên nhánh chính | M1 | 2026-10-19 | TV3 | Chưa bắt đầu |
-| V02 | Engine lõi: bảng chuyển 12 trường hợp, rơi, thắng | M1 | 2026-10-20 | TV3 | Chưa bắt đầu |
-| V04 | Ghép ô đặc biệt và tách khối vào result(); chạy lại toàn bộ test | M2 | 2026-10-24 | TV3 | Chưa bắt đầu |
-| V06 | Công tắc tách, điều khiển 2 khối con, ghép khi kề | M2 | 2026-10-23 | TV3 | Chưa bắt đầu |
-| V08 | BFS và đếm chỉ số theo docs/04 | M1 | 2026-10-21 | TV3 | Chưa bắt đầu |
-| V09 | BFS giải đủ 33 màn | M2 | 2026-10-25 | TV3 | Chưa bắt đầu |
-| V26 | Chương 2 Mô hình hóa bài toán và 3.1 BFS | M3 | 2026-10-27 | TV3 | Chưa bắt đầu |
-| V31 | Nhận xét kết quả BFS (mục 5.4) | M3 | 2026-10-28 | TV3 | Chưa bắt đầu |
-| V37 | Kiểm thử cài đặt theo README trên máy khác | Nộp | 2026-10-29 | TV3 | Chưa bắt đầu |
-| V38 | Đóng gói file nộp MSSV1_MSSV2_….zip | Nộp | 2026-10-30 | TV3 | Chưa bắt đầu |
+**Bảng 1.2.** Các mốc tiến độ.
 
-**Bảng 1.3.** Việc của TV2 (8 việc).
+| Mốc | Ngày | Kết quả cần có |
+|---|---|---|
+| Khởi động | 15–19/10 | Đọc đề, chọn cách chia việc, chốt hợp đồng code chung, chuẩn bị dữ liệu 33 màn gốc |
+| M1 | 21/10 | Engine lõi, bộ nạp màn; bốn thuật toán chạy đúng trên mê cung mẫu; giao diện vẽ bàn và chơi tay |
+| M2 | 25/10 | Ô đặc biệt, cầu, tách khối; bốn thuật toán giải đủ 33 màn; hàm chi phí, heuristic; script đo; giao diện đủ nút |
+| M3 | 28/10 | Chạy thực nghiệm, bảng và biểu đồ; nháp các chương báo cáo |
+| Nộp | 31/10 | Lần đo chính thức, báo cáo hoàn chỉnh, video, kiểm thử cài đặt, đóng gói |
 
-| ID | Việc | Mốc | Hạn | Đọc chéo | Trạng thái |
-|---|---|---|---|---|---|
-| V07 | Định dạng file màn và script chuyển 33 màn gốc (sửa màn 3) | M1 | 2026-10-20 | TV1 | Chưa bắt đầu |
-| V10 | DFS (hoặc IDS) có tập đã thăm, thứ tự hành động cố định | M1 | 2026-10-21 | TV1 | Chưa bắt đầu |
-| V11 | DFS giải đủ 33 màn | M2 | 2026-10-25 | TV1 | Chưa bắt đầu |
-| V23 | Script đo: thời gian, bộ nhớ, timeout, xuất CSV | M2 | 2026-10-24 | TV1 | Chưa bắt đầu |
-| V24 | Chạy thử 4 thuật toán × 33 màn, thêm A* với h_M và bộ màn tự sinh (số liệu nháp) | M2 | 2026-10-25 | TV1 | Chưa bắt đầu |
-| V25 | Chạy chính thức; bảng và biểu đồ | M3 | 2026-10-27 | TV1 | Chưa bắt đầu |
-| V27 | Chương 3.2 DFS và chương 5 Thực nghiệm (5.1–5.3, 5.5) | M3 | 2026-10-28 | TV1 | Chưa bắt đầu |
-| V32 | Nhận xét kết quả DFS (mục 5.4) | M3 | 2026-10-28 | TV1 | Chưa bắt đầu |
+### 1.4. Bảng việc
 
-**Bảng 1.4.** Việc của TV3 (9 việc).
+Bảng 1.3 đến 1.7 liệt kê việc của từng thành viên, kèm mốc và hạn.
 
-| ID | Việc | Mốc | Hạn | Đọc chéo | Trạng thái |
-|---|---|---|---|---|---|
-| V03 | Bộ nạp màn và kiểm tra hợp lệ file màn | M1 | 2026-10-21 | TV4 | Chưa bắt đầu |
-| V05 | Ô dễ vỡ, cầu, công tắc mềm và nặng (toggle, on, off), trạng thái cầu | M2 | 2026-10-23 | TV4 | Chưa bắt đầu |
-| V12 | UCS (heapq) đúng trên mê cung có trọng số | M1 | 2026-10-21 | TV4 | Chưa bắt đầu |
-| V13 | Hàm chi phí không đồng nhất và lý do; gửi TV4 | M2 | 2026-10-22 | TV4 | Chưa bắt đầu |
-| V14 | UCS giải đủ 33 màn | M2 | 2026-10-25 | TV4 | Chưa bắt đầu |
-| V28 | Chương 3.3 UCS và hàm chi phí | M3 | 2026-10-27 | TV4 | Chưa bắt đầu |
-| V33 | Nhận xét kết quả UCS (mục 5.4) | M3 | 2026-10-28 | TV4 | Chưa bắt đầu |
-| V36 | Kịch bản, quay, phụ đề, đăng YouTube công khai | Nộp | 2026-10-29 | TV4 | Chưa bắt đầu |
-| V40 | Bộ màn tự sinh S1–S3 (gen_levels.py), dùng BFS kiểm tra | M2 | 2026-10-24 | TV4 | Chưa bắt đầu |
+**Bảng 1.3.** Việc của TV1 (Trần Nguyên Tân).
 
-**Bảng 1.5.** Việc của TV4 (7 việc).
+| ID | Việc | Mốc | Hạn |
+|---|---|---|---|
+| V01 | Chốt hợp đồng code chung (State, Problem, Solver, SearchResult) và mê cung mẫu GridMaze; dựng khung code | M1 | 19/10 |
+| V02 | Engine lõi: bảng chuyển 12 trường hợp, rơi, thắng | M1 | 20/10 |
+| V08 | BFS và đếm chỉ số (nút mở rộng, nút sinh, biên lớn nhất, đã thăm) | M1 | 21/10 |
+| V06 | Công tắc tách, điều khiển 2 khối con, ghép khi kề | M2 | 23/10 |
+| V04 | Ghép ô đặc biệt và tách khối vào result(); chạy lại toàn bộ test | M2 | 24/10 |
+| V09 | BFS giải đủ 33 màn | M2 | 25/10 |
+| V26 | Chương 2 Mô hình hóa bài toán và mục 3.1 BFS | M3 | 27/10 |
+| V31 | Nhận xét kết quả BFS (mục 5.4.1) | M3 | 28/10 |
+| V37 | Kiểm thử cài đặt theo README trong môi trường mới | Nộp | 29/10 |
+| V38 | Đóng gói file nộp | Nộp | 30/10 |
 
-| ID | Việc | Mốc | Hạn | Đọc chéo | Trạng thái |
-|---|---|---|---|---|---|
-| V15 | A* đúng trên mê cung (h = Manhattan) | M1 | 2026-10-21 | TV5 | Chưa bắt đầu |
-| V16 | Heuristic h_M và h_P chấp nhận được với hàm chi phí của TV3 (cả trạng thái đã tách) | M2 | 2026-10-24 | TV5 | Chưa bắt đầu |
-| V17 | A* giải đủ 33 màn | M2 | 2026-10-25 | TV5 | Chưa bắt đầu |
-| V29 | Chương 3.4 A*, heuristic và chứng minh | M3 | 2026-10-27 | TV5 | Chưa bắt đầu |
-| V34 | Nhận xét kết quả A* (mục 5.4) | M3 | 2026-10-28 | TV5 | Chưa bắt đầu |
-| V35 | Ghép báo cáo; chương 1 Phân công; chương 6; tài liệu tham khảo; phụ lục AI; xuất PDF | Nộp | 2026-10-30 | TV5 | Chưa bắt đầu |
-| V39 | Module chạy solver ở tiến trình riêng cho GUI: Hủy, hết giờ 60 giây, chạy So sánh 4 thuật toán | M2 | 2026-10-23 | TV5 | Chưa bắt đầu |
+**Bảng 1.4.** Việc của TV2 (Bùi Quang Tiến).
 
-**Bảng 1.6.** Việc của TV5 (6 việc).
+| ID | Việc | Mốc | Hạn |
+|---|---|---|---|
+| V07 | Định dạng file màn và script chuyển 33 màn gốc (bổ sung màn 3) | M1 | 20/10 |
+| V10 | DFS (hoặc IDS) có tập đã thăm, thứ tự hành động cố định | M1 | 21/10 |
+| V23 | Script đo: thời gian, bộ nhớ, timeout, xuất CSV | M2 | 24/10 |
+| V11 | DFS giải đủ 33 màn | M2 | 25/10 |
+| V24 | Chạy thử 4 thuật toán × 33 màn, thêm A* với $h_M$ và bộ màn tự sinh | M2 | 25/10 |
+| V25 | Chạy chính thức; bảng và biểu đồ | M3 | 27/10 |
+| V27 | Mục 3.2 DFS và chương 5 Thực nghiệm (5.1–5.3, 5.5) | M3 | 28/10 |
+| V32 | Nhận xét kết quả DFS (mục 5.4.2) | M3 | 28/10 |
 
-| ID | Việc | Mốc | Hạn | Đọc chéo | Trạng thái |
-|---|---|---|---|---|---|
-| V18 | Chọn công nghệ 3D; vẽ bàn từ file màn | M1 | 2026-10-21 | TV2 | Chưa bắt đầu |
-| V19 | Chơi tay bằng engine thật (lăn, rơi, thắng) | M1 | 2026-10-21 | TV2 | Chưa bắt đầu |
-| V20 | Hiển thị ô đặc biệt, cầu, tách khối; Space đổi khối | M2 | 2026-10-24 | TV2 | Chưa bắt đầu |
-| V21 | New Game, Restart, chọn 33 màn, 4 nút Solve, nút So sánh và nút Hủy (gọi module V39), khối tự lăn, thông báo 4 kết quả | M2 | 2026-10-25 | TV2 | Chưa bắt đầu |
-| V22 | main.py, README, requirements.txt | M3 | 2026-10-27 | TV2 | Chưa bắt đầu |
-| V30 | Chương 4 Cài đặt và giao diện | M3 | 2026-10-27 | TV2 | Chưa bắt đầu |
+**Bảng 1.5.** Việc của TV3 (Nguyễn Bảo Trọng).
+
+| ID | Việc | Mốc | Hạn |
+|---|---|---|---|
+| V03 | Bộ nạp màn và kiểm tra hợp lệ file màn | M1 | 21/10 |
+| V12 | UCS (heapq) đúng trên mê cung có trọng số | M1 | 21/10 |
+| V13 | Hàm chi phí không đồng nhất và lý do | M2 | 22/10 |
+| V05 | Ô dễ vỡ, cầu, công tắc mềm và nặng (toggle, on, off), trạng thái cầu | M2 | 23/10 |
+| V40 | Bộ màn tự sinh S1–S3, dùng BFS kiểm tra | M2 | 24/10 |
+| V14 | UCS giải đủ 33 màn | M2 | 25/10 |
+| V28 | Mục 3.3 UCS và hàm chi phí | M3 | 27/10 |
+| V33 | Nhận xét kết quả UCS (mục 5.4.3) | M3 | 28/10 |
+| V36 | Kịch bản, quay, phụ đề, đăng YouTube công khai | Nộp | 29/10 |
+
+**Bảng 1.6.** Việc của TV4 (Trịnh Vỹ Triết).
+
+| ID | Việc | Mốc | Hạn |
+|---|---|---|---|
+| V15 | A* đúng trên mê cung (h = Manhattan) | M1 | 21/10 |
+| V39 | Module chạy thuật toán ở tiến trình riêng cho giao diện: Hủy, hết giờ 60 giây, So sánh các thuật toán | M2 | 23/10 |
+| V16 | Heuristic $h_M$ và $h_P$ chấp nhận được với hàm chi phí (cả trạng thái đã tách) | M2 | 24/10 |
+| V17 | A* giải đủ 33 màn | M2 | 25/10 |
+| V29 | Mục 3.4 A*, heuristic và chứng minh | M3 | 27/10 |
+| V34 | Nhận xét kết quả A* (mục 5.4.4) | M3 | 28/10 |
+| V35 | Ghép báo cáo; chương 1, chương 6; tài liệu tham khảo; phụ lục AI; xuất PDF | Nộp | 30/10 |
+
+**Bảng 1.7.** Việc của TV5 (Võ Quốc Trung).
+
+| ID | Việc | Mốc | Hạn |
+|---|---|---|---|
+| V18 | Chọn công nghệ 3D; vẽ bàn từ file màn | M1 | 21/10 |
+| V19 | Chơi tay bằng engine thật (lăn, rơi, thắng) | M1 | 21/10 |
+| V20 | Hiển thị ô đặc biệt, cầu, tách khối; Space đổi khối | M2 | 24/10 |
+| V21 | New Game, Restart, chọn 33 màn, nút Giải cho từng thuật toán, nút So sánh và nút Hủy, khối tự lăn, hiện kết quả | M2 | 25/10 |
+| V22 | main.py, README, requirements.txt | M3 | 27/10 |
+| V30 | Chương 4 Cài đặt và giao diện | M3 | 27/10 |

@@ -1,0 +1,315 @@
+\section{1. Phân công và tiến độ}
+
+\subsection{1.1. Thành viên và cách chia việc}
+
+Nhóm 9 có năm thành viên. Nhóm chia việc theo hướng mỗi người một thuật toán: bốn thành viên mỗi người phụ trách một thuật toán tìm kiếm (BFS, DFS, UCS, A*) cùng một phần dùng chung của engine, màn chơi hoặc thực nghiệm; thành viên thứ năm làm giao diện 3D. Phần dùng chung được chia thành các nhóm việc, mỗi nhóm việc có một người chủ chịu trách nhiệm và một người đọc chéo. Các mã TV1 đến TV5 được dùng trong toàn báo cáo (Bảng 1.1).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1155}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.2931}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1609}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.1.} Thành viên, phần việc phụ trách và \% hoàn thành.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mã}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Họ và tên}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{MSSV}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Phần chung phụ trách}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Phần báo cáo được giao}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\% hoàn thành}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mã}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Họ và tên}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{MSSV}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Phần chung phụ trách}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Phần báo cáo được giao}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\% hoàn thành}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+TV1 & Trần Nguyên Tân & 24120438 & BFS & Hợp đồng code chung; engine lõi (bảng lăn, rơi, thắng); tách và ghép khối; ghép module; kiểm thử cài đặt; đóng gói & Chương 2; mục 3.1, 5.4.1 & 100 \% \\
+TV2 & Bùi Quang Tiến & 24120462 & DFS & Chuyển 33 màn gốc; script đo và công cụ kiểm tra số liệu; chạy thực nghiệm; bảng và biểu đồ & Mục 3.2, 5.1--5.3, 5.4.2, 5.5; Phụ lục A & 100 \% \\
+TV3 & Nguyễn Bảo Trọng & 24120476 & UCS & Ô dễ vỡ, công tắc, cầu; hàm chi phí; bộ nạp và kiểm tra file màn; bộ màn tự sinh; video & Mục 3.3, 5.4.3 & 100 \% \\
+TV4 & Trịnh Vỹ Triết & 24120474 & A* & Hai heuristic và chứng minh; module chạy thuật toán ở tiến trình riêng cho giao diện; ghép báo cáo & Chương 1, 6; mục 3.4, 5.4.4; tài liệu tham khảo; Phụ lục B & 100 \% \\
+TV5 & Võ Quốc Trung & 24120478 & (không) & Giao diện 3D bằng Ursina; \texttt{main.\allowbreak{}py}; README và \texttt{requirements.\allowbreak{}txt} & Chương 4 & 100 \% \\
+\end{longtable}
+
+\subsection{1.2. Cách tính \% hoàn thành}
+
+Theo đề bài {[}1{]} (mục 3.6), điểm cá nhân bằng điểm nhóm nhân với \% hoàn thành của thành viên đó. Nhóm tính \% hoàn thành theo bảng việc ở mục 1.4, không theo cảm nhận: \% của một thành viên là tỉ lệ số việc được giao đã hoàn thành. Một việc tính là hoàn thành khi sản phẩm của nó (code, test, dữ liệu hoặc phần báo cáo) đã được gộp vào nhánh chính của repository nhóm và toàn bộ test vẫn qua. Khi nộp bài, mọi việc trong Bảng 1.3 đến 1.7 đều đạt điều kiện này, nên mỗi thành viên đạt 100 \%.
+
+\subsection{1.3. Tiến độ và cách làm việc}
+
+Nhóm làm việc trên một repository GitHub chung. Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (khoảng 250 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.7083}}@{}}
+\caption{\textbf{Bảng 1.2.} Các mốc tiến độ.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ngày}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kết quả cần có}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ngày}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kết quả cần có}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Khởi động & 15--19/10 & Đọc đề, chọn cách chia việc, chốt hợp đồng code chung, chuẩn bị dữ liệu 33 màn gốc \\
+M1 & 21/10 & Engine lõi, bộ nạp màn; bốn thuật toán chạy đúng trên mê cung mẫu; giao diện vẽ bàn và chơi tay \\
+M2 & 25/10 & Ô đặc biệt, cầu, tách khối; bốn thuật toán giải đủ 33 màn; hàm chi phí, heuristic; script đo; giao diện đủ nút \\
+M3 & 28/10 & Chạy thực nghiệm, bảng và biểu đồ; nháp các chương báo cáo \\
+Nộp & 31/10 & Lần đo chính thức, báo cáo hoàn chỉnh, video, kiểm thử cài đặt, đóng gói \\
+\end{longtable}
+
+\subsection{1.4. Bảng việc}
+
+Bảng 1.3 đến 1.7 liệt kê việc của từng thành viên, kèm mốc và hạn.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.3.} Việc của TV1 (Trần Nguyên Tân).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+V01 & Chốt hợp đồng code chung (State, Problem, Solver, SearchResult) và mê cung mẫu GridMaze; dựng khung code & M1 & 19/10 \\
+V02 & Engine lõi: bảng chuyển 12 trường hợp, rơi, thắng & M1 & 20/10 \\
+V08 & BFS và đếm chỉ số (nút mở rộng, nút sinh, biên lớn nhất, đã thăm) & M1 & 21/10 \\
+V06 & Công tắc tách, điều khiển 2 khối con, ghép khi kề & M2 & 23/10 \\
+V04 & Ghép ô đặc biệt và tách khối vào result(); chạy lại toàn bộ test & M2 & 24/10 \\
+V09 & BFS giải đủ 33 màn & M2 & 25/10 \\
+V26 & Chương 2 Mô hình hóa bài toán và mục 3.1 BFS & M3 & 27/10 \\
+V31 & Nhận xét kết quả BFS (mục 5.4.1) & M3 & 28/10 \\
+V37 & Kiểm thử cài đặt theo README trong môi trường mới & Nộp & 29/10 \\
+V38 & Đóng gói file nộp & Nộp & 30/10 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.4.} Việc của TV2 (Bùi Quang Tiến).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+V07 & Định dạng file màn và script chuyển 33 màn gốc (bổ sung màn 3) & M1 & 20/10 \\
+V10 & DFS (hoặc IDS) có tập đã thăm, thứ tự hành động cố định & M1 & 21/10 \\
+V23 & Script đo: thời gian, bộ nhớ, timeout, xuất CSV & M2 & 24/10 \\
+V11 & DFS giải đủ 33 màn & M2 & 25/10 \\
+V24 & Chạy thử 4 thuật toán × 33 màn, thêm A* với \(h_M\) và bộ màn tự sinh & M2 & 25/10 \\
+V25 & Chạy chính thức; bảng và biểu đồ & M3 & 27/10 \\
+V27 & Mục 3.2 DFS và chương 5 Thực nghiệm (5.1--5.3, 5.5) & M3 & 28/10 \\
+V32 & Nhận xét kết quả DFS (mục 5.4.2) & M3 & 28/10 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.5.} Việc của TV3 (Nguyễn Bảo Trọng).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+V03 & Bộ nạp màn và kiểm tra hợp lệ file màn & M1 & 21/10 \\
+V12 & UCS (heapq) đúng trên mê cung có trọng số & M1 & 21/10 \\
+V13 & Hàm chi phí không đồng nhất và lý do & M2 & 22/10 \\
+V05 & Ô dễ vỡ, cầu, công tắc mềm và nặng (toggle, on, off), trạng thái cầu & M2 & 23/10 \\
+V40 & Bộ màn tự sinh S1--S3, dùng BFS kiểm tra & M2 & 24/10 \\
+V14 & UCS giải đủ 33 màn & M2 & 25/10 \\
+V28 & Mục 3.3 UCS và hàm chi phí & M3 & 27/10 \\
+V33 & Nhận xét kết quả UCS (mục 5.4.3) & M3 & 28/10 \\
+V36 & Kịch bản, quay, phụ đề, đăng YouTube công khai & Nộp & 29/10 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.6.} Việc của TV4 (Trịnh Vỹ Triết).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+V15 & A* đúng trên mê cung (h = Manhattan) & M1 & 21/10 \\
+V39 & Module chạy thuật toán ở tiến trình riêng cho giao diện: Hủy, hết giờ 60 giây, So sánh các thuật toán & M2 & 23/10 \\
+V16 & Heuristic \(h_M\) và \(h_P\) chấp nhận được với hàm chi phí (cả trạng thái đã tách) & M2 & 24/10 \\
+V17 & A* giải đủ 33 màn & M2 & 25/10 \\
+V29 & Mục 3.4 A*, heuristic và chứng minh & M3 & 27/10 \\
+V34 & Nhận xét kết quả A* (mục 5.4.4) & M3 & 28/10 \\
+V35 & Ghép báo cáo; chương 1, chương 6; tài liệu tham khảo; phụ lục AI; xuất PDF & Nộp & 30/10 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 1.7.} Việc của TV5 (Võ Quốc Trung).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ID}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Việc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mốc}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạn}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+V18 & Chọn công nghệ 3D; vẽ bàn từ file màn & M1 & 21/10 \\
+V19 & Chơi tay bằng engine thật (lăn, rơi, thắng) & M1 & 21/10 \\
+V20 & Hiển thị ô đặc biệt, cầu, tách khối; Space đổi khối & M2 & 24/10 \\
+V21 & New Game, Restart, chọn 33 màn, nút Giải cho từng thuật toán, nút So sánh và nút Hủy, khối tự lăn, hiện kết quả & M2 & 25/10 \\
+V22 & main.py, README, requirements.txt & M3 & 27/10 \\
+V30 & Chương 4 Cài đặt và giao diện & M3 & 27/10 \\
+\end{longtable}

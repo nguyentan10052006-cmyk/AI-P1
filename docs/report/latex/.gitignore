@@ -1,0 +1,11 @@
+# File do biên dịch LaTeX sinh ra (Report.pdf được chép ra docs/report/)
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+Report.pdf

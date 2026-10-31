@@ -1,0 +1,67 @@
+\subsubsection{5.4.3. Nhận xét kết quả UCS}
+
+Số liệu lấy từ lần đo ở mục 5.3. Số đếm của UCS phụ thuộc hàm chi phí (Bảng 3.3.1) nhưng không phụ thuộc máy chạy; thời gian và bộ nhớ phụ thuộc máy, nên chỉ so tỉ lệ giữa các thuật toán.
+
+\textbf{UCS có cho lời giải rẻ nhất không?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Bảng 5.8): UCS có tổng chi phí nhỏ nhất ở 33/33 màn gốc, bằng A* với cả hai heuristic. Số bước của UCS bằng số bước tối ưu ở 33/33 màn: không màn nào có đường rẻ hơn mà dài hơn. Tổng chi phí của BFS lớn hơn UCS ở 2 màn (17 và 23, Bảng 3.3.2); của DFS lớn hơn ở 30/33 màn, với tỉ lệ trung vị 1,72.
+\item
+  \emph{Giải thích:} với hàm chi phí của nhóm, mỗi bước tốn từ 1,10 đến 1,71, nên đường ít bước nhất gần như luôn là đường rẻ nhất. UCS chỉ khác BFS khi có nhiều đường cùng số bước ít nhất: khi đó UCS chọn đường ít dựng khối hơn (màn 17) hoặc ít đè ô dễ vỡ hơn (màn 23).
+\item
+  \emph{Ý nghĩa:} trên 33 màn gốc, lợi ích về chi phí của UCS nhỏ (dưới 1 \% ở hai màn khác BFS), nhưng đó là lợi ích \textbf{được bảo đảm}: không cần biết trước đường nào rẻ.
+\end{itemize}
+
+\textbf{Tối ưu theo chi phí phải trả bao nhiêu nút?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} tổng số nút mở rộng trên 33 màn là 35 281 với UCS, 33 459 với BFS, tức UCS mở rộng nhiều hơn 5,4 \%. BFS mở rộng ít hơn UCS ở 29/33 màn, bằng ở 3 màn và nhiều hơn ở 1 màn. Trung vị tỉ lệ nút UCS/BFS theo màn là 1,03; lớn nhất 1,44 ở màn 8 (594 so với 412). UCS thăm nhiều trạng thái hơn BFS ở 30/33 màn.
+\item
+  \emph{Giải thích:} có hai nguyên nhân. Thứ nhất, BFS kiểm tra đích khi sinh nút, còn UCS kiểm tra khi lấy ra, nên UCS mở rộng thêm mọi trạng thái có chi phí nhỏ hơn lời giải. Thứ hai, với chi phí không đồng nhất, ``đường đồng mức'' chi phí của UCS không trùng với các lớp độ sâu của BFS: một trạng thái nhiều bước hơn nhưng toàn bước rẻ (khối nằm lăn, khối con đi) vẫn được mở rộng trước một trạng thái ít bước hơn nhưng phải dựng khối. Màn 8 có lời giải ngắn (10 bước) trong một không gian chủ yếu gồm trạng thái đã tách, nơi mỗi bước chỉ tốn 1,10, nên UCS mở rộng thêm nhiều trạng thái đã tách rẻ trước khi lấy được đích ra.
+\item
+  \emph{Ý nghĩa:} tính tối ưu theo chi phí tốn thêm một ít nút so với BFS, và mức thêm tăng ở các màn có nhiều bước rẻ (nhóm G5).
+\end{itemize}
+
+\textbf{Thời gian và bộ nhớ.}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} UCS không nhanh hơn BFS ở màn gốc nào. Tổng thời gian tìm kiếm trên 33 màn là 1 163,2 ms với UCS, 898,2 ms với BFS (chậm hơn 29,5 \%). Thời gian trung vị cho mỗi nút mở rộng là 18,6 µs với UCS, 15,1 µs với BFS. Bộ nhớ đỉnh của UCS lớn hơn BFS ở 25/33 màn; trung vị ở nhóm G5 là 1 418,9 KB so với 1 160,2 KB (Bảng 5.7).
+\item
+  \emph{Giải thích:} thời gian chậm hơn đến từ hai phần: UCS mở rộng nhiều nút hơn (+5,4 \%), và mỗi nút tốn hơn khoảng 23 \%. Mỗi lần đưa vào hay lấy ra khỏi \texttt{heapq} tốn \(O(\log n)\), trong khi \texttt{deque} của BFS tốn \(O(1)\); mỗi nút con UCS còn gọi hàm chi phí. Bộ nhớ lớn hơn vì UCS thăm nhiều trạng thái hơn, và heap còn giữ các mục cũ chờ bỏ qua (lazy deletion): tổng số nút sinh của UCS là 151 840, của BFS là 142 780.
+\item
+  \emph{Ý nghĩa:} trên bàn nhỏ, chênh lệch tuyệt đối chỉ vài chục mili-giây trên cả 33 màn, nên không ảnh hưởng việc dùng UCS trong giao diện.
+\end{itemize}
+
+\textbf{Khi bàn lớn dần (bộ S1).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} ở sân trống 200 × 200, UCS mở rộng 119 599 nút, BFS 119 589, tức gần như toàn bộ 119 600 trạng thái. UCS mất 3 357,7 ms, BFS 2 195,6 ms (gấp 1,53 lần); bộ nhớ đỉnh 49,5 MB so với 43,7 MB. Cả hai cho cùng lời giải 266 bước, cùng tổng chi phí 364,10.
+\item
+  \emph{Giải thích:} đích ở góc xa nhất, nên thuật toán nào bảo đảm tối ưu cũng phải thăm gần hết sân. Khi số nút bằng nhau, chênh lệch thời gian chính là chi phí của heap so với hàng đợi FIFO, và tăng dần theo \(\log n\) khi heap lớn lên (tỉ lệ thời gian UCS/BFS là 1,34 ở N = 10, 1,53 ở N = 200).
+\item
+  \emph{Ý nghĩa:} trên không gian lớn mà mọi bước gần như cùng giá, UCS không có lợi gì so với BFS mà chậm hơn rõ rệt.
+\end{itemize}
+
+\textbf{Khi có thêm công tắc (bộ S2).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} số trạng thái UCS thăm tăng từ 173 (k = 0) lên 828 (k = 10), gấp 4,8 lần; của BFS tăng từ 145 lên 414, gấp 2,9 lần. A* với \(h_P\) chỉ thăm 60 đến 89 trạng thái.
+\item
+  \emph{Giải thích:} lời giải dài 6 bước, tổng chi phí 8,22. UCS phải mở rộng mọi trạng thái có chi phí nhỏ hơn 8,22, tức mọi trạng thái tới được bằng tối đa khoảng 7 bước rẻ, trong khi BFS dừng ngay khi sinh ra đích ở độ sâu 6. Đi sâu hơn một bước là đủ để chạm thêm nhiều công tắc, và mỗi cấu hình cầu mới là một trạng thái mới.
+\item
+  \emph{Ý nghĩa:} cầu làm không gian của UCS lớn lên nhanh hơn của BFS, vì UCS duyệt ``quả cầu chi phí'' quanh trạng thái đầu một cách đầy đủ. Đây là chỗ heuristic của A* có ích nhất.
+\end{itemize}
+
+\textbf{Khi không có lời giải (bộ S3).} UCS duyệt hết mọi trạng thái tới được rồi trả \texttt{no\_\allowbreak{}solution}: 280 nút ở \texttt{s3\_\allowbreak{}10}, 7 400 nút ở \texttt{s3\_\allowbreak{}50}, đúng bằng BFS và DFS, nhưng chậm hơn (164,3 ms so với 122,9 ms của BFS ở \texttt{s3\_\allowbreak{}50}). Chỉ A* với \(h_P\) kết luận ngay mà không mở rộng nút nào (mục 5.4.4).
+
+\textbf{Ý nghĩa.} Dùng UCS khi chi phí các bước khác nhau và cần lời giải rẻ nhất có bảo đảm, ví dụ tính năng lượng hay thời gian của một robot lăn khối. Với hàm chi phí của nhóm, UCS cho lời giải gần như trùng BFS nhưng chậm hơn khoảng 30 \%, nên khi chỉ cần ít bước nhất thì BFS là đủ. Khi có heuristic chấp nhận được, A* cho cùng tổng chi phí với ít nút hơn (mục 5.4.4).

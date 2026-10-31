@@ -1,0 +1,86 @@
+\subsubsection{5.4.1. Nhận xét kết quả BFS}
+
+Số liệu lấy từ lần đo ở mục 5.3 (Bảng 5.2), với hàm chi phí ở Bảng 3.3.1; thời gian là trung vị của 5 lần đo. Số bước và số nút của BFS và DFS là tất định. Số nút của UCS và A* chỉ đổi khi đổi hàm chi phí. Thời gian và bộ nhớ phụ thuộc máy, nên chỉ nên so tỉ lệ giữa các thuật toán.
+
+\textbf{Lời giải của BFS có tối ưu không?} Theo số bước thì có: BFS ra đúng số bước tối ưu tham khảo ở 33/33 màn gốc, và lời giải nào phát lại trên engine cũng tới đích. Theo chi phí thì không bảo đảm. BFS có tổng chi phí bằng UCS ở 31/33 màn; hai màn còn lại là màn 17 (140,42 so với 140,10) và màn 23 (101,58 so với 100,58). Ở hai màn này, nhiều đường có cùng số bước ít nhất. BFS lấy đường đi trước theo thứ tự U, D, L, R, còn UCS chọn đường rẻ hơn trong số đó. Ở màn 17, đường của UCS dựng khối đứng ít hơn một lần và thay bằng hai lần lăn khối nằm. Ở màn 23, đường của UCS có ít hơn hai bước đặt khối lên ô dễ vỡ (21 so với 23 bước). Chênh lệch không quá 1 \%, vì mọi chi phí bước đều nằm trong khoảng 1,10 đến 1,71, nên đường ít bước nhất gần như luôn là đường rẻ nhất.
+
+\textbf{BFS mở rộng bao nhiêu nút so với các thuật toán khác?} Bảng 5.5 cho trung vị số nút mở rộng theo nhóm màn.
+
+\begin{itemize}
+\tightlist
+\item
+  BFS mở rộng ít nút hơn UCS ở 29/33 màn (tổng 33 459 so với 35 281). Có hai lý do. Thứ nhất, BFS kiểm tra đích khi sinh nút nên dừng sớm hơn một lớp; UCS phải chờ tới khi lấy đích ra khỏi hàng đợi. Thứ hai, với chi phí không đồng nhất, UCS phải mở rộng mọi trạng thái rẻ hơn lời giải tối ưu, kể cả những trạng thái nhiều bước hơn nhưng rẻ hơn.
+\item
+  A* với \(h_P\) mở rộng ít nút hơn BFS ở 21/33 màn, bằng BFS ở 5 màn và nhiều hơn ở 7 màn. Tính trên tổng, A* chỉ ít hơn khoảng 2 \% (32 712 so với 33 459). Heuristic ⌈Φ/2⌉ là cận dưới của số bước, trong khi mỗi bước tốn 1,1 đến 1,7, nên heuristic chỉ cắt được một phần nhỏ không gian (mục 5.4.4).
+\item
+  DFS mở rộng ít nút nhất (tổng 21 041) nhưng lời giải dài hơn nhiều (mục 5.4.2). Số nút ít của DFS không có nghĩa là DFS tốt hơn: DFS dừng ở đích đầu tiên trên nhánh đang đi, BFS phải bảo đảm không còn lời giải nào ngắn hơn.
+\end{itemize}
+
+\textbf{Công tìm kiếm của BFS dồn vào đâu?} Vào các màn có công tắc tách. Trung vị số nút mở rộng của nhóm G5 (2 851) gấp gần 9 lần nhóm G3 (325), dù lời giải ở G3 thường dài hơn (trung vị 65 bước, so với 57 bước ở G5). Như mục 2.3 đã chỉ ra, trạng thái đã tách chiếm 90--95 \% không gian ở các màn này, và hệ số phân nhánh tăng từ khoảng 2 lên khoảng 5 (mục 3.1.4). Cầu làm không gian lớn lên ít hơn nhiều: số cấu hình cầu tới được ở 33 màn nhiều nhất là 21.
+
+\textbf{Thời gian và bộ nhớ.} Trên 33 màn gốc, tổng thời gian tìm kiếm của BFS là 898,2 ms, thấp hơn UCS (1 163,2 ms) và A* (1 130,6 ms với \(h_P\), 1 193,3 ms với \(h_M\)). Thời gian trung vị cho mỗi nút mở rộng của BFS (15,1 µs) gần bằng DFS (15,8 µs) và thấp hơn UCS (18,6 µs) và A* (19,2 µs với \(h_P\), 19,9 µs với \(h_M\)). Hàng đợi \texttt{deque} thêm và lấy với chi phí \(O(1)\), còn hàng đợi ưu tiên \texttt{heapq} tốn \(O(\log n)\) mỗi lần, cộng thêm phần tính chi phí và heuristic. Trung vị bộ nhớ đỉnh của BFS ở nhóm G5 là 1 160,2 KB, ít hơn UCS (1 418,9 KB) vì BFS thăm ít trạng thái hơn (Bảng 5.7). Như mục 3.1.4 đã nêu, bộ nhớ chủ yếu nằm ở tập đã thăm và bảng cha.
+
+\textbf{Khi bàn lớn dần (bộ S1).} S1 là sân trống N × N, xuất phát ở góc trên trái và đích ở góc dưới phải (Bảng 5.4.1).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1131}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1270}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1687}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1687}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1270}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1270}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1687}}@{}}
+\caption{\textbf{Bảng 5.4.1.} BFS trên bộ sân trống S1.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{N}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bộ nhớ đỉnh (MB)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thời gian (ms)}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{N}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bộ nhớ đỉnh (MB)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thời gian (ms)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+10 & 12 & 259 & 273 & 53 & 0,10 & 4,1 \\
+25 & 32 & 1 804 & 1 818 & 122 & 0,73 & 30,9 \\
+50 & 66 & 7 389 & 7 398 & 235 & 2,9 & 122,9 \\
+100 & 132 & 29 779 & 29 793 & 472 & 11,9 & 537,7 \\
+150 & 200 & 67 197 & 67 200 & 703 & 24,0 & 1 160,7 \\
+200 & 266 & 119 589 & 119 598 & 935 & 43,7 & 2 195,6 \\
+\end{longtable}
+
+Đích nằm ở góc xa nhất, nên BFS thăm gần như toàn bộ \(3N^2 - 2N\) trạng thái của sân: ví dụ với N = 200 là 119 598 trên 119 600. Khi N tăng gấp đôi từ 100 lên 200, số nút tăng 4,0 lần, thời gian 4,1 lần, bộ nhớ 3,7 lần, đúng với bậc \(O(N^2)\) của số trạng thái. Biên lớn nhất chỉ tăng tuyến tính theo N (từ 53 lên 935), vì biên của BFS là một ``đường sóng'' lan dần ra từ góc xuất phát. Một lần nữa, bộ nhớ nằm ở tập đã thăm chứ không ở biên.
+
+\textbf{Khi không có lời giải (bộ S3).} BFS duyệt hết mọi trạng thái tới được rồi trả \texttt{no\_\allowbreak{}solution}: 280 nút với vùng 10 × 10 và 7 400 nút với vùng 50 × 50. DFS, UCS và A* với \(h_M\) mở rộng đúng số nút đó, vì thuật toán nào cũng phải duyệt hết mới kết luận được. Chỉ A* với \(h_P\) kết luận ngay mà không mở rộng nút nào, vì \(h_P\) phát hiện ô đích không nối được với vùng xuất phát (mục 3.4).
+
+\textbf{Khi có thêm công tắc (bộ S2).} Số trạng thái BFS đã thăm tăng từ 145 (k = 0) lên 414 (k = 10) và gần như không đổi từ k = 6. Mức tăng nhỏ hơn rất nhiều so với \(2^k\), vì BFS gặp đích ở độ sâu 6, trước khi kịp đi bấm phần lớn các công tắc. Như vậy, cầu chỉ làm tăng công tìm kiếm khi lời giải thật sự phải đi qua các công tắc.
+
+\textbf{Ý nghĩa.} BFS là lựa chọn tốt khi cần lời giải ít bước nhất, ví dụ để gợi ý nước đi cho người chơi. BFS đơn giản, có chi phí mỗi nút thấp nhất trong bốn thuật toán, và trên 33 màn gốc chạy nhanh hơn cả UCS lẫn A\emph{. BFS không phù hợp khi các bước có chi phí khác nhau, vì nó bỏ qua chi phí (màn 17, 23). Trên không gian lớn, BFS cũng không phù hợp vì tốn bộ nhớ tỉ lệ với số trạng thái đã thăm; khi đó A} với heuristic mạnh hơn sẽ cắt được nhiều nút hơn.

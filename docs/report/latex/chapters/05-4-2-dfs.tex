@@ -1,0 +1,136 @@
+\subsubsection{5.4.2. Nhận xét kết quả DFS}
+
+Số liệu lấy từ lần đo ở mục 5.3. Số bước, số đếm, thời gian và bộ nhớ của DFS không phụ thuộc hàm chi phí, vì DFS không dùng chi phí khi chọn nút; chỉ cột tổng chi phí phụ thuộc. Mục này trả lời bốn câu hỏi, mỗi câu theo ba bước: quan sát, giải thích, ý nghĩa.
+
+\textbf{DFS nhanh hay chậm so với BFS?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Trung vị số nút mở rộng và thời gian tìm kiếm của DFS nhỏ hơn BFS ở cả 5 nhóm (Bảng 5.5, 5.6). Ví dụ ở G5: DFS 658 nút, 19,32 ms; BFS 2 851 nút, 92,16 ms.
+  \item
+    Theo từng màn, DFS mở rộng ít nút nhất trong năm cấu hình ở 26/33 màn, và nhanh hơn BFS ở 26/33 màn.
+  \item
+    Có 6 màn DFS mở rộng nhiều hơn BFS: 01, 02, 04, 16, 23, 28 (Hình 5.1).
+  \item
+    Tổng thời gian tìm kiếm trên 33 màn: DFS 565,1 ms, BFS 898,2 ms.
+  \end{itemize}
+\item
+  \emph{Giải thích:} DFS dừng ngay khi nhánh nó đang đi chạm đích. Nếu nhánh đầu tiên (thử lên trước, rồi xuống, trái, phải) tình cờ đi về phía đích, DFS mở rộng ít nút hơn BFS. Nếu không, DFS đi sâu vào các vùng xa đích, và có thể duyệt gần hết không gian trạng thái trước khi gặp đích; đó là trường hợp của 6 màn trên. BFS và DFS có cùng chi phí cho mỗi nút: một lần lấy ra, gọi hàm chuyển cho 4 hoặc 8 hành động, và tra tập đã thăm. Vì vậy chênh lệch thời gian chủ yếu đến từ chênh lệch số nút (Hình 5.2).
+\end{itemize}
+
+\textbf{Lời giải dài gấp bao nhiêu lần tối ưu?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Hình 5.4, Bảng 5.8):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Số bước DFS chia số bước tối ưu: trung vị 1,73 theo màn, trung bình 288,3 \%, lớn nhất 15,83 lần ở màn 23.
+  \item
+    DFS ra đúng số bước tối ưu ở 3 màn: 04, 21, 27. Ví dụ ở màn 1: DFS đi 37 bước, so với 7 bước tối ưu (Bảng 3.2.1).
+  \item
+    Ở sân trống \texttt{s1\_\allowbreak{}200}: DFS đi 35 287 bước, so với 266 bước tối ưu.
+  \item
+    Tổng chi phí của DFS lớn hơn UCS ở 30/33 màn; tỉ lệ trung vị 1,72, lớn nhất 15,17.
+  \end{itemize}
+\item
+  \emph{Giải thích:} DFS không so sánh độ dài giữa các nhánh. Mỗi trạng thái được gán cho cha đầu tiên sinh ra nó, nên lời giải là nhánh DFS đã đi, kể cả các đoạn đi vòng. Với bàn rộng và ít vật cản, đoạn đi vòng càng dài (nhóm S1). Mỗi bước tốn ít nhất 1,10, nên lời giải nhiều bước hơn cũng tốn chi phí hơn; tỉ lệ chi phí (trung vị 1,72) gần bằng tỉ lệ số bước (1,73).
+\end{itemize}
+
+\textbf{Thứ tự hành động ảnh hưởng ra sao?}
+
+Kết quả của DFS phụ thuộc hoàn toàn vào thứ tự U, D, L, R. Thứ tự này cố định và giống nhau ở mọi thuật toán (mục 2.4), nên mọi con số của DFS chỉ đúng với thứ tự đó.
+
+Ví dụ ở các màn S1 (xuất phát ở góc trên trái, đích ở góc dưới phải):
+
+\begin{itemize}
+\tightlist
+\item
+  ở nước đầu, ``lên'' và ``trái'' làm khối rơi khỏi bàn, nên DFS đi ``xuống'' trước, đúng hướng đích;
+\item
+  nhưng ở mọi trạng thái sau đó mà ``lên'' hợp lệ, DFS đều thử ``lên'' trước;
+\item
+  vì vậy, khi đã xuống tới mép dưới, khối lại lăn ngược lên, và lời giải đi zíc zắc qua bàn thay vì đi thẳng tới đích.
+\end{itemize}
+
+\textbf{Nhóm chưa đo} DFS với các thứ tự hành động khác. Biên độ thay đổi theo thứ tự là một hạn chế của thực nghiệm này.
+
+\textbf{Ở màn không có lời giải (S3), DFS dừng thế nào?}
+
+DFS của nhóm có tập đã thăm, nên mỗi trạng thái được mở rộng nhiều nhất một lần. Ở màn không có lời giải, DFS duyệt hết các trạng thái tới được từ trạng thái đầu rồi trả \texttt{no\_\allowbreak{}solution}. Nó không lặp vô hạn, và không cần timeout để dừng (mục 3.2.5; test \texttt{test\_\allowbreak{}no\_\allowbreak{}solution\_\allowbreak{}when\_\allowbreak{}gap\_\allowbreak{}is\_\allowbreak{}two\_\allowbreak{}tiles}).
+
+\emph{Quan sát}, đúng như dự đoán:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1435}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1435}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1435}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1435}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1991}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2269}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thời gian}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bộ nhớ}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s3\_\allowbreak{}10} & DFS & 280 & 280 & 4,37 ms & 105,09 KB \\
+\texttt{s3\_\allowbreak{}10} & BFS & 280 & 280 & 4,39 ms & 106,02 KB \\
+\texttt{s3\_\allowbreak{}50} & DFS & 7 400 & 7 400 & 123,51 ms & 3 003,11 KB \\
+\texttt{s3\_\allowbreak{}50} & BFS & 7 400 & 7 400 & 122,87 ms & 3 004,41 KB \\
+\end{longtable}
+}
+
+Khi phải duyệt hết, DFS và BFS tốn gần như nhau. Nếu nhóm chọn IDS chỉ chặn lặp trên đường đi hiện tại, IDS sẽ hết giờ ở các màn này. Đây là một lý do nhóm chọn DFS (mục 3.2.2).
+
+\textbf{Bộ nhớ.}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Bộ nhớ đỉnh của DFS nhỏ hơn BFS ở 26/33 màn; trung vị nhỏ hơn ở 4/5 nhóm (G2: DFS 46,6 KB, BFS 43,5 KB; Bảng 5.7).
+  \item
+    Ngược lại, \textbf{biên lớn nhất của DFS lớn hơn BFS} ở 32/33 màn: trung vị 55 so với 20; ở \texttt{s1\_\allowbreak{}200} là 55 082 so với 935.
+  \item
+    DFS thăm ít trạng thái hơn BFS ở 25/33 màn.
+  \end{itemize}
+\item
+  \emph{Giải thích:} DFS dạng tìm kiếm trên đồ thị đẩy mọi con chưa thăm vào ngăn xếp, nên biên lớn hơn hàng đợi của BFS. Nhưng bộ nhớ chủ yếu nằm ở tập đã thăm và bảng cha, vốn tỉ lệ với số trạng thái đã thăm (Hình 5.3). Vì DFS thường dừng sớm hơn và thăm ít trạng thái hơn, tổng bộ nhớ vẫn nhỏ hơn. Lợi thế bộ nhớ ``O(b·m)'' của DFS dạng cây trong lý thuyết không áp dụng ở đây (mục 3.2.5).
+\end{itemize}
+
+\textbf{Ý nghĩa.}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Dùng DFS khi} chỉ cần biết màn có giải được hay không, hoặc cần một lời giải bất kỳ thật nhanh: trên 33 màn gốc, DFS ít nút, nhanh và ít bộ nhớ nhất trong đa số màn.
+\item
+  \textbf{Không dùng DFS khi} cần lời giải để hiển thị cho người chơi hay để so chi phí: lời giải trung vị dài gấp 1,73 lần tối ưu, và có thể dài gấp hàng chục tới hàng trăm lần trên bàn rộng (\texttt{s1\_\allowbreak{}200}: 35 287 so với 266 bước).
+\end{itemize}

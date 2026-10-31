@@ -1,0 +1,124 @@
+\subsubsection{5.4.4. Nhận xét kết quả A*}
+
+Số liệu lấy từ lần đo ở mục 5.3, với hàm chi phí ở Bảng 3.3.1. Cả hai heuristic \(h_M\) và \(h_P\) cho cùng tổng chi phí với UCS ở 33/33 màn, và không màn nào A* mở rộng nhiều nút hơn UCS (Bảng 3.4.1).
+
+\textbf{\(h_M\) và \(h_P\) bớt được bao nhiêu nút so với UCS?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Bảng 5.4.4, Hình 5.5): trên tổng 33 màn gốc, A* với \(h_P\) mở rộng 32 712 nút, ít hơn UCS (35 281) 7,3 \%; với \(h_M\) là 33 474 nút, ít hơn 5,1 \%. Theo từng màn, trung vị mức bớt là 5,7 \% với \(h_P\) và 4,3 \% với \(h_M\). Mức bớt lớn nhất ở màn 1 (60,6 \% với cả hai), rồi màn 2 (22,9 \% với \(h_P\)), màn 5 (17,6 \%), màn 8 (17,2 \%). Hai màn 11 và 18 không bớt được nút nào.
+\item
+  \emph{Giải thích:} màn 1 và màn 2 có đường đi gần như thẳng về phía đích, nên heuristic hướng A* đi đúng ngay từ đầu. Bốn màn bớt ít nhất (11, 18, 29, 14: dưới 0,5 \%) đều thuộc nhóm G3, nơi lời giải phải đi tới công tắc để mở cầu rồi mới về đích. Cả hai heuristic coi mọi cầu là mở, nên không thấy đoạn đi vòng này, và A* phải mở rộng gần hết vùng UCS mở rộng.
+\end{itemize}
+
+\textbf{Vì sao mức bớt nhỏ?} Ba lý do.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Heuristic có dạng \(\lceil \Phi/2 \rceil\): khoảng cách được chia đôi vì một lần lăn có thể đưa khối lại gần đích 2 ô (mục 3.4.3). Trên đường đi thật, khối hiếm khi tiến đủ 2 ô mỗi bước, nên \(h\) thường thấp hơn hẳn số bước thật còn lại.
+\item
+  Heuristic đếm cận dưới của \textbf{số bước}, còn mỗi bước tốn từ 1,10 đến 1,71. Ngay cả khi ước lượng số bước đúng hoàn toàn, \(h\) vẫn thấp hơn chi phí thật khoảng 9 \% trở lên, vì mỗi bước tốn ít nhất 1,10 (\(1 - 1/1{,}10 \approx 0{,}09\)). Mọi trạng thái có \(g + h < C^*\) đều phải được mở rộng, và khi \(h\) thấp thì tập này gần bằng tập \(g < C^*\) của UCS.
+\item
+  Heuristic bỏ qua cầu và công tắc (mục trên).
+\end{enumerate}
+
+Muốn bớt nhiều hơn mà vẫn chấp nhận được, có thể nhân \(h\) với chi phí bước nhỏ nhất 1,10: theo Định lý 1, \(1{,}1\,h(s) \le 1{,}1\,h(s') + 1{,}1 \le 1{,}1\,h(s') + c(s, a, s')\), nên \(1{,}1\,h\) vẫn nhất quán với hàm chi phí này. Cách khác là tính khoảng cách theo tư thế khối thay cho khoảng cách ô (chương 6). Nhóm giữ dạng hiện tại vì chứng minh ở mục 3.4.4 đúng với \textbf{mọi} hàm chi phí có bước tốn ít nhất 1, không phụ thuộc các mức cụ thể ở Bảng 3.3.1.
+
+\textbf{\(h_P\) so với \(h_M\).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} \(h_P\) mở rộng ít nút hơn \(h_M\) ở 22 màn, bằng ở 11 màn, và không màn nào nhiều hơn. Chênh lệch rõ nhất ở các màn có tường hoặc hố chắn giữa khối và đích: màn 10 (UCS 3 505, \(h_M\) 3 356, \(h_P\) 3 086), màn 15 (3 031 / 2 821 / 2 715), màn 19 (224 / 216 / 200), màn 2 (279 / 228 / 215).
+\item
+  \emph{Giải thích:} \(D_P\) là đường đi ngắn nhất trên các ô không trống, nên \(D_P \ge D_M\) ở mọi ô (mục 3.4.3). Ở màn ít vật cản, đường ngắn nhất gần như trùng đường Manhattan, nên hai heuristic bằng nhau.
+\end{itemize}
+
+\textbf{Dựng bảng \(h_P\) tốn bao lâu và có đáng không?}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} phần chuẩn bị (tổng thời gian trừ thời gian tìm kiếm, gồm nạp màn và \texttt{prepare()}) có trung vị 0,47 ms mỗi màn với \(h_P\), so với 0,37 ms với \(h_M\) và 0,34 ms với UCS: dựng bảng \(D_P\) bằng 0-1 BFS trên bàn 10 × 15 chỉ tốn khoảng 0,1 ms. Thời gian trung vị cho mỗi nút mở rộng là 18,6 µs với UCS, 19,2 µs với \(h_P\) và 19,9 µs với \(h_M\). Tổng thời gian tìm kiếm trên 33 màn: A* với \(h_P\) 1 130,6 ms, ít hơn UCS (1 163,2 ms) 2,8 \%; A* với \(h_M\) 1 193,3 ms, chậm hơn UCS 2,6 \%. Tổng bộ nhớ đỉnh trên 33 màn: UCS 14 946 KB, \(h_P\) 14 486 KB, \(h_M\) 14 472 KB.
+\item
+  \emph{Giải thích:} \(h_P\) chỉ tra bảng, còn \(h_M\) phải tính khoảng cách Manhattan tới đích và tới mọi công tắc tách cho mỗi nút. Vì vậy \(h_P\) vừa bớt nhiều nút hơn vừa rẻ hơn khi tính. Phần nút bớt được của \(h_M\) (5,1 \%) không bù được thời gian tính heuristic, nên \(h_M\) chậm hơn UCS.
+\item
+  \emph{Ý nghĩa:} dựng bảng \(h_P\) là đáng. Trên bộ 33 màn nhỏ, mọi khác biệt về thời gian chỉ vài chục mili-giây trên tổng cả bộ.
+\end{itemize}
+
+\textbf{Khi bàn lớn dần (bộ S1).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} trên sân trống, \(h_P\) và \(h_M\) cho cùng số nút ở mọi kích thước, và gần như không bớt được nút nào: ở N = 200, A* mở rộng 119 597 nút, UCS 119 599. A* với \(h_P\) mất 3 439,2 ms, chậm hơn UCS (3 357,7 ms) 2,4 \%, và tốn 54,6 MB bộ nhớ so với 49,5 MB của UCS.
+\item
+  \emph{Giải thích:} sân không có vật cản, nên \(D_P = D_M\). Đích ở góc xa nhất, lời giải 266 bước tốn 364,10, trong khi \(h\) ở trạng thái đầu chỉ là \(\lceil 398/2 \rceil = 199\). Hầu như mọi trạng thái trên sân có \(g + h < 364{,}10\), nên A* vẫn phải mở rộng gần hết sân như UCS, và phải trả thêm chi phí tính \(h\) cùng bảng \(D_P\) \(N \times N\).
+\item
+  \emph{Ý nghĩa:} heuristic đếm số bước chỉ có ích khi nó sát chi phí thật. Trên bàn lớn và trống, A* với các heuristic này không có lợi thế so với UCS.
+\end{itemize}
+
+\textbf{Khi có công tắc (bộ S2) và khi không có lời giải (bộ S3).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} ở S2, A* với \(h_P\) chỉ mở rộng 26 đến 30 nút và thăm 60 đến 89 trạng thái, trong khi UCS mở rộng 144 đến 413 nút và thăm 173 đến 828 trạng thái. Ở S3, A* với \(h_P\) kết luận không có lời giải với 0 nút mở rộng (0,01 ms ở \texttt{s3\_\allowbreak{}50}); A* với \(h_M\) duyệt hết 7 400 trạng thái như UCS (184,2 ms).
+\item
+  \emph{Giải thích:} ở S2, đích nằm thẳng phía trước, nên heuristic sát số bước thật và A* đi thẳng tới đích mà không đi bấm công tắc nào. Ở S3, đích nằm ở vùng không nối được với vùng xuất phát, nên mọi ô của khối có \(D_P = \infty\) và \(h_P = \infty\) ngay ở trạng thái đầu (Bổ đề 2, mục 3.4.4). \(h_M\) không biết tường và hố nên không phát hiện được.
+\item
+  \emph{Ý nghĩa:} lợi ích lớn nhất của \(h_P\) là cắt các ngõ cụt và phát hiện màn không có lời giải; khi heuristic sát chi phí thật (S2), A* bớt được phần lớn không gian mà UCS phải duyệt.
+\end{itemize}
+
+\begin{longtable}[]{@{}llllllll@{}}
+\caption{\textbf{Bảng 5.4.4.} Số nút mở rộng của UCS và A* theo từng màn gốc. ``Bớt'' là phần trăm nút ít hơn UCS.}\tabularnewline
+\toprule\noalign{}
+\textbf{Màn} & \textbf{Nhóm} & \textbf{Số bước} & \textbf{UCS} & \textbf{A* \(h_M\)} & \textbf{A* \(h_P\)} & \textbf{Bớt (\(h_M\))} & \textbf{Bớt (\(h_P\))} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Màn} & \textbf{Nhóm} & \textbf{Số bước} & \textbf{UCS} & \textbf{A* \(h_M\)} & \textbf{A* \(h_P\)} & \textbf{Bớt (\(h_M\))} & \textbf{Bớt (\(h_P\))} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+01 & G1 & 7 & 66 & 26 & 26 & 60,6 \% & 60,6 \% \\
+02 & G3 & 17 & 279 & 228 & 215 & 18,3 \% & 22,9 \% \\
+03 & G1 & 19 & 90 & 84 & 84 & 6,7 \% & 6,7 \% \\
+04 & G2 & 28 & 70 & 68 & 68 & 2,9 \% & 2,9 \% \\
+05 & G3 & 33 & 312 & 268 & 257 & 14,1 \% & 17,6 \% \\
+06 & G1 & 35 & 110 & 106 & 106 & 3,6 \% & 3,6 \% \\
+07 & G3 & 44 & 181 & 176 & 176 & 2,8 \% & 2,8 \% \\
+08 & G5 & 10 & 594 & 508 & 492 & 14,5 \% & 17,2 \% \\
+09 & G5 & 24 & 749 & 684 & 666 & 8,7 \% & 11,1 \% \\
+10 & G5 & 57 & 3 505 & 3 356 & 3 086 & 4,3 \% & 12,0 \% \\
+11 & G3 & 47 & 186 & 186 & 186 & 0,0 \% & 0,0 \% \\
+12 & G3 & 65 & 321 & 297 & 291 & 7,5 \% & 9,3 \% \\
+13 & G2 & 46 & 136 & 132 & 132 & 2,9 \% & 2,9 \% \\
+14 & G3 & 67 & 460 & 459 & 458 & 0,2 \% & 0,4 \% \\
+15 & G5 & 57 & 3 031 & 2 821 & 2 715 & 6,9 \% & 10,4 \% \\
+16 & G5 & 28 & 168 & 160 & 160 & 4,8 \% & 4,8 \% \\
+17 & G3 & 106 & 988 & 955 & 931 & 3,3 \% & 5,8 \% \\
+18 & G3 & 85 & 598 & 598 & 598 & 0,0 \% & 0,0 \% \\
+19 & G3 & 67 & 224 & 216 & 200 & 3,6 \% & 10,7 \% \\
+20 & G5 & 56 & 4 438 & 3 917 & 3 813 & 11,7 \% & 14,1 \% \\
+21 & G3 & 71 & 236 & 224 & 221 & 5,1 \% & 6,4 \% \\
+22 & G3 & 65 & 328 & 311 & 310 & 5,2 \% & 5,5 \% \\
+23 & G5 & 75 & 3 755 & 3 711 & 3 682 & 1,2 \% & 1,9 \% \\
+24 & G5 & 57 & 523 & 511 & 504 & 2,3 \% & 3,6 \% \\
+25 & G3 & 55 & 481 & 459 & 451 & 4,6 \% & 6,2 \% \\
+26 & G5 & 104 & 4 910 & 4 778 & 4 704 & 2,7 \% & 4,2 \% \\
+27 & G4 & 71 & 329 & 313 & 305 & 4,9 \% & 7,3 \% \\
+28 & G5 & 100 & 3 603 & 3 434 & 3 397 & 4,7 \% & 5,7 \% \\
+29 & G3 & 104 & 1 811 & 1 810 & 1 810 & 0,1 \% & 0,1 \% \\
+30 & G4 & 114 & 557 & 548 & 543 & 1,6 \% & 2,5 \% \\
+31 & G4 & 91 & 876 & 804 & 804 & 8,2 \% & 8,2 \% \\
+32 & G3 & 129 & 626 & 611 & 607 & 2,4 \% & 3,0 \% \\
+33 & G3 & 65 & 740 & 715 & 714 & 3,4 \% & 3,5 \% \\
+\textbf{Tổng} & & & \textbf{35 281} & \textbf{33 474} & \textbf{32 712} & \textbf{5,1 \%} & \textbf{7,3 \%} \\
+\end{longtable}
+
+\textbf{Ý nghĩa chung.} A* với \(h_P\) là thuật toán tốt nhất trong năm cấu hình khi cần lời giải rẻ nhất: cùng tổng chi phí với UCS, mở rộng ít nút hơn ở 31/33 màn, nhanh hơn UCS trên tổng 33 màn, và là thuật toán duy nhất nhận ra màn không có lời giải mà không phải duyệt hết. Mức lợi trên 33 màn gốc còn nhỏ vì heuristic đếm số bước trong khi chi phí mỗi bước lớn hơn 1; đây là hướng cải tiến chính (chương 6).

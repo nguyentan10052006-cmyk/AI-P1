@@ -1,0 +1,58 @@
+\section{3. Các thuật toán tìm kiếm}
+
+Bốn thuật toán được cài trong \texttt{Source/\allowbreak{}solvers/\allowbreak{}}. Mỗi thuật toán là một lớp con của \texttt{Solver}, có hàm \texttt{search(problem)} nhận một \texttt{Problem} (chương 2) và trả về một \texttt{SearchResult} gồm kết quả (\texttt{solved}, \texttt{no\_\allowbreak{}solution}), đường đi, tổng chi phí và bốn số đếm: nút mở rộng, nút sinh, biên lớn nhất, trạng thái đã thăm. Nhờ hợp đồng chung này, giao diện (chương 4) và script thực nghiệm (chương 5) gọi bốn thuật toán theo cùng một cách.
+
+Cả bốn thuật toán được nhóm tự viết, chỉ dùng cấu trúc dữ liệu của thư viện chuẩn Python (\texttt{collections.\allowbreak{}deque}, \texttt{list}, \texttt{heapq}), không dùng thư viện tìm kiếm có sẵn. Cả bốn đều là tìm kiếm trên đồ thị (mục 2.9) và duyệt hành động theo cùng một thứ tự cố định (mục 2.4). Bảng 3.1 tóm tắt điểm giống và khác nhau; mỗi mục 3.1 đến 3.4 trình bày ý tưởng, mã giả, tính đầy đủ, tính tối ưu, độ phức tạp và các điểm riêng khi cài đặt.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1750}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1944}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1377}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1457}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0694}}@{}}
+\caption{\textbf{Bảng 3.1.} Tóm tắt bốn thuật toán.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kiểm tra đích}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tránh lặp}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Đầy đủ}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mục}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kiểm tra đích}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tránh lặp}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Đầy đủ}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mục}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BFS & hàng đợi FIFO (\texttt{deque}) & khi sinh nút & tập đã thăm & có & theo số bước & 3.1 \\
+DFS & ngăn xếp (\texttt{list}) & khi sinh nút & tập đã thăm & có (không gian hữu hạn) & không & 3.2 \\
+UCS & hàng đợi ưu tiên theo \(g\) (\texttt{heapq}) & khi lấy ra & bảng \texttt{best\_\allowbreak{}g} & có & theo tổng chi phí & 3.3 \\
+A* & hàng đợi ưu tiên theo \(f = g + h\) (\texttt{heapq}) & khi lấy ra & bảng \texttt{best\_\allowbreak{}g} & có & theo tổng chi phí (\(h\) chấp nhận được) & 3.4 \\
+\end{longtable}

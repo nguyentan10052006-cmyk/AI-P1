@@ -1,0 +1,478 @@
+\section{2. Trò chơi và mô hình hóa bài toán}
+
+Chương này mô tả luật chơi mà nhóm cài đặt và cách đưa trò chơi về một bài toán tìm kiếm: trạng thái, hành động, hàm chuyển, kiểm tra đích, chi phí bước và cách tránh lặp trạng thái. Bốn thuật toán (chương 3), giao diện (chương 4) và script thực nghiệm (chương 5) dùng chung mô hình này, cài trong package \texttt{Source/\allowbreak{}bloxorz/\allowbreak{}}.
+
+\subsection{2.1. Luật chơi}
+
+Bloxorz {[}2{]} đặt một khối 1×1×2 trên một bàn ô vuông. Khối bắt đầu ở tư thế đứng tại ô xuất phát \texttt{S}. Mỗi lượt, người chơi lăn khối theo một trong bốn hướng: lên (U), xuống (D), trái (L), phải (R). Khối có ba tư thế: đứng (chiếm một ô), nằm ngang và nằm dọc (chiếm hai ô kề nhau). Khối thắng khi đứng thẳng trên ô đích \texttt{G}. Khối thua khi rơi, tức là khi có một phần khối nằm trên ô trống, trên cầu đang đóng hoặc ra ngoài bàn.
+
+Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3056}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}@{}}
+\caption{\textbf{Bảng 2.1.} Cách xử lý từng loại ô.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Loại ô}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ký hiệu trong file màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối đứng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối nằm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối con (sau khi tách)}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Loại ô}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ký hiệu trong file màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối đứng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối nằm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khối con (sau khi tách)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trống hoặc ngoài bàn & \texttt{.\allowbreak{}} & rơi & rơi, kể cả khi chỉ một nửa khối ở trên & rơi \\
+Sàn & \texttt{\#} & được & được & được \\
+Xuất phát & \texttt{S} & như sàn & như sàn & như sàn \\
+Đích & \texttt{G} & thắng & được, không thắng & được, không thắng \\
+Ô dễ vỡ & \texttt{F} & ô vỡ, khối rơi & được & được, ô không vỡ \\
+Cầu đang đóng & \texttt{b} & rơi & rơi & rơi \\
+Cầu đang mở & \texttt{B} & được & được & được \\
+Công tắc mềm & \texttt{o} & kích hoạt & kích hoạt & kích hoạt \\
+Công tắc nặng & \texttt{x} & kích hoạt & không kích hoạt & không kích hoạt \\
+Công tắc tách & \texttt{@} & tách khối & không có tác dụng & không có tác dụng \\
+\end{longtable}
+
+Tọa độ ô viết theo (hàng, cột): hàng tăng xuống dưới, cột tăng sang phải. Dữ liệu 33 màn gốc lấy từ bản port Game Boy Advance của trò chơi gốc {[}3{]}.
+
+Ở những chỗ đề bài chưa nói rõ, nhóm theo luật của trò chơi gốc và bản port {[}3{]}:
+
+\begin{itemize}
+\tightlist
+\item
+  Khối con 1×1×1 không làm vỡ ô dễ vỡ, vì đề chỉ đặt luật này cho khối 1×1×2 đứng.
+\item
+  Khối con chỉ kích hoạt được công tắc mềm; công tắc nặng và công tắc tách cần khối nguyên đứng trên.
+\item
+  Công tắc kích hoạt mỗi lần khối lăn tới ô của nó. Khối không cần dừng lại trên công tắc.
+\item
+  Hai khối con vừa tách ra không kích hoạt công tắc ở ô nơi chúng đáp xuống.
+\item
+  Công tắc đóng một ô cầu đang nằm dưới khối thì khối rơi.
+\end{itemize}
+
+Các điểm 1, 2, 3 và 5 có test riêng trong \texttt{Source/\allowbreak{}tests/\allowbreak{}test\_\allowbreak{}spec.\allowbreak{}py} và \texttt{Source/\allowbreak{}tests/\allowbreak{}test\_\allowbreak{}rules.\allowbreak{}py}. Điểm 4 không có test riêng vì không ảnh hưởng tới màn gốc nào: trong 33 màn, khối con chỉ có thể đáp xuống công tắc tách hoặc công tắc nặng, là hai loại khối con vốn không kích hoạt được.
+
+\subsection{2.2. Cầu và công tắc}
+
+Cầu là ô có hai trạng thái. Khi mở, cầu đỡ khối như sàn. Khi đóng, cầu giống ô trống. Trong file màn, \texttt{B} là cầu mở lúc đầu và \texttt{b} là cầu đóng lúc đầu. Trạng thái của cầu thay đổi trong lúc chơi, nên nó là một phần của trạng thái tìm kiếm (mục 2.3).
+
+Mỗi công tắc mềm hoặc nặng nối với một hoặc nhiều ô cầu, và tác động lên mỗi ô cầu theo một trong ba kiểu:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{toggle}: đảo trạng thái cầu, mở thành đóng và đóng thành mở;
+\item
+  \texttt{open}: luôn mở cầu;
+\item
+  \texttt{close}: luôn đóng cầu.
+\end{itemize}
+
+Đề gọi hai kiểu sau là tác động cố định (permanent). Một công tắc có thể tác động lên các cầu khác nhau theo các kiểu khác nhau. File màn ghi trường hợp này bằng trường \texttt{links}, mỗi phần tử gồm một ô cầu và kiểu tác động lên ô đó. Ví dụ, ở màn 29, công tắc mềm tại (0, 2) mở hai cầu (0, 10), (0, 11) và cùng lúc đóng hai cầu (6, 10), (6, 11).
+
+Công tắc tách có trường \texttt{targets} gồm hai ô. Khi khối nguyên đứng lên công tắc, khối tách thành hai khối con đặt tại hai ô đó (mục 2.6). Định dạng file màn cho phép công tắc tách nối thêm cầu; khi đó cầu đổi trạng thái trước, rồi khối mới tách. Không màn gốc nào dùng trường hợp này.
+
+\begin{longtable}[]{@{}llllll@{}}
+\caption{\textbf{Bảng 2.2.} Số công tắc trong 33 màn gốc, theo loại và kiểu tác động.}\tabularnewline
+\toprule\noalign{}
+\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Mềm & 10 & 5 & 32 & 5 & 52 \\
+Nặng & 19 & 15 & 2 & 4 & 40 \\
+Tách & & & & & 14 \\
+\textbf{Tổng} & & & & & \textbf{106} \\
+\end{longtable}
+
+Sáu màn 17, 23, 25, 29, 30, 31 có công tắc dùng \texttt{links}. Bộ nạp màn (\texttt{Source/\allowbreak{}bloxorz/\allowbreak{}level.\allowbreak{}py}) kiểm tra file trước khi chạy: mỗi công tắc phải có cấu hình, mỗi ô được nối phải là ô cầu, mỗi công tắc tách phải có đúng hai ô đáp không phải ô trống.
+
+\textbf{Định dạng file màn.} Mỗi màn là một file JSON: 33 màn gốc ở \texttt{Source/\allowbreak{}levels/\allowbreak{}original/\allowbreak{}01.\allowbreak{}json} đến \texttt{33.\allowbreak{}json}, các màn tự sinh ở \texttt{Source/\allowbreak{}levels/\allowbreak{}gen/\allowbreak{}} (mục 5.2). Bốn thuật toán, giao diện và script thực nghiệm đều đọc màn qua cùng một bộ nạp \texttt{load\_\allowbreak{}level()}, nên một màn được dùng lại y hệt ở mọi nơi. Các trường của file:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{grid}: danh sách các hàng của bàn, mỗi ký tự là một ô theo Bảng 2.1;
+\item
+  \texttt{switches}: danh sách công tắc. Mỗi phần tử có \texttt{at} là ô của công tắc (hàng, cột); loại công tắc lấy từ ký tự tại ô đó trong \texttt{grid} (\texttt{o}, \texttt{x} hoặc \texttt{@}). Công tắc mềm hoặc nặng có \texttt{bridges} (các ô cầu) cùng \texttt{effect} (\texttt{toggle}, \texttt{open} hoặc \texttt{close}), hoặc có \texttt{links} khi mỗi ô cầu chịu một kiểu tác động riêng. Công tắc tách có \texttt{targets} gồm hai ô đáp;
+\item
+  \texttt{par}: số bước của lời giải ít bước nhất, dùng để kiểm tra (mục 5.1); \texttt{name}, \texttt{group}, \texttt{source}: tên màn, nhóm độ khó (mục 5.2) và nguồn dữ liệu.
+\end{itemize}
+
+Ví dụ, file của màn 2 (bỏ hai trường \texttt{passcode} và \texttt{source}):
+
+\begin{verbatim}
+{
+  "name": "Màn 2", "group": "G3", "par": 17,
+  "grid": [
+    "...............",
+    "......####..###",
+    "####..##x#..#G#",
+    "##o#..####..###",
+    "####..####..###",
+    "#S##bb####bb###",
+    "####..####.....",
+    "...............",
+    "...............",
+    "..............."
+  ],
+  "switches": [
+    {"at": [3, 2], "bridges": [[5, 4], [5, 5]], "effect": "toggle"},
+    {"at": [2, 8], "bridges": [[5, 10], [5, 11]], "effect": "toggle"}
+  ]
+}
+\end{verbatim}
+
+Công tắc mềm ở (3, 2) đảo hai ô cầu (5, 4), (5, 5); công tắc nặng ở (2, 8) đảo hai ô cầu (5, 10), (5, 11). Hai dạng còn lại có cấu trúc tương tự: công tắc tách của màn 8 là \texttt{\{"at": [4, 4], "targets": [[1, 10], [7, 10]]\}}, và công tắc mềm đầu tiên của màn 29 là \texttt{\{"at": [0, 2], "links": [\{"cell": [0, 10], "effect": "open"\}, …, \{"cell": [6, 11], "effect": "close"\}]\}}.
+
+\subsection{2.3. Trạng thái}
+
+Trạng thái là lớp \texttt{State} (\texttt{Source/\allowbreak{}bloxorz/\allowbreak{}state.\allowbreak{}py}) gồm bốn thành phần:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{orient}: tư thế của khối, một trong bốn giá trị đứng, nằm ngang, nằm dọc, đã tách;
+\item
+  \texttt{pos}: ô neo của khối. Khối đứng có ô neo là ô đang đứng. Khối nằm ngang có ô neo là ô bên trái, khối nằm dọc là ô bên trên. Khi đã tách, \texttt{pos} là ô của khối con thứ nhất;
+\item
+  \texttt{pos2}: ô của khối con thứ hai, chỉ có khi đã tách. Hai ô luôn được sắp sao cho \texttt{pos < pos2}, nên một cặp ô chỉ có một cách biểu diễn;
+\item
+  \texttt{open\_\allowbreak{}bridges}: tập các ô cầu đang mở.
+\end{itemize}
+
+Thành phần \texttt{open\_\allowbreak{}bridges} là bắt buộc. Cùng một vị trí khối nhưng cấu hình cầu khác nhau thì là hai trạng thái khác nhau, vì từ đó khối đi tiếp được theo những cách khác nhau. Nếu tập đã thăm chỉ xét vị trí và tư thế, thuật toán sẽ bỏ qua trạng thái ``đã bấm công tắc, quay lại chỗ cũ'' và có thể kết luận sai là không có lời giải. Test \texttt{test\_\allowbreak{}bridge\_\allowbreak{}state\_\allowbreak{}is\_\allowbreak{}part\_\allowbreak{}of\_\allowbreak{}visited} kiểm tra đúng trường hợp này: lời giải phải đi bấm công tắc rồi quay về qua ô cũ.
+
+Trạng thái không lưu ba thông tin sau, vì chúng không cần thiết:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Ô dễ vỡ đã vỡ:} đứng lên ô dễ vỡ thì khối rơi ngay, nên không có trạng thái nào khối còn trên bàn mà ô dễ vỡ đã vỡ.
+\item
+  \emph{Công tắc đã bấm:} công tắc không có trạng thái riêng. Hệ quả của việc bấm nằm hết ở \texttt{open\_\allowbreak{}bridges}.
+\item
+  \emph{Khối con đang được điều khiển:} hành động đã ghi rõ khối con nào đi (mục 2.4). Nếu lưu thêm thông tin này thì số trạng thái đã tách tăng gấp đôi, và phải có thêm hành động ``đổi khối'' không lăn. Nếu hành động đó có chi phí nhỏ hơn 1 thì vi phạm điều kiện mọi bước có chi phí ít nhất 1, và heuristic của A* không còn chấp nhận được. Nếu tính nó là một bước thì số bước không còn là số lần lăn như đề định nghĩa.
+\end{itemize}
+
+Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợp có thể có. Duyệt hết các trạng thái tới được từ trạng thái đầu (không đi tiếp từ trạng thái đích), 33 màn gốc có tổng cộng 70 062 trạng thái (Bảng 2.3).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1481}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1620}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1481}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1898}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1898}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1620}}@{}}
+\caption{\textbf{Bảng 2.3.} Số trạng thái tới được ở một số màn.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số ô cầu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái tới được}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trong đó đã tách}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cấu hình cầu tới được}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số ô cầu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái tới được}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trong đó đã tách}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cấu hình cầu tới được}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & G1 & 0 & 89 & 0 & 1 \\
+2 & G3 & 4 & 380 & 0 & 4 \\
+8 & G5 & 0 & 710 & 573 & 1 \\
+20 & G5 & 6 & 10 856 & 9 814 & 8 \\
+23 & G5 & 8 & 22 847 & 21 712 & 16 \\
+29 & G3 & 17 & 1 817 & 0 & 21 \\
+32 & G3 & 8 & 840 & 0 & 8 \\
+\end{longtable}
+
+Bảng 2.3 cho thấy hai điều. Thứ nhất, trạng thái đã tách chiếm phần lớn không gian ở các màn có công tắc tách: 95 \% ở màn 23 và 90 \% ở màn 20, vì hai khối con đặt ở hai ô bất kỳ tạo ra nhiều tổ hợp hơn một khối nguyên. Thứ hai, số cấu hình cầu thực tế rất nhỏ: màn 29 có 17 ô cầu, tức tối đa \(2^{17} = 131\,072\) cấu hình, nhưng chỉ 21 cấu hình tới được, vì mỗi công tắc chỉ đổi một nhóm cầu cố định.
+
+\emph{Chạy lại trong \texttt{Source/\allowbreak{}}:} duyệt BFS từ \texttt{level.\allowbreak{}initial\_\allowbreak{}state()} với \texttt{Problem.\allowbreak{}actions()} và \texttt{Problem.\allowbreak{}result()}, không mở rộng trạng thái đích, rồi đếm kích thước tập đã thăm. Công cụ \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} in cùng tổng 70 062.
+
+\subsection{2.4. Hành động}
+
+Khi khối nguyên, có bốn hành động U, D, L, R. Khi đã tách, có tám hành động theo thứ tự cố định U1, D1, L1, R1, U2, D2, L2, R2, trong đó chỉ số 1 và 2 là khối con ở \texttt{pos} và ở \texttt{pos2}. Trong code, hành động là \texttt{Action(dir, cube)} với \texttt{cube} bằng \texttt{None} khi khối nguyên, bằng 0 hoặc 1 khi đã tách.
+
+Thứ tự này cố định và giống nhau ở cả bốn thuật toán, để kết quả tái lập được và so sánh được. Khi có nhiều lời giải cùng độ dài, thứ tự hành động quyết định lời giải nào được trả về.
+
+Hàm \texttt{Problem.\allowbreak{}actions(state)} trả về mọi hành động, kể cả hành động làm khối rơi. Hàm \texttt{Problem.\allowbreak{}result(state, action)} trả về trạng thái kế tiếp, hoặc \texttt{None} nếu hành động làm khối rơi. Thuật toán bỏ qua kết quả \texttt{None} và không đếm nó vào số nút được sinh.
+
+\subsection{2.5. Hàm chuyển}
+
+Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế và mỗi hướng lăn là tư thế mới và vị trí ô neo mới.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}@{}}
+\caption{\textbf{Bảng 2.4.} Bảng chuyển của khối nguyên, với ô neo hiện tại là (r, c).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tư thế hiện tại}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{U}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{D}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{L}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{R}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tư thế hiện tại}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{U}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{D}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{L}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{R}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Đứng & nằm dọc tại (r − 2, c) & nằm dọc tại (r + 1, c) & nằm ngang tại (r, c − 2) & nằm ngang tại (r, c + 1) \\
+Nằm ngang & nằm ngang tại (r − 1, c) & nằm ngang tại (r + 1, c) & đứng tại (r, c − 1) & đứng tại (r, c + 2) \\
+Nằm dọc & đứng tại (r − 1, c) & đứng tại (r + 2, c) & nằm dọc tại (r, c − 1) & nằm dọc tại (r, c + 1) \\
+\end{longtable}
+
+Bảng này là hằng \texttt{BLOCK\_\allowbreak{}MOVES} trong \texttt{Source/\allowbreak{}bloxorz/\allowbreak{}rules.\allowbreak{}py}, và cả 12 trường hợp đều có test. Một bước được xử lý theo thứ tự sau (hàm \texttt{step()} và \texttt{\_\allowbreak{}settle()}):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Tính vị trí mới. Khối nguyên đi theo Bảng 2.4; khối con đi một ô theo hướng đã chọn.
+\item
+  Kiểm tra rơi. Nếu một ô khối chiếm nằm ngoài bàn, là ô trống hoặc là cầu đang đóng thì khối rơi. Khối nguyên đứng trên ô dễ vỡ cũng rơi.
+\item
+  Nếu khối không rơi, kích hoạt công tắc ở các ô khối vừa tới: công tắc mềm kích hoạt ở mọi tư thế; công tắc nặng và công tắc tách chỉ kích hoạt khi khối nguyên đứng trên.
+\item
+  Kiểm tra rơi lần hai: nếu một ô khối đang chiếm là cầu vừa bị đóng ở bước 3 thì khối rơi.
+\item
+  Nếu đã tách và hai khối con kề cạnh nhau thì ghép lại (mục 2.6).
+\item
+  Nếu khối nguyên đứng trên ô đích thì thắng.
+\end{enumerate}
+
+Ngoài trạng thái mới, \texttt{step()} trả về danh sách sự kiện theo thứ tự xảy ra (công tắc, ô vỡ, tách, ghép, rơi, thắng). Giao diện chỉ đọc các sự kiện này để vẽ hiệu ứng, không tự tính lại luật (chương 4). Hàm \texttt{Problem.\allowbreak{}result()} của bài toán tìm kiếm gọi đúng hàm \texttt{step()} này.
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{\textbf{Bảng 2.5.} Lời giải BFS của màn 1: \texttt{R D D R R D R}, 7 bước.}\tabularnewline
+\toprule\noalign{}
+\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & & đứng & (3, 3) \\
+1 & R & nằm ngang & (3, 4), (3, 5) \\
+2 & D & nằm ngang & (4, 4), (4, 5) \\
+3 & D & nằm ngang & (5, 4), (5, 5) \\
+4 & R & đứng & (5, 6) \\
+5 & R & nằm ngang & (5, 7), (5, 8) \\
+6 & D & nằm ngang & (6, 7), (6, 8) \\
+7 & R & đứng trên đích & (6, 9) \\
+\end{longtable}
+
+\subsection{2.6. Tách và ghép khối}
+
+Chỉ khối nguyên đứng trên công tắc tách mới bị tách. Khi đó khối thành hai khối con 1×1×1, đặt tại hai ô ghi trong trường \texttt{targets} của công tắc. Các khối con vừa đáp xuống không kích hoạt công tắc ở ô đáp.
+
+Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con không làm vỡ ô dễ vỡ; đi vào ô đích cũng không thắng. Khi hai khối con kề cạnh nhau (chung một cạnh), chúng tự ghép thành khối nằm. Nếu cùng hàng thì thành khối nằm ngang với ô neo bên trái; nếu cùng cột thì thành khối nằm dọc với ô neo bên trên. Hai khối con kề chéo thì không ghép.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1944}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2775}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2225}}@{}}
+\caption{\textbf{Bảng 2.6.} Lời giải BFS của màn 8, có tách và ghép, 10 bước. Công tắc tách ở (4, 4), hai ô đáp là (1, 10) và (7, 10).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Lệnh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tư thế}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ô khối chiếm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Sự kiện}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Lệnh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tư thế}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ô khối chiếm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Sự kiện}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & & đứng & (4, 1) & \\
+1 & R & nằm ngang & (4, 2), (4, 3) & \\
+2 & R & đã tách & (1, 10), (7, 10) & khối đứng lên công tắc tách tại (4, 4) và tách \\
+3--6 & D1 (bốn lần) & đã tách & khối con 1 đi từ (1, 10) xuống (5, 10); khối con 2 ở yên (7, 10) & \\
+7 & U2 & nằm dọc & (5, 10), (6, 10) & hai khối con kề cạnh, ghép thành khối nằm dọc \\
+8 & U & đứng & (4, 10) & \\
+9 & R & nằm ngang & (4, 11), (4, 12) & \\
+10 & R & đứng trên đích & (4, 13) & thắng \\
+\end{longtable}
+
+``Khối con 1'' là khối ở \texttt{pos}, tức ô nhỏ hơn theo thứ tự (hàng, cột); hàm \texttt{split\_\allowbreak{}state()} luôn sắp xếp hai ô như vậy. Sau bước 6, khối con 1 ở (5, 10) đứng trước khối con 2 ở (7, 10), nên lệnh U2 đưa khối con ở (7, 10) lên (6, 10).
+
+\subsection{2.7. Kiểm tra đích}
+
+Trạng thái đích là trạng thái khối nguyên đứng có ô neo trùng ô đích (\texttt{Problem.\allowbreak{}is\_\allowbreak{}goal()}). Khối nằm vắt qua ô đích không thắng. Khối con đi vào ô đích cũng không thắng: hai khối con phải ghép lại rồi khối nguyên đứng lên ô đích.
+
+\subsection{2.8. Chi phí bước}
+
+Chi phí của một bước do \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost(s, a, s')} trả về. Khi không truyền hàm chi phí, mỗi bước tốn 1. Giao diện và script thực nghiệm dùng hàm chi phí không đồng nhất trong \texttt{Source/\allowbreak{}bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 2.7), xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đi lên ô dễ vỡ. Định nghĩa đầy đủ và lý do của từng mức được trình bày ở mục 3.3.2 và 3.3.3.
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{\textbf{Bảng 2.7.} Chi phí một bước.}\tabularnewline
+\toprule\noalign{}
+\textbf{Bước} & \textbf{Chi phí} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Bước} & \textbf{Chi phí} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Đứng → nằm & 1,12 \\
+Nằm → đứng & 1,62 \\
+Nằm → nằm (lăn quanh trục dài) & 1,21 \\
+Khối con 1×1×1 lăn một ô (kể cả bước hai khối con ghép lại) & 1,10 \\
+Nằm → đứng lên công tắc tách, rồi tách thành hai khối con & 1,62 \\
+Thêm khi có phần khối nằm trên ô dễ vỡ & + 0,50 \\
+\end{longtable}
+
+Mọi bước có chi phí ít nhất 1. Điều kiện này giữ cho heuristic của A*, vốn đếm cận dưới của số bước, vẫn chấp nhận được (mục 3.4). BFS và DFS không dùng chi phí khi chọn nút. Tuy vậy, tổng chi phí lời giải của cả bốn thuật toán đều tính theo cùng một hàm chi phí, để so sánh được chất lượng lời giải ở chương 5.
+
+\subsection{2.9. Tránh lặp trạng thái}
+
+Bốn thuật toán đều là tìm kiếm trên đồ thị (graph search): ghi nhớ các trạng thái đã gặp và không xét lại một trạng thái đã có.
+
+\begin{itemize}
+\tightlist
+\item
+  BFS và DFS giữ tập đã thăm \texttt{visited} và đánh dấu một trạng thái ngay khi đưa nó vào biên, nên mỗi trạng thái vào biên nhiều nhất một lần.
+\item
+  UCS và A* giữ bảng \texttt{best\_\allowbreak{}g}, chi phí nhỏ nhất đã biết để tới mỗi trạng thái. Một trạng thái chỉ được đưa lại vào biên khi tìm được đường rẻ hơn. Mục cũ còn trong hàng đợi ưu tiên bị bỏ qua lúc lấy ra (lazy deletion).
+\end{itemize}
+
+\texttt{State} là dataclass bất biến (\texttt{frozen=True}) và \texttt{open\_\allowbreak{}bridges} có kiểu \texttt{frozenset}, nên trạng thái băm được (hashable) và dùng trực tiếp làm khóa của tập đã thăm, bảng cha và bảng \texttt{best\_\allowbreak{}g}. Số trạng thái tới được của một màn là hữu hạn (Bảng 2.3), nên với cơ chế trên, cả bốn thuật toán đều dừng: hoặc tìm ra lời giải, hoặc duyệt hết rồi báo không có lời giải.
+
+\subsection{2.10. Tóm tắt mô hình}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3991}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3787}}@{}}
+\caption{\textbf{Bảng 2.8.} Mô hình bài toán tìm kiếm và nơi cài đặt.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thành phần}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Định nghĩa}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cài đặt trong \texttt{Source/\allowbreak{}}}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thành phần}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Định nghĩa}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cài đặt trong \texttt{Source/\allowbreak{}}}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trạng thái & (tư thế, ô neo, ô khối con thứ hai, tập cầu đang mở) & \texttt{bloxorz/\allowbreak{}state.\allowbreak{}py}, lớp \texttt{State} \\
+Trạng thái đầu & khối đứng tại \texttt{S}; cầu mở là các ô \texttt{B} & \texttt{Level.\allowbreak{}initial\_\allowbreak{}state()} \\
+Hành động & U, D, L, R; khi đã tách U1 \ldots{} R1, U2 \ldots{} R2 & \texttt{Problem.\allowbreak{}actions()} \\
+Hàm chuyển & Bảng 2.4 và thứ tự xử lý ở mục 2.5; \texttt{None} khi khối rơi & \texttt{rules.\allowbreak{}step()}, \texttt{Problem.\allowbreak{}result()} \\
+Kiểm tra đích & khối nguyên đứng trên ô đích & \texttt{Problem.\allowbreak{}is\_\allowbreak{}goal()} \\
+Chi phí bước & Bảng 2.7, mọi bước ≥ 1 & \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost()}, \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} \\
+Heuristic & \(h_M\) và \(h_P\) (mục 3.4) & \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py} \\
+Tránh lặp & tập đã thăm (BFS, DFS); bảng \texttt{best\_\allowbreak{}g} (UCS, A*) & \texttt{solvers/\allowbreak{}*.\allowbreak{}py} \\
+\end{longtable}

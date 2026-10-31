@@ -1,0 +1,118 @@
+\subsection{5.5. Kết luận thực nghiệm}
+
+Năm câu hỏi ở mục 5.1, mỗi câu trả lời theo ba bước: quan sát, giải thích, ý nghĩa. Các kết luận chỉ dựa trên lần đo ở mục 5.3.
+
+\textbf{1. Ít nút, nhanh, ít bộ nhớ nhất.}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} DFS có trung vị nhỏ nhất ở cả 5 nhóm về số nút (Bảng 5.5) và thời gian (Bảng 5.6). Theo từng màn, DFS mở rộng ít nút nhất ở 26/33 màn, nhanh nhất ở 26/33 màn, tốn ít bộ nhớ nhất ở 25/33 màn. Tổng thời gian tìm kiếm trên 33 màn: DFS 565,1 ms, BFS 898,2 ms, A* (\(h_P\)) 1 130,6 ms, UCS 1 163,2 ms, A* (\(h_M\)) 1 193,3 ms. BFS mở rộng ít nút hơn UCS ở 29/33 màn.
+\item
+  \emph{Giải thích:} DFS dừng ngay khi nhánh đang đi gặp đích. BFS kiểm tra đích khi sinh nút. UCS và A* phải chờ tới khi lấy đích ra khỏi hàng đợi (mục 5.1), và với chi phí không đồng nhất, chúng duyệt theo đường đồng mức chi phí chứ không theo số bước. Thời gian đi theo số nút (Hình 5.2), còn mỗi nút của UCS và A* tốn thêm thao tác trên heap.
+\item
+  \emph{Ý nghĩa:} chỉ cần biết màn có giải được hay không thì DFS rẻ nhất. Cần lời giải ngắn hay rẻ thì phải dùng BFS hoặc UCS và A* (câu 2).
+\end{itemize}
+
+\textbf{2. Chất lượng lời giải.}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Bảng 5.8): BFS, UCS và cả hai A* đều cho số bước tối ưu ở 33/33 màn. UCS và A* tối ưu về chi phí ở 33/33 màn; BFS ở 31/33 màn. Hai màn còn lại là 17 (BFS 140,42, UCS 140,10) và 23 (BFS 101,58, UCS 100,58), cùng số bước. DFS chỉ tối ưu ở 3/33 màn; số bước trung bình bằng 288,3 \% tối ưu, lớn nhất 15,83 lần ở màn 23 (Hình 5.4).
+\item
+  \emph{Giải thích:} UCS và A* tối ưu theo tổng chi phí. Với hàm chi phí của nhóm, đường ít bước nhất thường cũng là đường rẻ nhất, trừ màn 17 và 23, nơi có đường cùng số bước nhưng ít lần dựng khối hơn. DFS không so sánh độ dài giữa các nhánh (mục 3.2.5).
+\item
+  \emph{Ý nghĩa:} với hàm chi phí của nhóm, UCS khác BFS ở rất ít màn trong bộ 33 màn gốc.
+\end{itemize}
+
+\textbf{3. Cầu làm không gian trạng thái lớn lên bao nhiêu (S2).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Hình 5.8): từ k = 0 đến k = 10, số trạng thái BFS thăm tăng từ 145 lên 414, tức gấp 2,9 lần, trong khi \(2^{10}\) = 1 024; từ k = 6 thì gần như không đổi. UCS tăng từ 173 lên 828; A* (\(h_P\)) từ 60 lên 89.
+\item
+  \emph{Giải thích:} ở bố cục S2, lời giải chỉ 6 bước và không đi qua cầu, nên tìm kiếm gặp đích trước khi kịp duyệt các tổ hợp cầu.
+\item
+  \emph{Ý nghĩa:} với bộ màn này, \textbf{thực nghiệm không đo được} mức tăng \(2^k\); con số trên chỉ là phần không gian trạng thái mà tìm kiếm thực sự chạm tới. Đây là giới hạn của bố cục S2, không phải kết luận về mức tăng của không gian trạng thái.
+\end{itemize}
+
+\textbf{4. Heuristic bớt được bao nhiêu nút so với UCS.}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát} (Bảng 5.9, Hình 5.5): trên tổng 33 màn gốc, A* (\(h_P\)) mở rộng 32 712 nút, A* (\(h_M\)) 33 474, UCS 35 281, tức bớt 7,3 \% và 5,1 \%. Theo từng màn, trung vị mức bớt là 5,7 \% (\(h_P\)) và 4,3 \% (\(h_M\)). \(h_P\) mở rộng ít hơn \(h_M\) ở 22 màn, bằng nhau ở 11 màn, không màn nào nhiều hơn. Trung vị \(b^*\) của cả ba là 1,080. Ở S3, A* (\(h_P\)) kết luận không có lời giải với 0 nút mở rộng; UCS và A* (\(h_M\)) duyệt hết 7 400 trạng thái của \texttt{s3\_\allowbreak{}50}.
+\item
+  \emph{Giải thích:} hai heuristic là cận dưới của \textbf{số bước} còn lại (mục 3.4), trong khi mỗi bước tốn từ 1,10 đến 1,71 trên các cạnh tới được của 33 màn gốc. Khoảng cách tới chi phí thật vì vậy lớn, và mức bớt nhỏ. \(h_P\) nhận ra ngõ cụt, vì ô không nối được tới đích có h = ∞.
+\item
+  \emph{Ý nghĩa:} A* (\(h_P\)) luôn bằng hoặc tốt hơn A* (\(h_M\)) về số nút. Lợi ích lớn nhất của \(h_P\) là phát hiện màn không có lời giải.
+\end{itemize}
+
+\textbf{5. Bàn lớn dần (S1) và màn không có lời giải (S3).}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Quan sát:} ở S1, số nút BFS mở rộng xấp xỉ \(3N^2\), đúng bậc của số trạng thái (khoảng 3 tư thế mỗi ô). Ở N = 200: BFS 2,20 giây, 43,7 MB; UCS 3,36 giây; A* (\(h_P\)) 3,44 giây, 54,6 MB. DFS 0,91 giây, nhưng lời giải dài 35 287 bước so với 266 bước tối ưu. Ở S3, BFS, DFS, UCS và A* (\(h_M\)) đều phải duyệt hết các trạng thái tới được (7 400 ở \texttt{s3\_\allowbreak{}50}).
+\item
+  \emph{Giải thích:} trên sân trống không có vật cản, mọi trạng thái đều tới được. Heuristic theo số bước gần như không cắt được nút nào khi chi phí mỗi bước lớn hơn 1: ở N = 200, A* (\(h_P\)) mở rộng 119 597 nút so với 119 599 của UCS. A* vì thế không nhanh hơn UCS, do phải tính thêm h: A* (\(h_P\)) 3,44 giây, A* (\(h_M\)) 3,34 giây, UCS 3,36 giây, chênh nhau trong phạm vi sai số đo (xem phần hạn chế).
+\item
+  \emph{Ý nghĩa:} trên bàn lớn và trống, A* không có lợi thế so với UCS. Trên màn không có lời giải, A* (\(h_P\)) là lựa chọn duy nhất không phải vét cạn.
+\end{itemize}
+
+\textbf{Tóm tắt điểm mạnh và điểm yếu.} Bảng 5.11 gom các nhận xét ở mục 5.4 và các câu trả lời trên thành một bảng, kèm số liệu làm căn cứ.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2851}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3179}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2304}}@{}}
+\caption{\textbf{Bảng 5.11.} Điểm mạnh, điểm yếu và trường hợp nên dùng của từng thuật toán (số liệu trên 33 màn gốc, trừ khi ghi khác).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Điểm mạnh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Điểm yếu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nên dùng khi}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Điểm mạnh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Điểm yếu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nên dùng khi}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BFS & Số bước tối ưu ở 33/33 màn; nhanh nhất trong các thuật toán cho lời giải tối ưu (tổng 898 ms); chi phí mỗi nút thấp nhất (15,1 µs) & Bỏ qua chi phí: đắt hơn UCS ở màn 17 và 23; bộ nhớ tăng theo số trạng thái đã thăm (43,7 MB ở sân 200 × 200) & Cần lời giải ít bước nhất, ví dụ để gợi ý nước đi \\
+DFS & Ít nút nhất và nhanh nhất ở 26/33 màn (tổng 565 ms); ít bộ nhớ nhất ở 25/33 màn; luôn dừng nhờ tập đã thăm & Lời giải dài gấp 1,73 lần tối ưu (trung vị), 15,8 lần ở màn 23, khoảng 133 lần ở sân 200 × 200; biên lớn hơn BFS ở 32/33 màn; kết quả phụ thuộc thứ tự hành động & Chỉ cần biết màn có giải được hay không, hoặc cần một lời giải bất kỳ thật nhanh \\
+UCS & Tổng chi phí tối ưu ở 33/33 màn, có bảo đảm; không cần heuristic & Nhiều hơn BFS 5,4 \% số nút, chậm hơn khoảng 30 \%; duyệt hết các trạng thái rẻ hơn lời giải (S2: 828 trạng thái, BFS 414) & Các bước có chi phí khác nhau và chưa có heuristic tốt \\
+A* với \(h_P\) & Tổng chi phí tối ưu ở 33/33 màn; ít nút hơn UCS ở 31/33 màn (bớt 7,3 \%); kết luận màn không có lời giải mà không mở rộng nút nào & Heuristic đếm số bước nên yếu khi mỗi bước tốn hơn 1; trên sân trống không bớt được nút nào và chậm hơn UCS 2,4 \% & Cần lời giải rẻ nhất; màn có tường, hố, hoặc có thể không có lời giải \\
+A* với \(h_M\) & Tổng chi phí tối ưu ở 33/33 màn; không cần tiền xử lý & Bớt ít nút hơn \(h_P\) (5,1 \% so với UCS); chậm hơn UCS 2,6 \% vì phải tính khoảng cách tới đích và mọi công tắc tách; không nhận ra ngõ cụt & Làm mốc so sánh cho \(h_P\) \\
+\end{longtable}
+
+\textbf{Hạn chế và sai số.}
+
+\begin{itemize}
+\tightlist
+\item
+  Thời gian đo trên một máy, trung vị 5 lần. Hai lần đo cùng commit lệch tối đa 19 \% ở từng cặp, trung vị tỉ lệ là 1,03. So lần đo trên \texttt{cd93624} với lần này: ở 185 cặp không phụ thuộc chi phí bước tách, số đếm và bộ nhớ trùng hẳn, nhưng thời gian lệch 0,94--1,18 lần (trung vị 1,05). Phần lệch này là nhiễu đo, không do đổi code. Bộ nhớ đo bằng \texttt{tracemalloc}, chỉ tính phần Python cấp phát.
+\item
+  33 màn gốc nhỏ (bàn 10 × 15): nhiều cặp chỉ vài mili-giây, nên so sánh thời gian ở đó kém tin cậy hơn so sánh số nút.
+\item
+  Số liệu G5 phụ thuộc chi phí bước tách (1,62; lý do ở mục 3.3.3). Đổi mức này chỉ làm đổi số liệu của 10 màn G5 (mục 5.3, phần so sánh trước và sau khi sửa).
+\item
+  S2 không đo được mức tăng \(2^k\) (câu 3).
+\end{itemize}

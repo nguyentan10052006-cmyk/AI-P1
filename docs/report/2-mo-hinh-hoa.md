@@ -60,6 +60,38 @@ Công tắc tách có trường `targets` gồm hai ô. Khi khối nguyên đứ
 
 Sáu màn 17, 23, 25, 29, 30, 31 có công tắc dùng `links`. Bộ nạp màn (`Source/bloxorz/level.py`) kiểm tra file trước khi chạy: mỗi công tắc phải có cấu hình, mỗi ô được nối phải là ô cầu, mỗi công tắc tách phải có đúng hai ô đáp không phải ô trống.
 
+**Định dạng file màn.** Mỗi màn là một file JSON: 33 màn gốc ở `Source/levels/original/01.json` đến `33.json`, các màn tự sinh ở `Source/levels/gen/` (mục 5.2). Bốn thuật toán, giao diện và script thực nghiệm đều đọc màn qua cùng một bộ nạp `load_level()`, nên một màn được dùng lại y hệt ở mọi nơi. Các trường của file:
+
+- `grid`: danh sách các hàng của bàn, mỗi ký tự là một ô theo Bảng 2.1;
+- `switches`: danh sách công tắc. Mỗi phần tử có `at` là ô của công tắc (hàng, cột); loại công tắc lấy từ ký tự tại ô đó trong `grid` (`o`, `x` hoặc `@`). Công tắc mềm hoặc nặng có `bridges` (các ô cầu) cùng `effect` (`toggle`, `open` hoặc `close`), hoặc có `links` khi mỗi ô cầu chịu một kiểu tác động riêng. Công tắc tách có `targets` gồm hai ô đáp;
+- `par`: số bước của lời giải ít bước nhất, dùng để kiểm tra (mục 5.1); `name`, `group`, `source`: tên màn, nhóm độ khó (mục 5.2) và nguồn dữ liệu.
+
+Ví dụ, file của màn 2 (bỏ hai trường `passcode` và `source`):
+
+```json
+{
+  "name": "Màn 2", "group": "G3", "par": 17,
+  "grid": [
+    "...............",
+    "......####..###",
+    "####..##x#..#G#",
+    "##o#..####..###",
+    "####..####..###",
+    "#S##bb####bb###",
+    "####..####.....",
+    "...............",
+    "...............",
+    "..............."
+  ],
+  "switches": [
+    {"at": [3, 2], "bridges": [[5, 4], [5, 5]], "effect": "toggle"},
+    {"at": [2, 8], "bridges": [[5, 10], [5, 11]], "effect": "toggle"}
+  ]
+}
+```
+
+Công tắc mềm ở (3, 2) đảo hai ô cầu (5, 4), (5, 5); công tắc nặng ở (2, 8) đảo hai ô cầu (5, 10), (5, 11). Hai dạng còn lại có cấu trúc tương tự: công tắc tách của màn 8 là `{"at": [4, 4], "targets": [[1, 10], [7, 10]]}`, và công tắc mềm đầu tiên của màn 29 là `{"at": [0, 2], "links": [{"cell": [0, 10], "effect": "open"}, …, {"cell": [6, 11], "effect": "close"}]}`.
+
 ### 2.3. Trạng thái
 
 Trạng thái là lớp `State` (`Source/bloxorz/state.py`) gồm bốn thành phần:
@@ -166,7 +198,7 @@ Trạng thái đích là trạng thái khối nguyên đứng có ô neo trùng 
 
 ### 2.8. Chi phí bước
 
-Chi phí của một bước do `Problem.step_cost(s, a, s')` trả về. Khi không truyền hàm chi phí, mỗi bước tốn 1. Giao diện và script thực nghiệm dùng hàm chi phí không đồng nhất trong `Source/bloxorz/costs.py` (Bảng 2.7), xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đi lên ô dễ vỡ. Lý do của từng mức được trình bày ở mục 3.3.
+Chi phí của một bước do `Problem.step_cost(s, a, s')` trả về. Khi không truyền hàm chi phí, mỗi bước tốn 1. Giao diện và script thực nghiệm dùng hàm chi phí không đồng nhất trong `Source/bloxorz/costs.py` (Bảng 2.7), xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đi lên ô dễ vỡ. Định nghĩa đầy đủ và lý do của từng mức được trình bày ở mục 3.3.2 và 3.3.3.
 
 **Bảng 2.7.** Chi phí một bước.
 
@@ -175,7 +207,8 @@ Chi phí của một bước do `Problem.step_cost(s, a, s')` trả về. Khi kh
 | Đứng → nằm | 1,12 |
 | Nằm → đứng | 1,62 |
 | Nằm → nằm (lăn quanh trục dài) | 1,21 |
-| Khối con 1×1×1 lăn một ô | 1,10 |
+| Khối con 1×1×1 lăn một ô (kể cả bước hai khối con ghép lại) | 1,10 |
+| Nằm → đứng lên công tắc tách, rồi tách thành hai khối con | 1,62 |
 | Thêm khi có phần khối nằm trên ô dễ vỡ | + 0,50 |
 
 Mọi bước có chi phí ít nhất 1. Điều kiện này giữ cho heuristic của A*, vốn đếm cận dưới của số bước, vẫn chấp nhận được (mục 3.4). BFS và DFS không dùng chi phí khi chọn nút. Tuy vậy, tổng chi phí lời giải của cả bốn thuật toán đều tính theo cùng một hàm chi phí, để so sánh được chất lượng lời giải ở chương 5.

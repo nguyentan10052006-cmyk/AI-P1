@@ -1,0 +1,660 @@
+\section{5. Thực nghiệm}
+
+Chương này so sánh năm cấu hình thuật toán trên cùng một bộ màn, cùng một hàm chi phí và cùng một cách đo. Mục 5.1 nêu câu hỏi và cách đo, mục 5.2 mô tả bộ màn, mục 5.3 trình bày kết quả, mục 5.4 nhận xét từng thuật toán và mục 5.5 trả lời các câu hỏi.
+
+\subsection{5.1. Thiết lập thực nghiệm}
+
+\textbf{Câu hỏi cần trả lời.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Thuật toán nào mở rộng ít nút nhất, chạy nhanh nhất, tốn ít bộ nhớ nhất, và khác biệt thay đổi thế nào theo nhóm màn G1--G5?
+\item
+  Chất lượng lời giải: số bước và tổng chi phí so với tối ưu.
+\item
+  Công tắc và cầu làm không gian trạng thái lớn lên bao nhiêu (nhóm S2)?
+\item
+  Mỗi heuristic của A* (\(h_M\), \(h_P\)) bớt được bao nhiêu nút so với UCS?
+\item
+  Số nút, thời gian và bộ nhớ tăng thế nào khi bàn lớn dần (S1), và khi màn không có lời giải (S3)?
+\end{enumerate}
+
+\textbf{Thuật toán.} Năm cấu hình, dùng chung một engine luật, một hàm chi phí và một thứ tự hành động (U, D, L, R; khi đã tách U1 \ldots{} R1, U2 \ldots{} R2):
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4170}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3469}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1111}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Khóa}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kiểm tra đích}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Chương}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{bfs} & BFS & khi sinh nút & 3.1 \\
+\texttt{dfs} & DFS dạng tìm kiếm trên đồ thị & khi sinh nút & 3.2 \\
+\texttt{ucs} & UCS & khi lấy ra khỏi hàng đợi & 3.3 \\
+\texttt{astar} & A* với \(h_P\) (heuristic chính) & khi lấy ra khỏi hàng đợi & 3.4 \\
+\texttt{astar\_\allowbreak{}m} & A* với \(h_M\) (để so sánh) & khi lấy ra khỏi hàng đợi & 3.4 \\
+\end{longtable}
+}
+
+Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và DFS dừng ngay khi sinh ra đích, còn UCS và A* phải chờ tới lúc lấy đích ra để giữ tính tối ưu. Khi đọc bảng, cần nhớ điều này.
+
+\textbf{Chỉ số.} Bốn chỉ số đề bắt buộc (thời gian tìm kiếm, bộ nhớ đỉnh, số nút mở rộng, độ dài lời giải), cộng năm chỉ số để giải thích kết quả.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1944}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5278}}@{}}
+\caption{\textbf{Bảng 5.1.} Các chỉ số đo (quy ước đếm ở mục 3.1.3).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Chỉ số}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cột trong \texttt{summary.\allowbreak{}csv}}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Định nghĩa}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Chỉ số}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cột trong \texttt{summary.\allowbreak{}csv}}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Định nghĩa}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Số bước & \texttt{steps} & Số lần lăn trong lời giải, gồm cả bước của khối con \\
+Tổng chi phí & \texttt{path\_\allowbreak{}cost} & Tổng chi phí bước dọc lời giải, theo \textbf{cùng một} hàm chi phí cho cả 5 cấu hình \\
+Số nút mở rộng & \texttt{expanded} & Số trạng thái được lấy ra khỏi biên để sinh con. \textbf{Chỉ số chính khi so sánh} \\
+Số nút sinh & \texttt{generated} & Số trạng thái con hợp lệ, đếm trước khi xét tập đã thăm \\
+Biên lớn nhất & \texttt{max\_\allowbreak{}frontier} & Số phần tử lớn nhất từng có trong biên. UCS và A* tính cả mục cũ còn trong heap (lazy deletion) \\
+Trạng thái đã thăm & \texttt{visited} & Kích thước tập đã thăm lúc kết thúc \\
+Bộ nhớ đỉnh & \texttt{peak\_\allowbreak{}mem\_\allowbreak{}kb} & Đỉnh bộ nhớ Python cấp phát trong \texttt{prepare()} và \texttt{search()}, đo bằng \texttt{tracemalloc} \\
+Thời gian tìm kiếm & \texttt{search\_\allowbreak{}ms} & Thời gian chạy \texttt{search()}, trung vị 5 lần \\
+Tổng thời gian & \texttt{total\_\allowbreak{}ms} & Từ lúc đọc file màn tới khi có lời giải: nạp màn, dựng bài toán, \texttt{prepare()}, \texttt{search()}; trung vị 5 lần \\
+Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}solution}, \texttt{timeout}, \texttt{invalid} \\
+\end{longtable}
+
+\textbf{Cách đo.} Script \texttt{Source/\allowbreak{}experiments/\allowbreak{}run.\allowbreak{}py} đo theo cách sau:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Mỗi lần chạy là một tiến trình con riêng} (\texttt{multiprocessing}, kiểu \texttt{spawn}), có giới hạn 60 giây. Nhờ vậy, hết giờ thì dừng được tiến trình một cách an toàn, và bộ nhớ của lần chạy trước không dồn sang lần sau.
+\item
+  \textbf{Thời gian:} đo 5 lần bằng \texttt{time.\allowbreak{}perf\_\allowbreak{}counter\_\allowbreak{}ns()}, gọi \texttt{gc.\allowbreak{}collect()} trước mỗi lần, \textbf{không} bật \texttt{tracemalloc}; lấy trung vị, làm tròn 2 chữ số thập phân. \texttt{tracemalloc} làm chương trình chậm đi đáng kể, nên đo thời gian khi đang bật nó thì không tách được chi phí của thuật toán khỏi chi phí của việc đo.
+\item
+  \textbf{Bộ nhớ:} chạy thêm một lần riêng. \texttt{tracemalloc.\allowbreak{}start()} ngay trước \texttt{prepare()}, đọc giá trị đỉnh ngay sau \texttt{search()}; thời gian của lần này bị bỏ.
+\item
+  \textbf{Hàm chi phí:} với \texttt{-\allowbreak{}-\allowbreak{}cost energy}, script dựng \texttt{Problem(level, cost\_\allowbreak{}fn=compute\_\allowbreak{}step\_\allowbreak{}cost)} (\texttt{Source/\allowbreak{}bloxorz/\allowbreak{}costs.\allowbreak{}py}, Bảng 2.7). Cả năm cấu hình đọc chi phí qua cùng một hàm \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    UCS và A* cộng chi phí này khi mở rộng nút;
+  \item
+    BFS và DFS không dùng nó khi chọn nút, chỉ dùng để tính tổng chi phí của lời giải.
+  \end{itemize}
+
+  \texttt{run\_\allowbreak{}info.\allowbreak{}json} ghi chế độ chi phí ở khóa \texttt{cost}. Với \texttt{-\allowbreak{}-\allowbreak{}cost unit}, mỗi bước tốn 1.
+\item
+  \textbf{Kiểm tra lời giải:} sau khi đo, phát lại lời giải bằng engine từ trạng thái đầu và tính lại tổng chi phí. Không tới đích, hoặc tổng chi phí lệch với solver báo, thì ghi \texttt{invalid}. Chi phí bước là số thập phân, nên tổng chi phí được so tương đối (sai lệch tương đối tối đa \(10^{-9}\)): solver và bước phát lại cộng theo thứ tự khác nhau. Bước phát lại nằm ngoài phần đo thời gian.
+\item
+  \textbf{Nguồn gốc số liệu:} \texttt{run\_\allowbreak{}info.\allowbreak{}json} ghi commit Git, cấu hình máy, các tham số chạy, mã băm sha256 của từng file màn, và đánh dấu \texttt{-\allowbreak{}dirty} nếu mã nguồn hoặc file màn khác với commit.
+\end{itemize}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2507}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7493}}@{}}
+\caption{\textbf{Bảng 5.2.} Thiết lập của lần đo chính thức.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạng mục}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Giá trị}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Hạng mục}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Giá trị}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CPU, RAM & AMD64 Family 25 Model 117 (16 luồng), 15,3 GB \\
+Hệ điều hành & Windows (\texttt{platform}: Windows-10-10.0.26200-SP0) \\
+Python & CPython 3.11.9 \\
+Commit Git & \texttt{0a35afd}, không có thay đổi chưa commit (\texttt{dirty\_\allowbreak{}reasons} rỗng) \\
+Số lần đo thời gian & 5, lấy trung vị \\
+Số lần đo bộ nhớ & 1, chạy riêng \\
+Giới hạn thời gian & 60 giây mỗi lần chạy \\
+Hàm chi phí & \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 3.3.1), bước tách khối 1,62; \texttt{run.\allowbreak{}py -\allowbreak{}-\allowbreak{}cost energy}, ghi ở khóa \texttt{cost} trong \texttt{run\_\allowbreak{}info.\allowbreak{}json} \\
+Thời gian chạy toàn bộ & 9 phút 34 giây (04:43:38 → 04:53:12 UTC, 31/10/2026) \\
+Cảnh báo, lần đo bộ nhớ thất bại & 0, 0 \\
+\end{longtable}
+
+\textbf{Hàm chi phí.} Cột \texttt{path\_\allowbreak{}cost} của cả năm cấu hình tính theo cùng một hàm chi phí (Bảng 3.3.1), để so được chất lượng lời giải.
+
+\textbf{Kiểm tra chức năng của hàm chi phí} (kiểm tính đúng, không phải số liệu hiệu năng; chạy trên commit \texttt{0a35afd}):
+
+\begin{itemize}
+\tightlist
+\item
+  Công cụ \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} với hàm chi phí này: 0 vi phạm chấp nhận được và 0 vi phạm nhất quán của \(h_M\) và \(h_P\). Phạm vi kiểm: 340 414 cạnh của 33 màn gốc, 2 015 147 cạnh của 14 màn tự sinh. Tổng chi phí của A* bằng UCS ở mọi màn.
+\item
+  Test \texttt{tests/\allowbreak{}test\_\allowbreak{}costs\_\allowbreak{}split.\allowbreak{}py} duyệt mọi cạnh tới được của 33 màn gốc. Mọi cặp tư thế đều có trong bảng năng lượng, không cạnh nào rơi về mức mặc định. Chi phí bằng bảng cộng phụ phí ô dễ vỡ, mọi bước có chi phí ít nhất 1 (đúng điều kiện ở mục 2.8), và không có cạnh đứng → tách. Test cũng kiểm: bước tách trên lời giải UCS của màn 08 tốn đúng 1,62; ở cả 10 màn G5, tổng chi phí của 5 cấu hình bằng chi phí phát lại.
+\end{itemize}
+
+Riêng \textbf{số bước và các số đếm của BFS và DFS không phụ thuộc hàm chi phí}, vì hai thuật toán này không dùng chi phí khi chọn nút. Ngược lại, số liệu của UCS và A* sẽ thay đổi khi đổi hàm chi phí.
+
+\textbf{Kiểm tra chéo trước khi dùng số liệu.} Một dòng sai là dấu hiệu lỗi trong engine hoặc thuật toán; sửa xong mới đưa số liệu vào báo cáo.
+
+\begin{itemize}
+\tightlist
+\item
+  Mọi lời giải phát lại đều tới đích, không có dòng \texttt{invalid} hay lỗi.
+\item
+  Số bước của BFS bằng số bước tối ưu tham khảo ở cả 33 màn.
+\item
+  Số bước của DFS, UCS, A* không nhỏ hơn của BFS.
+\item
+  Tổng chi phí của UCS bằng A* ở mọi màn, với cả \(h_M\) và \(h_P\).
+\item
+  Tổng chi phí của BFS và DFS không nhỏ hơn của UCS.
+\item
+  Số nút mở rộng của A* không lớn hơn UCS.
+\item
+  Màn không có lời giải (S3): mọi thuật toán trả \texttt{no\_\allowbreak{}solution}.
+\item
+  Đủ dòng: 33 màn gốc × 5 cấu hình cùng các màn tự sinh, không thiếu cặp nào; mọi dòng của màn gốc là \texttt{solved}, vì màn gốc nào cũng có lời giải.
+\end{itemize}
+
+Các mục trên được kiểm tự động bằng \texttt{experiments/\allowbreak{}check\_\allowbreak{}results.\allowbreak{}py} (K1--K8). Kiểm tra ``đặt mọi chi phí bằng 1 thì UCS bằng BFS'' nằm ở test của UCS. Kiểm tra ``0 vi phạm heuristic'' nằm ở \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py}.
+
+\textbf{Kết quả trên lần đo ngày 31/10:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{K1--K8 đều PASS} (\texttt{check\_\allowbreak{}results.\allowbreak{}txt}).
+\item
+  \textbf{Tái lập:} chạy lại lần hai trên cùng commit; \texttt{compare\_\allowbreak{}runs.\allowbreak{}py} cho số đếm trùng hẳn ở 235/235 cặp. Thời gian tìm kiếm lần hai so với lần một có tỉ lệ trung vị 1,03 (thấp nhất 0,93, cao nhất 1,19); bộ nhớ đỉnh trùng hẳn.
+\item
+  \textbf{Kiểm tra độc lập} (\texttt{kiem\_\allowbreak{}tra\_\allowbreak{}doc\_\allowbreak{}lap.\allowbreak{}py}, không dùng công cụ sinh bảng):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    phát lại 225 lời giải bằng engine: 0 lệch số bước hay tổng chi phí;
+  \item
+    tính lại 75 ô trung vị của Bảng 5.5--5.7: 0 lệch;
+  \item
+    555 giá trị trong CSV của các hình khớp \texttt{summary.\allowbreak{}csv}.
+  \end{itemize}
+\end{itemize}
+
+\textbf{Chạy lại.} Trong \texttt{Source/\allowbreak{}}, theo thứ tự ở \texttt{Source/\allowbreak{}experiments/\allowbreak{}README.\allowbreak{}md}:
+
+\begin{verbatim}
+python -m pip install -r requirements.txt                    # gồm matplotlib cho hình và bảng
+python tools/check_heuristics.py                             # hàm chi phí Bảng 3.3.1 là mặc định; 0 vi phạm
+python -m experiments.run --levels levels/original levels/gen --cost energy --out experiments/<thư mục>
+python -m experiments.check_results experiments/<thư mục>/summary.csv          # K1–K8
+python -m experiments.charts --summary experiments/<thư mục>/summary.csv --out experiments/<thư mục>/figures
+python -m experiments.tables --summary experiments/<thư mục>/summary.csv --out experiments/<thư mục>/tables.md
+python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>      # kiểm tra tái lập
+\end{verbatim}
+
+\subsection{5.2. Bộ màn}
+
+Đề yêu cầu một bộ test cố định, chia theo độ khó tăng dần và mô tả rõ trong báo cáo {[}1, mục 3.6{]}. Nhóm dùng \textbf{33 màn của game gốc} (5 nhóm G1--G5) và \textbf{14 màn tự sinh} (3 nhóm S1--S3). Bộ màn cố định cho mọi thuật toán, nên phép so sánh là công bằng.
+
+\textbf{33 màn gốc.} 33 màn của Bloxorz {[}2{]}, theo đúng thứ tự trong game. Dữ liệu chuyển tự động từ file \texttt{levels.\allowbreak{}json} của bản port bloxorz\_gba {[}3{]} (commit \texttt{f57ebb6}, giấy phép GPL-3.0) bằng script \texttt{Source/\allowbreak{}experiments/\allowbreak{}convert\_\allowbreak{}original\_\allowbreak{}levels.\allowbreak{}py}. Có một hiệu chỉnh: màn 3 thêm 4 ô sàn mà bản port thiếu, trong khi ba nguồn đối chiếu {[}4{]}, {[}5{]}, {[}6{]} đều có. Test \texttt{tests/\allowbreak{}test\_\allowbreak{}original\_\allowbreak{}levels.\allowbreak{}py} đối chiếu từng ô và từng liên kết với dữ liệu gốc. Bàn của mọi màn là lưới 10 × 15.
+
+Đề gợi ý bốn nhóm: không có ô đặc biệt, có ô dễ vỡ, có công tắc, và kết hợp. Nhóm tách thêm các màn có công tắc tách thành nhóm riêng (G5), vì khi khối bị tách, trạng thái gồm hai khối con và không gian trạng thái khác hẳn.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2870}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.4213}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}@{}}
+\caption{\textbf{Bảng 5.3.} Năm nhóm màn gốc. ``Số bước tối ưu'' là số bước của lời giải ít bước nhất theo dữ liệu tham khảo; BFS của nhóm khớp ở cả 33 màn (test T24 và bước kiểm tra K2 của lần đo).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mô tả}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước tối ưu (nhỏ nhất -- lớn nhất)}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Mô tả}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước tối ưu (nhỏ nhất -- lớn nhất)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+G1 & Cơ bản: chỉ sàn, ô trống, đích & 1, 3, 6 & 3 & 7 -- 35 \\
+G2 & Có ô dễ vỡ & 4, 13 & 2 & 28 -- 46 \\
+G3 & Có công tắc mềm hoặc nặng và cầu & 2, 5, 7, 11, 12, 14, 17, 18, 19, 21, 22, 25, 29, 32, 33 & 15 & 17 -- 129 \\
+G4 & Ô dễ vỡ kết hợp công tắc & 27, 30, 31 & 3 & 71 -- 114 \\
+G5 & Có công tắc tách & 8, 9, 10, 15, 16, 20, 23, 24, 26, 28 & 10 & 10 -- 104 \\
+\end{longtable}
+
+Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với kiểu tác động khác nhau (mở, đóng, đảo trạng thái); file màn ghi các công tắc này bằng trường \texttt{links} (mục 2.2).
+
+\textbf{14 màn tự sinh.} 33 màn gốc nhỏ, thời gian giải chỉ vài mili-giây nên dễ nhiễu, và khó thấy khác biệt giữa các thuật toán. Ba nhóm màn sinh bằng script cho số liệu ở quy mô lớn hơn, mỗi nhóm trả lời một câu hỏi ở mục 5.1.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2710}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1025}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1126}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}@{}}
+\caption{\textbf{Bảng 5.4.} Ba nhóm màn tự sinh.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cách dựng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tham số}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kích thước lưới}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước tối ưu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Câu hỏi}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cách dựng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tham số}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kích thước lưới}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước tối ưu}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Câu hỏi}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S1 Sân trống & Bàn N × N toàn sàn; xuất phát ở góc trên trái (0, 0), đích ở góc dưới phải (N − 1, N − 1) & N = 10, 25, 50, 100, 150, 200 & N × N & 12, 32, 66, 132, 200, 266 & 5 \\
+S2 Cầu & Lưới 8 × 12 cố định. Hàng 0 là mép ngoài: ô trống, trừ k ô cầu đóng ở cột 1 \ldots{} k. k công tắc mềm ở hàng 1, cột 1 \ldots{} k; mỗi công tắc đảo ô cầu ngay trên nó. Xuất phát (3, 1), đích (3, 10); đường tới đích không qua cầu & k = 0, 2, 4, 6, 8, 10 & 8 × 12 & 6 với mọi k & 3 \\
+S3 Không lời giải & Vùng trái N × N chứa điểm xuất phát (1, 1), một cột ô trống, rồi vùng phải N × 3 chứa đích (1, N + 2). Khối không qua được khe rộng 1 ô, vì lăn về phía khe thì luôn có một phần khối trên ô trống & N = 10, 50 & N × (N + 4) & không có lời giải & 5 \\
+\end{longtable}
+
+Ở S2, lời giải không đổi theo k, nhưng mỗi cấu hình cầu là một trạng thái khác nhau, nên số trạng thái có thể tăng tới \(2^k\) lần. Đây là cách đo trực tiếp phần không gian trạng thái do cầu tạo ra.
+
+Khi sinh, script \texttt{experiments/\allowbreak{}gen\_\allowbreak{}levels.\allowbreak{}py} dùng BFS tính số bước tối ưu (\texttt{par}) của từng màn; S3 không có lời giải nên \texttt{par} = 0. Test \texttt{tests/\allowbreak{}test\_\allowbreak{}gen\_\allowbreak{}levels.\allowbreak{}py} kiểm đủ 14 file, cấu trúc của từng nhóm, và tính giải được của một màn đại diện mỗi nhóm. Tên file: \texttt{s1\_\allowbreak{}010} \ldots{} \texttt{s1\_\allowbreak{}200}, \texttt{s2\_\allowbreak{}00} \ldots{} \texttt{s2\_\allowbreak{}10}, \texttt{s3\_\allowbreak{}10}, \texttt{s3\_\allowbreak{}50}.
+
+Bảng 5.4 lấy trực tiếp từ các file màn trong \texttt{Source/\allowbreak{}levels/\allowbreak{}gen/\allowbreak{}}; chạy lại \texttt{gen\_\allowbreak{}levels.\allowbreak{}py} ra giống hệt 14 file.
+
+\textbf{Tổng cộng:} 47 màn (33 gốc + 14 tự sinh) × 5 cấu hình = 235 cặp (màn, cấu hình); mỗi cặp 5 lần đo thời gian và 1 lần đo bộ nhớ.
+
+\subsection{5.3. Kết quả}
+
+Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit \texttt{0a35afd}, chế độ chi phí \texttt{energy} (Bảng 5.2). Bảng sinh bằng \texttt{experiments/\allowbreak{}tables.\allowbreak{}py}, hình vẽ bằng Matplotlib {[}12{]} qua \texttt{experiments/\allowbreak{}charts.\allowbreak{}py}, không chỉnh tay. Dữ liệu gốc và CSV của từng hình nằm ở \texttt{Source/\allowbreak{}experiments/\allowbreak{}benchmark-\allowbreak{}2026-\allowbreak{}10-\allowbreak{}31-\allowbreak{}0a35afd/\allowbreak{}}. Bảng đầy đủ 235 cặp ở Phụ lục A.
+
+Ở nhóm G5, cột tổng chi phí và số liệu của UCS, A* phụ thuộc chi phí của bước tách khối (1,62; lý do ở mục 3.3.3).
+
+\begin{longtable}[]{@{}lllllll@{}}
+\caption{\textbf{Bảng 5.5.} Trung vị số nút mở rộng theo nhóm màn gốc.}\tabularnewline
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+G1 & 3 & 81 & 63 & 90 & 84 & 84 \\
+G2 & 2 & 100 & 92 & 103 & 100 & 100 \\
+G3 & 15 & 325 & 240 & 328 & 310 & 311 \\
+G4 & 3 & 552 & 261 & 557 & 543 & 548 \\
+G5 & 10 & 2 851 & 658 & 3 268 & 2 900 & 3 088 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lllllll@{}}
+\caption{\textbf{Bảng 5.6.} Trung vị thời gian tìm kiếm (ms) theo nhóm màn gốc.}\tabularnewline
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+G1 & 3 & 1,21 & 1,03 & 1,69 & 1,61 & 1,67 \\
+G2 & 2 & 1,56 & 1,41 & 1,77 & 1,85 & 1,92 \\
+G3 & 15 & 4,76 & 3,70 & 6,51 & 5,90 & 6,02 \\
+G4 & 3 & 8,18 & 3,91 & 9,93 & 10,26 & 10,06 \\
+G5 & 10 & 92,16 & 19,32 & 126,06 & 117,57 & 128,37 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lllllll@{}}
+\caption{\textbf{Bảng 5.7.} Trung vị bộ nhớ đỉnh (KB) theo nhóm màn gốc.}\tabularnewline
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+G1 & 3 & 44,0 & 38,3 & 45,2 & 50,2 & 45,7 \\
+G2 & 2 & 43,5 & 46,6 & 44,9 & 51,1 & 45,3 \\
+G3 & 15 & 151,0 & 116,4 & 134,1 & 134,9 & 129,9 \\
+G4 & 3 & 223,0 & 105,3 & 222,8 & 229,1 & 220,8 \\
+G5 & 10 & 1 160,2 & 459,5 & 1 418,9 & 1 342,4 & 1 376,0 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2278}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2139}}@{}}
+\caption{\textbf{Bảng 5.8.} Chất lượng lời giải trên 33 màn gốc. ``Tối ưu về số bước'': bằng số bước của BFS. ``Tối ưu về chi phí'': bằng tổng chi phí của UCS.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Giải được}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu về số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu về chi phí}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước trung bình so với tối ưu}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Giải được}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu về số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tối ưu về chi phí}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước trung bình so với tối ưu}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BFS & 33/33 & 33/33 & 31/33 & 100,0 \% \\
+DFS & 33/33 & 3/33 & 3/33 & 288,3 \% \\
+UCS & 33/33 & 33/33 & 33/33 & 100,0 \% \\
+A* (\(h_P\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
+A* (\(h_M\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
+\end{longtable}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{\textbf{Bảng 5.9.} Trung vị số nút mở rộng của UCS và A* theo nhóm, và trung vị hệ số phân nhánh hiệu dụng \(b^*\) trên 33 màn gốc.}\tabularnewline
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+G1 & 90 & 84 & 84 \\
+G2 & 103 & 100 & 100 \\
+G3 & 328 & 311 & 310 \\
+G4 & 557 & 548 & 543 \\
+G5 & 3 268 & 3 088 & 2 900 \\
+\(b^*\) & 1,080 & 1,080 & 1,080 \\
+\end{longtable}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.1}]{hinh/h5-1-so-nut-mo-rong.png}
+\caption{Hình 5.1. Số nút mở rộng trên từng màn gốc, thang log. DFS mở rộng ít nút nhất ở 26/33 màn. DFS mở rộng nhiều hơn BFS ở 6 màn: 01, 02, 04, 16, 23, 28.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.2}]{hinh/h5-2-thoi-gian.png}
+\caption{Hình 5.2. Thời gian tìm kiếm trên từng màn gốc. Thời gian đi theo số nút mở rộng: tương quan hạng Spearman giữa hai cột trên 165 cặp (màn, thuật toán) là 0,978.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.3}]{hinh/h5-3-bo-nho.png}
+\caption{Hình 5.3. Bộ nhớ đỉnh trên từng màn gốc. Bộ nhớ đi theo số trạng thái đã thăm: tương quan hạng Spearman 0,997.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.4}]{hinh/h5-4-dfs-so-voi-toi-uu.png}
+\caption{Hình 5.4. Số bước của DFS chia cho số bước tối ưu. Trung vị theo màn là 1,73; lớn nhất 15,83 ở màn 23. DFS ra đúng số bước tối ưu ở 3 màn: 04, 21, 27.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.5}]{hinh/h5-5-astar-so-voi-ucs.png}
+\caption{Hình 5.5. Số nút của A}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.6}]{hinh/h5-6-theo-nhom.png}
+\caption{Hình 5.6. Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.7}]{hinh/h5-7-san-trong-s1.png}
+\caption{Hình 5.7. Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ \(3N^2\) nút (2,59 \(N^2\) ở N = 10, 2,99 \(N^2\) ở N = 200). Đường của UCS và A}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.8}]{hinh/h5-8-cau-s2.png}
+\caption{Hình 5.8. Số trạng thái đã thăm theo số công tắc k (S2); đường nét đứt là số trạng thái BFS thăm ở k = 0, nhân \(2^k\). Số trạng thái thực tế đi ngang từ k = 6 và còn xa đường \(2^k\).}
+\end{figure}
+
+\textbf{Bộ màn tự sinh.} Số liệu chọn lọc từ \texttt{summary.\allowbreak{}csv}:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1222}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1083}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1139}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1278}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1361}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Kết quả}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thời gian (ms)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Bộ nhớ (KB)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{s1\_\allowbreak{}200} & BFS & solved & 266 & 119 589 & 119 598 & 2 195,64 & 44 736,48 \\
+\texttt{s1\_\allowbreak{}200} & DFS & solved & 35 287 & 43 013 & 98 095 & 914,64 & 39 080,73 \\
+\texttt{s1\_\allowbreak{}200} & UCS & solved & 266 & 119 599 & 119 600 & 3 357,73 & 50 718,93 \\
+\texttt{s1\_\allowbreak{}200} & A* (\(h_P\)) & solved & 266 & 119 597 & 119 600 & 3 439,23 & 55 926,54 \\
+\texttt{s2\_\allowbreak{}00} & BFS & solved & 6 & 95 & 145 & 1,52 & 61,27 \\
+\texttt{s2\_\allowbreak{}10} & BFS & solved & 6 & 197 & 414 & 3,41 & 200,24 \\
+\texttt{s2\_\allowbreak{}10} & A* (\(h_P\)) & solved & 6 & 30 & 89 & 0,85 & 62,39 \\
+\texttt{s3\_\allowbreak{}50} & BFS & no\_solution & & 7 400 & 7 400 & 122,87 & 3 004,41 \\
+\texttt{s3\_\allowbreak{}50} & DFS & no\_solution & & 7 400 & 7 400 & 123,51 & 3 003,11 \\
+\texttt{s3\_\allowbreak{}50} & UCS & no\_solution & & 7 400 & 7 400 & 164,30 & 3 081,45 \\
+\texttt{s3\_\allowbreak{}50} & A* (\(h_P\)) & no\_solution & & 0 & 1 & 0,01 & 13,98 \\
+\texttt{s3\_\allowbreak{}50} & A* (\(h_M\)) & no\_solution & & 7 400 & 7 400 & 184,18 & 3 107,64 \\
+\end{longtable}
+}
+
+\textbf{Timeout và không có lời giải.}
+
+\begin{itemize}
+\tightlist
+\item
+  Không cặp nào hết giờ (60 giây). Cặp chạy lâu nhất là A* (\(h_P\)) trên \texttt{s1\_\allowbreak{}200}: 3 439,23 ms thời gian tìm kiếm.
+\item
+  10 cặp \texttt{no\_\allowbreak{}solution} đều ở S3, đúng như thiết kế.
+\item
+  Không có dòng \texttt{invalid} hay lỗi (K1).
+\end{itemize}
+
+\textbf{Trước và sau khi sửa chi phí bước tách.} Lần đo trước, trên commit \texttt{cd93624}, tính bước tách 1,0. Dữ liệu của lần đo đó vẫn giữ ở \texttt{Source/\allowbreak{}experiments/\allowbreak{}benchmark-\allowbreak{}2026-\allowbreak{}10-\allowbreak{}31-\allowbreak{}cd93624/\allowbreak{}}, kèm ghi chú đã bị thay thế. So hai \texttt{summary.\allowbreak{}csv} bằng \texttt{compare\_\allowbreak{}runs.\allowbreak{}py} (\texttt{so-\allowbreak{}sanh-\allowbreak{}voi-\allowbreak{}cd93624.\allowbreak{}txt}):
+
+\begin{itemize}
+\tightlist
+\item
+  50 cặp khác nhau, đúng bằng 10 màn G5 × 5 cấu hình; 185 cặp còn lại trùng hẳn ở mọi số đếm, tổng chi phí và bộ nhớ.
+\item
+  Số bước không đổi ở mọi cặp.
+\item
+  BFS và DFS chỉ khác ở tổng chi phí, vì hai thuật toán không dùng chi phí khi chọn nút. Mỗi bước tách trên lời giải đắt thêm 0,62.
+\item
+  UCS và A* khác thêm ở số đếm, vì chi phí bước tách đổi thứ tự lấy nút ra khỏi hàng đợi.
+\end{itemize}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2288}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2010}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2018}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2018}}@{}}
+\caption{\textbf{Bảng 5.10.} Nhóm G5 trước (\texttt{cd93624}, bước tách 1,0) và sau (\texttt{0a35afd}, bước tách 1,62) khi sửa.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tổng chi phí tối ưu (UCS)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Chênh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng UCS}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút A* (\(h_P\))}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút A* (\(h_M\))}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tổng chi phí tối ưu (UCS)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Chênh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng UCS}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút A* (\(h_P\))}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút A* (\(h_M\))}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+08 & 11,98 → 12,60 & +0,62 & 594 → 594 & 492 → 492 & 507 → 508 \\
+09 & 28,68 → 29,30 & +0,62 & 749 → 749 & 666 → 666 & 684 → 684 \\
+10 & 66,82 → 67,44 & +0,62 & 3 611 → 3 505 & 3 153 → 3 086 & 3 391 → 3 356 \\
+15 & 68,22 → 68,84 & +0,62 & 3 031 → 3 031 & 2 715 → 2 715 & 2 821 → 2 821 \\
+16 & 33,88 → 38,22 & +4,34 & 160 → 168 & 149 → 160 & 155 → 160 \\
+20 & 70,06 → 70,68 & +0,62 & 4 437 → 4 438 & 3 810 → 3 813 & 3 915 → 3 917 \\
+23 & 99,96 → 100,58 & +0,62 & 3 804 → 3 755 & 3 682 → 3 682 & 3 737 → 3 711 \\
+24 & 75,69 → 76,31 & +0,62 & 518 → 523 & 502 → 504 & 508 → 511 \\
+26 & 124,26 → 125,50 & +1,24 & 4 910 → 4 910 & 4 704 → 4 704 & 4 778 → 4 778 \\
+28 & 127,35 → 127,97 & +0,62 & 3 603 → 3 603 & 3 397 → 3 397 & 3 434 → 3 434 \\
+\end{longtable}
+
+Mức chênh tổng chi phí là bội của 0,62: lời giải tối ưu của màn 16 có 7 bước tách, của màn 26 có 2, các màn còn lại có 1. Các kết luận ở mục 5.5 không đổi; chỉ các con số của G5 và các tổng có chứa G5 đổi theo. Hai thay đổi lớn nhất:
+
+\begin{itemize}
+\tightlist
+\item
+  trung vị G5 của UCS giảm từ 3 317 xuống 3 268 nút, của A* (\(h_P\)) từ 2 934 xuống 2 900 (Bảng 5.5);
+\item
+  ở màn 16, A* (\(h_P\)) và A* (\(h_M\)) nay cùng mở rộng 160 nút, nên số màn \(h_P\) bằng \(h_M\) tăng từ 10 lên 11.
+\end{itemize}
+
+Thời gian ở mọi cặp đều đổi giữa hai lần đo, kể cả ở 185 cặp không bị ảnh hưởng, nên phần lệch thời gian không dùng để đánh giá việc sửa (xem phần hạn chế ở mục 5.5).
+
+\subsection{5.4. Nhận xét từng thuật toán}
+
+Mục này nhận xét kết quả của từng thuật toán: BFS (5.4.1), DFS (5.4.2), UCS (5.4.3) và A* (5.4.4). Mỗi mục trả lời các câu hỏi riêng của thuật toán đó theo ba bước: quan sát, giải thích, ý nghĩa.

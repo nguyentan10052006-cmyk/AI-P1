@@ -1,0 +1,159 @@
+\subsection{3.1. Tìm kiếm theo chiều rộng (BFS)}
+
+\subsubsection{3.1.1. Ý tưởng}
+
+BFS {[}7, §3.4.1{]} mở rộng các trạng thái theo từng lớp độ sâu: trước hết là mọi trạng thái cách trạng thái đầu một bước, rồi tới mọi trạng thái cách hai bước, và cứ thế. Biên (frontier) là một hàng đợi vào trước ra trước (FIFO). BFS không dùng chi phí bước khi chọn nút, nên trạng thái đích gặp đầu tiên nằm ở độ sâu nhỏ nhất: lời giải BFS là lời giải có ít bước nhất.
+
+Nhóm cài BFS dạng \textbf{tìm kiếm trên đồ thị} (graph search): có tập đã thăm \texttt{visited}, mỗi trạng thái vào hàng đợi nhiều nhất một lần. Không gian trạng thái của Bloxorz có rất nhiều chu trình, ví dụ lăn sang phải rồi sang trái là về đúng trạng thái cũ. BFS dạng cây sẽ sinh lại các trạng thái này rất nhiều lần. Trạng thái, hành động, hàm chuyển và kiểm tra đích dùng chung với ba thuật toán còn lại (chương 2).
+
+\subsubsection{3.1.2. Mã giả}
+
+\begin{verbatim}
+BFS(problem):
+    s0 ← problem.initial_state()
+    nếu problem.is_goal(s0): trả về lời giải rỗng
+    frontier ← hàng đợi FIFO [s0];  visited ← {s0};  cha[s0] ← (rỗng, rỗng)
+    lặp khi frontier khác rỗng:
+        s ← frontier.lấy_đầu()                            ▷ nút nông nhất
+        expanded ← expanded + 1
+        với mỗi a trong problem.actions(s):               ▷ thứ tự U, D, L, R (đã tách: U1 … R1, U2 … R2)
+            s' ← problem.result(s, a)
+            nếu s' = None: bỏ qua                         ▷ khối rơi, không phải nút con
+            generated ← generated + 1
+            nếu s' ∈ visited: bỏ qua                      ▷ trạng thái lặp
+            visited ← visited ∪ {s'};  cha[s'] ← (s, a)   ▷ đánh dấu khi ĐƯA VÀO hàng đợi
+            nếu problem.is_goal(s'): trả về dựng_đường(cha, s')   ▷ kiểm tra đích khi SINH nút
+            frontier.thêm_cuối(s')
+            max_frontier ← max(max_frontier, |frontier|)
+    trả về NO_SOLUTION
+
+dựng_đường(cha, g):
+    lần theo cha từ g về s0, gom các hành động, rồi đảo ngược;
+    tổng chi phí = tổng problem.step_cost(s, a, s') dọc đường đi
+\end{verbatim}
+
+Mã nguồn: \texttt{Source/\allowbreak{}solvers/\allowbreak{}bfs.\allowbreak{}py} (lớp \texttt{BFS}, hàm \texttt{\_\allowbreak{}build\_\allowbreak{}path}).
+
+\subsubsection{3.1.3. Các điểm riêng khi cài đặt}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Hàng đợi \texttt{collections.\allowbreak{}deque}.} Lấy đầu (\texttt{popleft}) và thêm cuối (\texttt{append}) đều tốn \(O(1)\). Nếu dùng \texttt{list.\allowbreak{}pop(0)}, mỗi lần lấy tốn \(O(n)\) vì phải dời cả danh sách.
+\item
+  \textbf{Đánh dấu đã thăm khi đưa vào hàng đợi, không phải khi lấy ra.} Một trạng thái không bao giờ nằm trong hàng đợi hai lần, nên hàng đợi và bộ nhớ không phình vì các bản trùng, và \texttt{expanded} đúng bằng số lần lấy ra.
+\item
+  \textbf{Kiểm tra đích khi sinh nút} (early goal test). Lựa chọn này vẫn cho lời giải ít bước nhất. Hàng đợi FIFO sinh mọi nút ở độ sâu \(d\) trước mọi nút ở độ sâu \(d + 1\). Vì vậy, khi nút đích đầu tiên được sinh ra ở độ sâu \(d\), không có nút đích nào ở độ sâu nhỏ hơn: nếu có thì nó đã được sinh trước. Lợi ích là BFS dừng ngay khi sinh ra đích, không phải mở rộng các nút còn lại ở độ sâu \(d - 1\) và các nút ở độ sâu \(d\) đứng trước đích trong hàng đợi {[}7, §3.4.1{]}. UCS và A* thì phải kiểm tra đích khi lấy ra mới giữ được tính tối ưu theo chi phí (mục 3.3, 3.4).
+\item
+  \textbf{Dựng lại đường đi bằng bảng cha.} Mỗi trạng thái mới được ghi \texttt{cha[s'] = (s, a)} khi vào hàng đợi. Khi gặp đích, \texttt{\_\allowbreak{}build\_\allowbreak{}path} lần ngược bảng cha về trạng thái đầu rồi đảo lại, đồng thời cộng \texttt{step\_\allowbreak{}cost} của từng bước. Nhờ vậy cột tổng chi phí của BFS tính theo cùng hàm chi phí với UCS và A* (mục 2.8), và so sánh được với hai thuật toán đó.
+\item
+  \textbf{Đếm chỉ số theo quy ước chung của nhóm.} \texttt{expanded} tăng khi lấy một trạng thái ra để sinh con. \texttt{generated} tăng cho mỗi con hợp lệ (\texttt{result()} khác \texttt{None}), đếm trước khi xét \texttt{visited}. \texttt{max\_\allowbreak{}frontier} cập nhật sau mỗi lần thêm vào hàng đợi. \texttt{visited} là số trạng thái khác nhau đã gặp, tính cả trạng thái đầu. Thời gian và bộ nhớ đo bên ngoài thuật toán, bằng script thực nghiệm (chương 5) và module chạy nền của giao diện (chương 4).
+\end{enumerate}
+
+\subsubsection{3.1.4. Tính đầy đủ, tối ưu và độ phức tạp}
+
+Gọi \(S\) là tập trạng thái tới được từ trạng thái đầu, \(b\) là số hành động tối đa ở một trạng thái (\(b = 4\) khi khối nguyên, \(b = 8\) khi đã tách) và \(d\) là số bước của lời giải ngắn nhất.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Đầy đủ.} \(S\) hữu hạn (mục 2.3, 2.9). Mỗi trạng thái vào hàng đợi nhiều nhất một lần, nên vòng lặp chạy nhiều nhất \(|S|\) lần. Vì vậy BFS luôn dừng: có lời giải thì tìm ra, không có thì duyệt hết \(S\) rồi trả \texttt{no\_\allowbreak{}solution}.
+\item
+  \textbf{Tối ưu theo số bước.} Trên 33 màn gốc, số bước của BFS bằng số bước tối ưu tham khảo ở cả 33/33 màn (test T24, mục 3.1.5).
+\item
+  \textbf{Không tối ưu theo chi phí} khi chi phí bước khác nhau. BFS chỉ bảo đảm ít bước nhất; trong các lời giải cùng số bước, nó trả về lời giải đi trước theo thứ tự hành động. Với hàm chi phí ở Bảng 2.7, BFS và UCS có tổng chi phí khác nhau ở 2/33 màn: màn 17 (140,42 so với 140,10) và màn 23 (101,58 so với 100,58). Ở cả hai màn, BFS và UCS cùng đi 106 và 75 bước, nhưng chọn hai đường khác nhau.
+\item
+  \textbf{Thời gian và bộ nhớ.} Theo lý thuyết, BFS sinh \(O(b^d)\) nút và giữ \(O(b^d)\) nút trong bộ nhớ {[}7, §3.4.1{]}. Nhờ tập đã thăm, cả hai còn bị chặn bởi kích thước không gian trạng thái: nhiều nhất \(|S|\) lần mở rộng, \(b \cdot |S|\) lần gọi hàm chuyển, và \(O(|S|)\) bộ nhớ cho \texttt{visited}, bảng cha và hàng đợi.
+\end{itemize}
+
+Cận \(O(b^d)\) rất lỏng với bài toán này. Màn 32 có lời giải 129 bước, nên \(4^{129} \approx 4{,}6 \times 10^{77}\), trong khi BFS chỉ mở rộng 626 nút trên tổng số 840 trạng thái tới được (Bảng 3.1.1). Hệ số phân nhánh thực tế \texttt{generated /\allowbreak{} expanded} nằm trong khoảng 2,02 đến 5,73 trên 33 màn. Ở các màn khối luôn nguyên, hệ số này từ 2,0 đến khoảng 3,0: trong bốn hướng lăn thường có một hoặc hai hướng làm khối rơi. Ở các màn mà phần lớn trạng thái đã tách (màn 8, 9, 10, 15, 20, 23, 26, 28), hệ số từ 4,8 đến 5,7, vì khi đã tách có tám hành động và mỗi khối con chỉ đi một ô nên ít bị rơi hơn.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1024}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1163}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1163}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1302}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1441}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1163}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1302}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1441}}@{}}
+\caption{\textbf{Bảng 3.1.1.} BFS trên một số màn gốc. Các số đếm là tất định: không phụ thuộc máy chạy và không phụ thuộc hàm chi phí.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút sinh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái tới được}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Màn}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nhóm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút sinh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái tới được}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & G1 & 7 & 48 & 130 & 21 & 65 & 89 \\
+8 & G5 & 10 & 412 & 2 359 & 136 & 533 & 710 \\
+20 & G5 & 56 & 3 983 & 21 069 & 309 & 4 265 & 10 856 \\
+23 & G5 & 75 & 3 692 & 19 754 & 157 & 3 719 & 22 847 \\
+29 & G3 & 104 & 1 809 & 3 999 & 50 & 1 812 & 1 817 \\
+32 & G3 & 129 & 626 & 1 306 & 16 & 631 & 840 \\
+\end{longtable}
+
+Bảng 3.1.1 cho thấy biên lớn nhất của BFS nhỏ so với số trạng thái đã thăm: nhiều nhất 309 phần tử, ở màn 20. Bộ nhớ của BFS vì vậy chủ yếu nằm ở tập đã thăm và bảng cha, không phải ở hàng đợi. BFS cũng thường dừng trước khi duyệt hết không gian: ở màn 23, BFS chỉ thăm 3 719 trên 22 847 trạng thái tới được (16 \%), vì đích nằm ở độ sâu 75 trong khi phần lớn trạng thái đã tách nằm sâu hơn.
+
+\emph{Chạy lại trong \texttt{Source/\allowbreak{}}:}
+\texttt{python -\allowbreak{}c "from pathlib import Path; from bloxorz.\allowbreak{}level import load\_\allowbreak{}level; from bloxorz.\allowbreak{}problem import Problem; from solvers.\allowbreak{}bfs import BFS; r = BFS().\allowbreak{}search(Problem(load\_\allowbreak{}level(Path('levels/\allowbreak{}original/\allowbreak{}23.\allowbreak{}json'), '23'))); print(len(r.\allowbreak{}path), r.\allowbreak{}expanded, r.\allowbreak{}generated, r.\allowbreak{}max\_\allowbreak{}frontier, r.\allowbreak{}visited)"}
+
+\subsubsection{3.1.5. Kiểm thử}
+
+\texttt{Source/\allowbreak{}tests/\allowbreak{}test\_\allowbreak{}bfs.\allowbreak{}py} gồm:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{test\_\allowbreak{}counts\_\allowbreak{}on\_\allowbreak{}corridor\_\allowbreak{}by\_\allowbreak{}hand}, \texttt{test\_\allowbreak{}counts\_\allowbreak{}on\_\allowbreak{}branching\_\allowbreak{}maze\_\allowbreak{}by\_\allowbreak{}hand}: đếm \texttt{expanded}, \texttt{generated}, \texttt{max\_\allowbreak{}frontier}, \texttt{visited} trên hành lang và mê cung rẽ nhánh nhỏ, so với kết quả tính tay;
+\item
+  \texttt{test\_\allowbreak{}action\_\allowbreak{}order\_\allowbreak{}prefers\_\allowbreak{}down\_\allowbreak{}before\_\allowbreak{}right\_\allowbreak{}on\_\allowbreak{}open\_\allowbreak{}board}: trên sân trống có nhiều đường cùng độ dài, thứ tự U, D, L, R làm BFS luôn ra đúng một đường;
+\item
+  \texttt{test\_\allowbreak{}start\_\allowbreak{}is\_\allowbreak{}goal\_\allowbreak{}returns\_\allowbreak{}empty\_\allowbreak{}path}: trạng thái đầu đã là đích thì trả lời giải rỗng, không mở rộng nút nào;
+\item
+  \texttt{test\_\allowbreak{}level\_\allowbreak{}1\_\allowbreak{}typed\_\allowbreak{}by\_\allowbreak{}hand}: màn 1 chép tay từ dữ liệu gốc, lời giải 7 bước;
+\item
+  \texttt{test\_\allowbreak{}bridge\_\allowbreak{}state\_\allowbreak{}is\_\allowbreak{}part\_\allowbreak{}of\_\allowbreak{}visited}: lời giải phải đi bấm công tắc rồi quay lại ô cũ, tức là cùng vị trí khối nhưng khác cấu hình cầu;
+\item
+  \texttt{test\_\allowbreak{}no\_\allowbreak{}solution\_\allowbreak{}when\_\allowbreak{}gap\_\allowbreak{}is\_\allowbreak{}two\_\allowbreak{}tiles}: màn không có lời giải thì BFS duyệt hết rồi trả \texttt{no\_\allowbreak{}solution};
+\item
+  \texttt{test\_\allowbreak{}levels\_\allowbreak{}1\_\allowbreak{}3\_\allowbreak{}6}, \texttt{test\_\allowbreak{}split\_\allowbreak{}levels\_\allowbreak{}8\_\allowbreak{}9\_\allowbreak{}16}: các màn cơ bản và các màn có tách khối ra đúng số bước tối ưu;
+\item
+  \texttt{test\_\allowbreak{}t24\_\allowbreak{}levels\_\allowbreak{}without\_\allowbreak{}links}, \texttt{test\_\allowbreak{}t24\_\allowbreak{}levels\_\allowbreak{}with\_\allowbreak{}links} (test T24): cả 33 màn gốc, lời giải BFS phát lại trên engine tới đích và có số bước bằng số bước tối ưu tham khảo.
+\end{itemize}

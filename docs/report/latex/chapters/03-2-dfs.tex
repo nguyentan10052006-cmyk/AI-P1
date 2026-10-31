@@ -1,0 +1,174 @@
+\subsection{3.2. Tìm kiếm theo chiều sâu (DFS)}
+
+\subsubsection{3.2.1. Ý tưởng}
+
+DFS {[}7, §3.4.3{]} luôn mở rộng nút sâu nhất trong biên: biên là một ngăn xếp (vào sau, ra trước). Từ trạng thái đầu, thuật toán đi theo một nhánh tới khi gặp đích hoặc hết đường, rồi quay lui về nút gần nhất còn con chưa thử.
+
+Nhóm cài DFS dạng \textbf{tìm kiếm trên đồ thị} (graph search): có tập đã thăm \texttt{visited}, mỗi trạng thái chỉ được đưa vào biên một lần. Đề yêu cầu xử lý trạng thái lặp {[}1, mục 3.3{]}, và không gian trạng thái của Bloxorz có rất nhiều chu trình: khối lăn sang phải rồi sang trái là về đúng trạng thái cũ. DFS dạng cây (không nhớ trạng thái đã gặp) sẽ lặp vô hạn trên các chu trình này.
+
+Trạng thái, hành động, hàm chuyển và kiểm tra đích dùng chung với ba thuật toán còn lại (chương 2). Trạng thái gồm tư thế, vị trí khối (hoặc hai khối con) và tập cầu đang mở, nên hai trạng thái cùng vị trí khối nhưng khác cấu hình cầu là hai trạng thái khác nhau trong \texttt{visited}.
+
+\subsubsection{3.2.2. Vì sao chọn DFS, không chọn IDS}
+
+Đề cho phép thay DFS bằng IDS {[}1, mục 3.3{]}. Nhóm chọn \textbf{DFS dạng tìm kiếm trên đồ thị}, không cài IDS, vì bốn lý do.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{IDS không thêm góc nhìn mới cho thực nghiệm.} Với chi phí bước bằng nhau, IDS cho lời giải ít bước nhất, giống BFS. DFS thì cho lời giải dài và không tối ưu, tạo một điểm đối chiếu rõ với BFS, UCS và A* trong chương 5.
+\item
+  \textbf{Lời giải của các màn gốc rất dài.} Lời giải ít bước nhất dài tới 129 bước (màn 32). IDS phải chạy lại từ đầu với mọi giới hạn độ sâu từ 0 tới độ dài đó.
+\item
+  \textbf{IDS phải chọn giữa hai cách chặn lặp, cách nào cũng có giá.} Chặn lặp chỉ trên đường đi hiện tại thì giữ được ưu điểm bộ nhớ, nhưng duyệt lại cùng một trạng thái qua rất nhiều đường. Ở màn không có lời giải (nhóm S3, mục 5.2), IDS kiểu này chỉ kết luận ``không có lời giải'' khi giới hạn độ sâu đã vượt độ dài của đường đi đơn (không lặp trạng thái) dài nhất. Trước đó, mỗi vòng phải duyệt lại mọi đường đi đơn, mà số đường này tăng theo hàm mũ. Vì vậy, trên thực tế IDS sẽ hết giờ trước khi dừng. Nhớ toàn cục mọi trạng thái đã gặp thì mất ưu điểm bộ nhớ: ở bài của nhóm khóa trước {[}8{]}, IDS tốn 30,7 MB trong khi BFS chỉ 5,6 MB.
+\item
+  \textbf{DFS có tập đã thăm luôn dừng} trên không gian hữu hạn (mục 3.2.5), kể cả ở màn không có lời giải, và đơn giản để kiểm chứng.
+\end{enumerate}
+
+\subsubsection{3.2.3. Mã giả}
+
+\begin{verbatim}
+DFS(problem):
+    s0 ← problem.initial_state()
+    nếu problem.is_goal(s0): trả về lời giải rỗng
+    stack ← [s0];  visited ← {s0};  cha[s0] ← (rỗng, rỗng)
+    lặp khi stack khác rỗng:
+        s ← stack.pop()                                   ▷ nút sâu nhất
+        expanded ← expanded + 1
+        con ← []
+        với mỗi a trong problem.actions(s):               ▷ thứ tự U, D, L, R (đã tách: U1 … R1, U2 … R2)
+            s' ← problem.result(s, a)
+            nếu s' = None: bỏ qua                         ▷ khối rơi, không phải nút con
+            generated ← generated + 1
+            nếu s' ∈ visited: bỏ qua                      ▷ trạng thái lặp
+            visited ← visited ∪ {s'};  cha[s'] ← (s, a)   ▷ đánh dấu khi ĐƯA VÀO biên
+            nếu problem.is_goal(s'): trả về dựng_đường(cha, s')   ▷ kiểm tra đích khi SINH nút
+            thêm s' vào cuối con
+        đẩy các phần tử của con vào stack theo thứ tự NGƯỢC   ▷ con của U nằm trên cùng
+        max_frontier ← max(max_frontier, |stack|)
+    trả về NO_SOLUTION
+
+dựng_đường(cha, g):
+    lần theo cha từ g về s0, gom các hành động, rồi đảo ngược;
+    tổng chi phí = tổng problem.step_cost(s, a, s') dọc đường đi
+\end{verbatim}
+
+Mã nguồn: \texttt{Source/\allowbreak{}solvers/\allowbreak{}dfs.\allowbreak{}py} (lớp \texttt{DFS}, hàm \texttt{\_\allowbreak{}build\_\allowbreak{}path}).
+
+\subsubsection{3.2.4. Thứ tự mở rộng và cách dựng lại đường đi}
+
+\textbf{Thứ tự hành động.} \texttt{Problem.\allowbreak{}actions()} trả về các hành động theo thứ tự cố định: U, D, L, R khi khối nguyên; U1, D1, L1, R1, U2, D2, L2, R2 khi đã tách (mục 2.4). Kết quả của DFS phụ thuộc thứ tự này, nên thứ tự được giữ cố định và giống nhau ở cả bốn thuật toán. Các con được đẩy vào ngăn xếp theo thứ tự ngược, nên con sinh từ U nằm trên cùng và được mở rộng trước. Nói cách khác, DFS luôn thử đi lên trước, rồi xuống, trái, phải.
+
+\textbf{Bảng cha và dựng lại đường đi.} Mỗi trạng thái mới được ghi \texttt{cha[s'] = (s, a)} ngay khi được đưa vào ngăn xếp. Khi gặp đích, \texttt{\_\allowbreak{}build\_\allowbreak{}path} lần theo bảng cha từ đích về trạng thái đầu, gom các hành động rồi đảo ngược, đồng thời cộng \texttt{step\_\allowbreak{}cost} của từng bước để ra tổng chi phí. Vì mỗi trạng thái chỉ có một cha (cha đầu tiên sinh ra nó), đường đi dựng lại là duy nhất và đúng là nhánh DFS đã đi tới đích. Hành động ``đổi khối con đang điều khiển'' không phải là một hành động của bài toán (mục 2.3): khối con được chọn nằm ngay trong hành động (\texttt{U1} hay \texttt{U2}), nên không cần ghi thêm gì vào bảng cha.
+
+\textbf{Ví dụ.} Bảng 3.2.1 so sánh DFS với BFS trên màn 1 (nhóm G1, lời giải ít bước nhất 7 bước).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.4722}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}@{}}
+\caption{\textbf{Bảng 3.2.1.} BFS và DFS trên màn 1. Số đếm theo quy ước ở mục 3.1.3.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Lời giải}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút sinh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Thuật toán}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Số bước}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Lời giải}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút mở rộng}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nút sinh}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Biên lớn nhất}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Trạng thái đã thăm}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BFS & 7 & \texttt{R D D R R D R} & 48 & 130 & 21 & 65 \\
+DFS & 37 & \texttt{D R U L U R D D R U L U L D R D R R U R D L U L D R D R R U L D L U R R D} & 63 & 167 & 22 & 83 \\
+\end{longtable}
+
+\emph{Chạy lại trong \texttt{Source/\allowbreak{}}:}
+\texttt{python -\allowbreak{}c "from pathlib import Path; from bloxorz.\allowbreak{}level import load\_\allowbreak{}level; from bloxorz.\allowbreak{}problem import Problem; from solvers.\allowbreak{}dfs import DFS; r = DFS().\allowbreak{}search(Problem(load\_\allowbreak{}level(Path('levels/\allowbreak{}original/\allowbreak{}01.\allowbreak{}json'), '01'))); print(len(r.\allowbreak{}path), r.\allowbreak{}expanded, r.\allowbreak{}generated, r.\allowbreak{}max\_\allowbreak{}frontier, r.\allowbreak{}visited)"}
+
+Lời giải DFS dài gấp hơn 5 lần lời giải tối ưu, vì DFS chỉ dừng ở lần đầu gặp đích trên nhánh nó đang đi, không so sánh với các nhánh khác. Các số đếm này \textbf{không phụ thuộc hàm chi phí}: DFS không dùng \texttt{step\_\allowbreak{}cost} để chọn nút, chỉ dùng để tính tổng chi phí của lời giải sau khi đã tìm xong. Chúng cũng không phụ thuộc máy chạy: cùng commit thì luôn ra cùng kết quả (test \texttt{test\_\allowbreak{}deterministic}).
+
+\subsubsection{3.2.5. Tính đầy đủ, tối ưu và độ phức tạp}
+
+Gọi \(S\) là tập trạng thái tới được từ trạng thái đầu và \(b\) là số hành động tối đa ở một trạng thái: \(b = 4\) khi khối nguyên, \(b = 8\) khi đã tách.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Đầy đủ (trên không gian hữu hạn).} \(S\) hữu hạn, vì bàn hữu hạn và số cấu hình cầu hữu hạn (tối đa \(2^k\) với \(k\) ô cầu). Mỗi trạng thái được đưa vào ngăn xếp nhiều nhất một lần, nhờ \texttt{visited}, nên vòng lặp chạy nhiều nhất \(|S|\) lần. Vì vậy DFS luôn dừng: nếu có lời giải thì tìm ra một lời giải; nếu không thì duyệt hết \(S\) rồi trả về \texttt{no\_\allowbreak{}solution}. Không cần timeout để DFS dừng ở màn không có lời giải; test \texttt{test\_\allowbreak{}no\_\allowbreak{}solution\_\allowbreak{}when\_\allowbreak{}gap\_\allowbreak{}is\_\allowbreak{}two\_\allowbreak{}tiles} kiểm tra điều này. Trên không gian vô hạn, DFS không đầy đủ {[}7, §3.4.3{]}, nhưng trường hợp đó không xảy ra trong bài này.
+\item
+  \textbf{Không tối ưu.} DFS trả về lời giải đầu tiên gặp được theo thứ tự hành động, không bảo đảm ít bước nhất hay rẻ nhất (Bảng 3.2.1: 37 bước so với 7). Vì vậy kiểm tra đích ngay khi sinh nút không làm mất gì. Hệ quả dùng để kiểm tra cài đặt: số bước của DFS không bao giờ nhỏ hơn số bước của BFS (mục 5.1).
+\item
+  \textbf{Thời gian.} Mỗi trạng thái được mở rộng nhiều nhất một lần, và mỗi lần mở rộng gọi \texttt{problem.\allowbreak{}result()} cho \(b\) hành động, nên thời gian là \(O(b \cdot |S|)\) lần gọi hàm chuyển. Các thao tác trên \texttt{visited} và bảng cha là phép băm, trung bình \(O(1)\). Đây là cận trên của trường hợp xấu nhất; trên thực tế DFS dừng ngay khi gặp đích, nên có thể duyệt ít hơn BFS nếu nhánh đầu tiên may mắn đi đúng hướng, hoặc nhiều hơn nếu không.
+\item
+  \textbf{Bộ nhớ.} DFS dạng cây chỉ cần \(O(b \cdot m)\) bộ nhớ, với \(m\) là độ sâu lớn nhất {[}7, §3.4.3{]}. Bản dạng đồ thị của nhóm phải giữ \texttt{visited} và bảng cha cho mọi trạng thái đã gặp, nên bộ nhớ là \(O(|S|)\), cùng bậc với BFS. Ngăn xếp cũng có thể lớn tới \(O(|S|)\), vì mỗi lần mở rộng đẩy vào tối đa \(b\) con. Ưu điểm bộ nhớ kinh điển của DFS vì vậy không còn; mức chênh thực tế với BFS là câu hỏi cho chương 5. Ví dụ ở Bảng 3.2.1: biên lớn nhất của DFS (22) không nhỏ hơn của BFS (21).
+\end{itemize}
+
+\subsubsection{3.2.6. Các điểm riêng khi cài đặt}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ngăn xếp tường minh, không đệ quy.} Biên là một \texttt{list} của Python, dùng \texttt{append} và \texttt{pop}. Python mặc định chỉ cho khoảng 1000 tầng đệ quy, trong khi lời giải DFS có thể dài hơn nhiều; test \texttt{test\_\allowbreak{}long\_\allowbreak{}path\_\allowbreak{}does\_\allowbreak{}not\_\allowbreak{}hit\_\allowbreak{}recursion\_\allowbreak{}limit} chạy trên hành lang 3000 ô.
+\item
+  \textbf{Đánh dấu đã thăm khi đưa vào ngăn xếp}, không phải khi lấy ra (giống BFS). Mỗi trạng thái chỉ nằm trong ngăn xếp nhiều nhất một lần, nên không có mục nào bị bỏ qua khi lấy ra, và \texttt{expanded} đúng bằng số lần lấy ra. Cái giá: thứ tự duyệt không giống hệt DFS đệ quy. Một trạng thái được ``giữ chỗ'' bởi cha đầu tiên sinh ra nó, nên một nhánh sâu hơn đi tới nó sau đó sẽ không đi qua nó nữa. Thuật toán vẫn là DFS theo nghĩa luôn mở rộng nút được đưa vào sau cùng.
+\item
+  \textbf{Kiểm tra đích khi sinh nút}, giống BFS. Trạng thái đầu được kiểm tra riêng trước vòng lặp.
+\item
+  \textbf{Đếm chỉ số theo quy ước chung} (mục 3.1.3). \texttt{expanded} tăng khi lấy một trạng thái ra để sinh con. \texttt{generated} tăng với mỗi con hợp lệ (\texttt{result()} khác \texttt{None}), đếm trước khi xét \texttt{visited}. \texttt{max\_\allowbreak{}frontier} lấy sau mỗi lần đẩy các con vào ngăn xếp. \texttt{visited} là kích thước tập đã thăm lúc kết thúc, tính cả trạng thái đầu.
+\item
+  \textbf{Không dùng hàm chi phí để tìm.} \texttt{step\_\allowbreak{}cost} chỉ dùng trong \texttt{\_\allowbreak{}build\_\allowbreak{}path} để tính tổng chi phí của lời giải, nên cột \texttt{path\_\allowbreak{}cost} của DFS so được với UCS và A* theo cùng một hàm chi phí (mục 3.3.2).
+\end{itemize}
+
+\subsubsection{3.2.7. Kiểm thử}
+
+\texttt{Source/\allowbreak{}tests/\allowbreak{}test\_\allowbreak{}dfs.\allowbreak{}py} gồm:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{test\_\allowbreak{}counts\_\allowbreak{}on\_\allowbreak{}corridor\_\allowbreak{}by\_\allowbreak{}hand}: đếm \texttt{expanded}, \texttt{generated}, \texttt{max\_\allowbreak{}frontier}, \texttt{visited} trên một hành lang 3 ô, so với kết quả tính tay;
+\item
+  \texttt{test\_\allowbreak{}action\_\allowbreak{}order\_\allowbreak{}prefers\_\allowbreak{}up\_\allowbreak{}down\_\allowbreak{}left\_\allowbreak{}right}: con sinh từ hành động đứng trước được mở rộng trước;
+\item
+  \texttt{test\_\allowbreak{}deterministic}: chạy hai lần cho cùng kết quả;
+\item
+  \texttt{test\_\allowbreak{}long\_\allowbreak{}path\_\allowbreak{}does\_\allowbreak{}not\_\allowbreak{}hit\_\allowbreak{}recursion\_\allowbreak{}limit}: lời giải dài hơn giới hạn đệ quy;
+\item
+  \texttt{test\_\allowbreak{}no\_\allowbreak{}solution\_\allowbreak{}when\_\allowbreak{}gap\_\allowbreak{}is\_\allowbreak{}two\_\allowbreak{}tiles}: màn không có lời giải trả về \texttt{no\_\allowbreak{}solution}, không lặp vô hạn;
+\item
+  \texttt{test\_\allowbreak{}bridge\_\allowbreak{}state\_\allowbreak{}is\_\allowbreak{}part\_\allowbreak{}of\_\allowbreak{}search}: lời giải phải đi bấm công tắc rồi quay lại, tức là cùng vị trí khối nhưng khác cấu hình cầu;
+\item
+  \texttt{test\_\allowbreak{}original\_\allowbreak{}levels} và \texttt{test\_\allowbreak{}levels\_\allowbreak{}with\_\allowbreak{}links}: 33 màn gốc đều giải được, lời giải phát lại trên engine tới đích, và số bước không nhỏ hơn cột ``Bước tối ưu''. Test \texttt{test\_\allowbreak{}levels\_\allowbreak{}with\_\allowbreak{}links} chạy riêng sáu màn có công tắc dùng \texttt{links} (17, 23, 25, 29, 30, 31).
+\end{itemize}

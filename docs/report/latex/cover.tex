@@ -1,0 +1,52 @@
+% Trang bìa. Lớp, giảng viên, link video lấy từ info.tex.
+\begin{titlepage}
+\def\coverclassrow{}\def\coverlecturerrow{}%
+\ifx\classname\empty\else\def\coverclassrow{\textbf{Lớp học phần:} & \classname \\}\fi
+\ifx\lecturer\empty\else\def\coverlecturerrow{\textbf{Giảng viên:} & \lecturer \\}\fi
+\begin{tcolorbox}[
+  enhanced, colback=white, colframe=primary, boxrule=0.9pt, arc=0pt,
+  height=\textheight, valign=top,
+  left=1.25cm,right=1.25cm,top=1.0cm,bottom=1.0cm,
+  borderline west={4pt}{0pt}{secondary}
+]
+\centering
+{\small\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\par}
+\vspace{0.15cm}
+{\large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+\vspace{0.1cm}
+{\normalsize\bfseries KHOA CÔNG NGHỆ THÔNG TIN\par}
+\vspace{0.3cm}
+{\color{primary}\rule{0.72\linewidth}{1.2pt}\par}
+\vspace{0.4cm}
+\includegraphics[width=3.6cm]{logo-hcmus.png}\par
+\vspace{0.25cm}
+{\Large\bfseries\color{primary} BÁO CÁO ĐỒ ÁN\par}
+\vspace{0.12cm}
+{\normalsize\bfseries\color{darkneutral} MÔN CƠ SỞ TRÍ TUỆ NHÂN TẠO (CSC14003)\par}
+\vspace{0.5cm}
+{\Huge\bfseries\color{secondary} Project 1\par}
+\vspace{0.1cm}
+{\LARGE\bfseries\color{primary} Bloxorz Solver\par}
+\vspace{0.2cm}
+{\normalsize\color{darkneutral} Giải trò chơi Bloxorz bằng các thuật toán tìm kiếm BFS, DFS, UCS và A*\par}
+\vspace{0.45cm}
+\begin{tcolorbox}[enhanced, colback=lightbg, colframe=codeborder, boxrule=0.5pt, arc=1.5pt,
+  width=0.95\linewidth, left=12pt,right=12pt,top=10pt,bottom=10pt]
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{tabular}{@{}r >{\raggedright\arraybackslash}p{9.2cm}@{}}
+\textbf{Nhóm:}       & Nhóm 9 \\
+\coverclassrow
+\textbf{Thành viên:} & 24120478 -- Võ Quốc Trung \\
+                     & 24120462 -- Bùi Quang Tiến \\
+                     & 24120476 -- Nguyễn Bảo Trọng \\
+                     & 24120474 -- Trịnh Vỹ Triết \\
+                     & 24120438 -- Trần Nguyên Tân \\
+\coverlecturerrow
+\textbf{Video demo:} & \videourl \\
+\end{tabular}
+\end{tcolorbox}
+\vfill
+{\small\color{darkneutral} TP. HỒ CHÍ MINH, THÁNG 10/2026\par}
+\end{tcolorbox}
+\end{titlepage}
