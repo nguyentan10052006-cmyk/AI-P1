@@ -1,6 +1,6 @@
 # Phụ lục B: phần của TV2 (gửi TV4 ghép vào `phu-luc-b-ai.md`)
 
-> TV2 soạn ngày 28/10. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 25 prompt từ 19/10 20:32 tới 28/10 14:12; không tính thông báo hệ thống). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
+> TV2 soạn ngày 28/10, bổ sung ngày 31/10. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 32 prompt từ 19/10 20:32 tới 31/10 10:50; không tính thông báo hệ thống). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
 
 ## Đoạn ghép vào B.1 (bảng công cụ)
 
@@ -28,6 +28,9 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
 | 28/10 | Ghép tạm code UCS, $h_P$ và bộ nạp `links` của TV3, TV4 trên một nhánh riêng để chạy thử; viết tạm bộ màn S1–S3; vẽ biểu đồ V25; kiểm tra chéo số liệu | Nhánh `integration/Tien/V24` (chưa push); số liệu chạy thử **không** dùng trong báo cáo | Kiểm tra chéo 04 §6 trên số liệu chạy thử; xem lại từng hình đã vẽ; công cụ `check_heuristics.py` của TV4 cho 0 vi phạm |
 | 28/10 | Kiểm tra hồi cứu cách đã khảo sát repository; đối chiếu đề bài với tài liệu nhóm; đọc chéo GUI V20, V21 của TV5 | Các báo cáo trong `docs/nghiem-thu/` (không nộp); ghi chú gửi TV3, TV4, TV5 | Lái GUI ở chế độ offscreen: 13/13 kiểm tra đạt khi có đủ code của TV3, TV4; tái hiện các lỗi tìm được bằng script |
 | 28/10 | Nháp chương 3.2, chương 5 (5.1, 5.2, khung 5.3 và 5.5), mục 5.4.2 và phần này | `docs/report/` | Đối chiếu từng câu với code `dfs.py`, `run.py` và test; lệnh tái hiện ví dụ ở Bảng 3.2.1 chạy lại ra đúng số |
+| 28/10 (chiều) | Mở PR báo cáo; sửa các công cụ thực nghiệm để từ chối dữ liệu hỏng (5 lỗi tái hiện bằng file cố ý làm hỏng); thêm kiểm tra đủ dòng K8 và `compare_runs.py`; tách các công cụ ra một nhánh sạch từ `main` | PR #14, #16, #17: `check_results.py`, `charts.py`, `tables.py`, `compare_runs.py`, `experiments/README.md` | Test mới thất bại trên code cũ; chạy thử 235 cặp, so hai lần chạy cho số đếm trùng hẳn |
+| 31/10 | Rà cách nối hàm chi phí V13 sau PR #18 (đọc code, chạy `check_heuristics` với V13, duyệt mọi cạnh của 33 màn); phát hiện bước làm khối tách đôi có chi phí 1,0 (module của TV3); làm công cụ biết chế độ chi phí | PR #20; tài liệu bàn giao và bản vá đề xuất cho TV3 (không áp vào code của TV3) | 0 vi phạm heuristic; bản vá đề xuất qua 233 test. **Sự cố do Claude gây ra:** lần đo kỹ thuật đầu chạy trong worktree mà Claude đang sửa tạm `costs.py`, nên dữ liệu có thể bị nhiễm. Lần đo đó bị dừng, dữ liệu được đánh dấu loại bỏ, và đo lại trong worktree riêng |
+| 31/10 | Đo thực nghiệm trên commit sạch `cd93624` theo 04 §4; kiểm tra K1–K8, tái lập và kiểm tra độc lập; viết mục 5.3, 5.5, 5.4.2 và Phụ lục A | PR #21: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-cd93624/` | Đo lần hai trùng số đếm 235/235 cặp; phát lại 225 lời giải; tính lại 75 ô trung vị; mỗi con số trong chương đối chiếu với `summary.csv`. Rà lại chương trước khi merge và sửa 3 câu không khớp số liệu |
 
 **Phần AI đề xuất và phần TV2 chọn.**
 - **Claude đề xuất,** TV2 đồng ý qua prompt tiếp theo:
@@ -40,6 +43,9 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
   - chờ PR #10 merge rồi mới làm tiếp V23;
   - tên nhánh `feature/Tien/M1`;
   - cho phép push các nhánh `feature/Tien/M1`, `feature/Tien/V23`, `feature/Tien/V23-fixes` và mở PR #10, #11, #13;
+  - cho phép push và mở PR #14, #16, #17, #20, #21. #10, #11, #13, #14, #16, #17 do TV1 merge;
+  - ngày 31/10, cho phép tự review và tự merge **chỉ** PR #20 và #21, với điều kiện test đạt, không xung đột, không có số liệu giả; Claude thực hiện việc merge qua tài khoản GitHub của TV2;
+  - giữ nguyên các quyết định thuộc người khác: mức chi phí bước tách (TV3), bố cục S2 (TV3), định dạng file kết quả Q1–Q7 (nhóm). Báo cáo ghi rõ phần số liệu phụ thuộc các quyết định này;
   - không giao cho Claude các việc thuộc người khác: hàm chi phí V13, định dạng file kết quả chung, xác nhận bộ màn S1–S3.
 
 *(TV2 bổ sung trước khi nộp: các lần tự chạy lại test hoặc tự đọc code ngoài phiên Claude Code, nếu có.)*
@@ -97,6 +103,13 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 | 28/10 13:24 | `Tiếp tục dự án AI-P1 từ trạng thái hiện tại, nhưng trước khi phát triển thêm V24/V25, hãy hoàn tất kiểm tra repository …` |
 | 28/10 13:35 | `# AI-P1 / Bloxorz Solver — Hoàn thành toàn bộ công việc thuộc phạm vi TV2` |
 | 28/10 14:12 | `Tiếp tục công việc TV2 trong repository Bloxorz-Solver dựa trên báo cáo trạng thái gần nhất.` |
+| 28/10 14:27 | `Tiếp tục công việc TV2 trong repository Bloxorz-Solver theo hướng chủ động hoàn thành công việc, không chờ review của TV1 …` |
+| 28/10 20:07 | `Tiếp tục ở trạng thái hiện tại.` |
+| 31/10 01:35 | `# TIẾP TỤC HOÀN THÀNH CÔNG VIỆC TV2 — BẢO ĐẢM TÍCH HỢP VÀ BÀN GIAO` |
+| 31/10 10:11 | `# PROMPT CLAUDE CODE — TIẾP TỤC TÍCH HỢP V13 VÀ HOÀN THÀNH THỰC NGHIỆM BLOXORZ SOLVER (TV2)` |
+| 31/10 10:27 | `thông báo hoàn tất ở đâu?` |
+| 31/10 10:35 | `# NHIỆM VỤ: HOÀN TẤT PHẦN VIỆC TV2 – BLOXORZ SOLVER` |
+| 31/10 10:50 | `# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR #20/#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER` |
 
 ## Dòng dán vào tab prompt-ai (`docs/sheet/6-prompt-ai.csv`)
 
@@ -108,6 +121,9 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 2026-10-28,TV2,Claude Code (Anthropic),"Kiểm tra hồi cứu, đối chiếu đề bài, đọc chéo GUI V20/V21 của TV5","Trước khi tiếp tục dự án AI-P1 / Bloxorz Solver, hãy thực hiện kiểm tra hồi cứu việc khảo sát repository Git …","docs/nghiem-thu/ (không nộp); ghi chú cho TV3, TV4, TV5","GUI offscreen 13/13 khi đủ code TV3, TV4; tái hiện lỗi bằng script"
 2026-10-28,TV2,Claude Code (Anthropic),"Nháp chương 3.2, 5 (5.1, 5.2), 5.4.2, phụ lục B phần TV2","# AI-P1 / Bloxorz Solver — Hoàn thành toàn bộ công việc thuộc phạm vi TV2","docs/report/3.2-dfs.md, 5-thuc-nghiem.md, 5.4-nhan-xet-dfs.md, phu-luc-b-tv2.md","Đối chiếu với dfs.py, run.py và test; chạy lại lệnh ví dụ ở Bảng 3.2.1"
 2026-10-28,TV2,Claude Code (Anthropic),"Kiểm tra nhánh báo cáo, mở PR; rà lại tables.py, charts.py, check_results.py; soạn tin nhắn bàn giao","Tiếp tục công việc TV2 trong repository Bloxorz-Solver dựa trên báo cáo trạng thái gần nhất.","PR nhánh feature/Tien/report; docs/nghiem-thu/ (không nộp)","diff so với main chỉ gồm file báo cáo TV2; git diff --check; cả bộ test"
+2026-10-28,TV2,Claude Code (Anthropic),"Công cụ từ chối dữ liệu hỏng, K8, compare_runs.py; tách nhánh công cụ","Tiếp tục công việc TV2 … theo hướng chủ động hoàn thành công việc, không chờ review của TV1 …","PR #16, #17: experiments/check_results.py, charts.py, tables.py, compare_runs.py, README","Test mới thất bại trên code cũ; so hai lần chạy thử: số đếm trùng 235/235"
+2026-10-31,TV2,Claude Code (Anthropic),"Rà V13 sau PR #18; công cụ biết chế độ chi phí; tìm lỗi chi phí bước tách (TV3)","# PROMPT CLAUDE CODE — TIẾP TỤC TÍCH HỢP V13 VÀ HOÀN THÀNH THỰC NGHIỆM BLOXORZ SOLVER (TV2)","PR #20; tài liệu bàn giao cho TV3","check_heuristics với V13: 0 vi phạm; lần đo bị nhiễm do Claude sửa tạm code trong cùng worktree đã bị loại và đo lại"
+2026-10-31,TV2,Claude Code (Anthropic),"Đo thực nghiệm cd93624; chương 5.3, 5.5, 5.4.2, Phụ lục A","# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR #20/#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER","PR #21: docs/report/, Source/experiments/benchmark-2026-10-31-cd93624/","K1–K8 PASS; lần đo hai trùng số đếm 235/235; kiểm tra độc lập 0 lệch"
 ```
 
 ## Nguồn để kiểm lại
