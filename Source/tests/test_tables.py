@@ -43,6 +43,7 @@ class TablesTests(unittest.TestCase):
         self.summary = self.tmp / "summary.csv"
         self.out = self.tmp / "tables.md"
         write_summary(self.summary, small_rows())
+        (self.tmp / "run_info.json").write_text('{"cost": "energy"}', encoding="utf-8")
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -75,7 +76,23 @@ class TablesTests(unittest.TestCase):
         appendix = lines[lines.index("**Phụ lục A. Kết quả đầy đủ.**"):]
         self.assertEqual(sum(1 for line in appendix if line.startswith("| original/") or line.startswith("| gen/")), 13)
         self.assertLess(text.index("| original/08 |"), text.index("| gen/S3-010 |"))
-        self.assertNotIn("Cảnh báo", text)   # một commit, không -dirty
+        self.assertNotIn("Cảnh báo", text)   # một commit, không -dirty, biết chế độ chi phí
+        self.assertIn("Chế độ chi phí: `energy`", text)
+
+    def test_unknown_cost_mode_is_warned(self):
+        (self.tmp / "run_info.json").unlink()
+        self.assertEqual(tables.main(["--summary", str(self.summary), "--out", str(self.out)]), 0)
+        self.assertIn("không rõ chế độ chi phí", self.out.read_text(encoding="utf-8"))
+
+    def test_cost_optimality_is_compared_relatively(self):
+        rows = small_rows()
+        rows[0]["path_cost"], rows[2]["path_cost"] = 35287.0, 35287.00001   # BFS, UCS màn 01: lệch tương đối 3e-10
+        text = tables.build([tables.read_summary(self._write(rows))][0], "x", "energy")
+        self.assertIn("| BFS | 3/3 | 3/3 | 3/3 | 100,0 % |", text.splitlines())
+
+    def _write(self, rows):
+        write_summary(self.summary, rows)
+        return self.summary
 
     def test_refuses_to_overwrite_and_warns_on_dirty(self):
         self.out.write_text("cũ", encoding="utf-8")

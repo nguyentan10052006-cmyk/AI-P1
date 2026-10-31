@@ -146,6 +146,7 @@ class ChartsTests(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             self.assertEqual(charts.main(["--summary", str(self.summary), "--out", str(self.out)]), 0)
         self.assertIn("Không vẽ 2 cặp không solved: gen/S3-010/bfs=no_solution, original/07/ucs=error", out.getvalue())
+        self.assertIn("Chế độ chi phí: KHÔNG RÕ", out.getvalue())   # thư mục tạm không có run_info.json
 
     def test_does_not_overwrite_and_colors_follow_algorithm(self):
         write_summary(self.summary, synthetic_rows())

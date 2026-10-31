@@ -22,12 +22,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 from experiments.charts import ChartDataError, GROUPS, algorithms_in, label_of, read_summary
+from experiments.check_results import cost_mode, run_info_for, same_cost
 
 SOURCE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_SUMMARY = SOURCE_DIR / "experiments" / "summary.csv"
 DEFAULT_OUT = SOURCE_DIR / "experiments" / "tables.md"
 GROUP_ORDER = GROUPS + ["S1", "S2", "S3"]
-COST_TOLERANCE = 1e-9   # 04 §6: chênh lệch chi phí nhỏ hơn mức này coi là bằng nhau
 T3_METRICS = (("expanded", "số nút mở rộng", 0), ("search_ms", "thời gian tìm kiếm (ms)", 2),
               ("peak_mem_kb", "bộ nhớ đỉnh (KB)", 1))
 T5_ALGORITHMS = ("ucs", "astar_m", "astar")
@@ -116,7 +116,7 @@ def table_t4(rows: Sequence[Dict], algorithms: Sequence[str]) -> List[str]:
             if bfs and bfs["status"] == "solved" and bfs["steps"]:
                 step_ok += row["steps"] == bfs["steps"]
                 ratios.append(row["steps"] / bfs["steps"])
-            if ucs and ucs["status"] == "solved" and abs(row["path_cost"] - ucs["path_cost"]) < COST_TOLERANCE:
+            if ucs and ucs["status"] == "solved" and same_cost(row["path_cost"], ucs["path_cost"]):
                 cost_ok += 1
         has_ucs = any(r["algorithm"] == "ucs" for r in original)
         mean = f"{fmt(100 * statistics.mean(ratios), 1)} %" if ratios else "—"
@@ -169,13 +169,17 @@ def appendix_a(rows: Sequence[Dict], algorithms: Sequence[str]) -> List[str]:
     return out
 
 
-def build(rows: Sequence[Dict], source: str) -> str:
+def build(rows: Sequence[Dict], source: str, cost: Optional[str] = None) -> str:
+    """cost: chế độ chi phí của lần chạy (run_info.json); None là không rõ, đầu file sẽ có cảnh báo."""
     if not rows:
         raise ChartDataError("summary.csv không có dòng nào")
     algorithms = algorithms_in(rows)
     commits = sorted({r["commit"] for r in rows})
     header = [f"<!-- Sinh bằng experiments/tables.py từ {source}; không sửa tay. -->", "",
-              f"Nguồn: `{source}`, commit {', '.join(f'`{c}`' for c in commits)}, {len(rows)} dòng.", ""]
+              f"Nguồn: `{source}`, commit {', '.join(f'`{c}`' for c in commits)}, {len(rows)} dòng.", "",
+              f"Chế độ chi phí: `{cost}` (energy là hàm chi phí V13, unit là 1 mỗi bước)." if cost else
+              "> **Cảnh báo:** không rõ chế độ chi phí (thiếu `run_info.json` cạnh summary.csv, hoặc run.py cũ chưa "
+              "ghi khóa `cost`); cột chi phí và bảng T4, T5 không xác định được hàm chi phí.", ""]
     if len(commits) > 1 or any(c.endswith("-dirty") or not c for c in commits):
         header += ["> **Cảnh báo:** số liệu đến từ nhiều commit hoặc commit có thay đổi chưa lưu; "
                    "không dùng làm số liệu chính thức (04 §4).", ""]
@@ -198,7 +202,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"LỖI: không ghi đè {args.out} (dùng --force nếu chắc chắn)", file=sys.stderr)
         return 2
     try:
-        text = build(read_summary(args.summary), args.summary.name)
+        text = build(read_summary(args.summary), args.summary.name, cost_mode(run_info_for(args.summary)))
     except (FileNotFoundError, ChartDataError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 1

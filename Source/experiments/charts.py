@@ -34,7 +34,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from experiments.check_results import NUMERIC, REQUIRED_WHEN_SOLVED  # noqa: E402
+from experiments.check_results import NUMERIC, REQUIRED_WHEN_SOLVED, cost_mode, run_info_for  # noqa: E402
 from experiments.run import SUMMARY_COLUMNS  # noqa: E402
 
 SOURCE_DIR = Path(__file__).resolve().parent.parent
@@ -373,6 +373,8 @@ def main(argv=None) -> int:
     except (FileNotFoundError, FileExistsError, ChartDataError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 1
+    mode = cost_mode(run_info_for(args.summary))
+    print(f"Chế độ chi phí: {mode}" if mode else "Chế độ chi phí: KHÔNG RÕ (không có run_info.json cạnh summary.csv)")
     for key, info in report.items():
         print(f"{key}: {info.get('png') or 'bỏ qua — ' + info['skipped']}")
     excluded = [f"{r['level']}/{r['algorithm']}={r['status']}" for r in read_summary(args.summary)

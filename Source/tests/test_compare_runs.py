@@ -55,6 +55,22 @@ class CompareRunsTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("LỆCH 1 chỗ", out)
 
+    def test_different_cost_modes_are_not_compared(self):
+        (self.tmp / "a").mkdir(); (self.tmp / "b").mkdir()
+        for name, mode in (("a", "energy"), ("b", "unit")):
+            (self.tmp / name / "run_info.json").write_text(f'{{"cost": "{mode}"}}', encoding="utf-8")
+        a, b = self.write("a/summary.csv", rows()), self.write("b/summary.csv", rows())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = main([str(a), str(b)])
+        self.assertEqual(code, 1)
+        self.assertIn("KHÁC CHẾ ĐỘ CHI PHÍ", out.getvalue())
+
+    def test_unknown_cost_mode_is_noted(self):
+        code, out = self.run_main(rows(), rows())
+        self.assertEqual(code, 0)
+        self.assertIn("không xác định được chế độ chi phí", out)
+
     def test_status_difference_fails(self):
         b = rows()
         b[1].update(status="timeout", steps="", path_cost="", expanded="")
