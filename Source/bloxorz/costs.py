@@ -36,6 +36,10 @@ COST_FRAGILE_RISK = 0.50
 ENERGY_COSTS = {
     (Orient.STANDING, Orient.HORIZONTAL): COST_STAND_TO_LIE,
     (Orient.STANDING, Orient.VERTICAL): COST_STAND_TO_LIE,
+    # Khối tách khi ĐỨNG lên công tắc tách, tức là bước lăn nằm -> đứng rồi mới dịch chuyển: tính như nằm -> đứng.
+    # Trước đây hai cặp này không có trong bảng nên rơi về COST_BASE = 1.0, rẻ hơn mọi bước khác.
+    (Orient.HORIZONTAL, Orient.SPLIT): COST_LIE_TO_STAND,
+    (Orient.VERTICAL, Orient.SPLIT): COST_LIE_TO_STAND,
     (Orient.STANDING, Orient.SPLIT): COST_STAND_TO_LIE,
     (Orient.HORIZONTAL, Orient.STANDING): COST_LIE_TO_STAND,
     (Orient.VERTICAL, Orient.STANDING): COST_LIE_TO_STAND,

@@ -131,7 +131,7 @@ class UCSOnOriginalLevelsTests(unittest.TestCase):
         """Màn 17 và 23: UCS tìm ra đường đi tối ưu năng lượng khác với BFS (tiết kiệm công dựng khối)."""
         ucs = UCS()
         bfs = BFS()
-        for n, want_ucs_cost, want_bfs_cost in ((17, 140.10, 140.42), (23, 99.96, 100.96)):
+        for n, want_ucs_cost, want_bfs_cost in ((17, 140.10, 140.42), (23, 100.58, 101.58)):
             with self.subTest(level=n):
                 level = parse_level(self.data[n], f"{n:02d}")
                 problem = Problem(level, cost_fn=compute_step_cost)
