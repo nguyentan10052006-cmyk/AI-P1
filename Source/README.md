@@ -19,7 +19,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 cd Source
-python main.py          # mở màn 01
+python main.py          # mở trang chủ (Chơi ngay, Chọn màn, Cách chơi, Thoát)
 python main.py 17       # mở thẳng màn 17 (mã màn 01 … 33)
 ```
 
