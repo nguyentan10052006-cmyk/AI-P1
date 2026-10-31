@@ -55,6 +55,41 @@ class CompareRunsTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("LỆCH 1 chỗ", out)
 
+    def test_different_cost_modes_are_not_compared(self):
+        (self.tmp / "a").mkdir(); (self.tmp / "b").mkdir()
+        for name, mode in (("a", "energy"), ("b", "unit")):
+            (self.tmp / name / "run_info.json").write_text(f'{{"cost": "{mode}"}}', encoding="utf-8")
+        a, b = self.write("a/summary.csv", rows()), self.write("b/summary.csv", rows())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = main([str(a), str(b)])
+        self.assertEqual(code, 1)
+        self.assertIn("KHÁC CHẾ ĐỘ CHI PHÍ", out.getvalue())
+
+    def test_strange_cost_value_is_reported_with_reason(self):
+        (self.tmp / "a").mkdir()
+        (self.tmp / "a" / "run_info.json").write_text('{"cost": "free"}', encoding="utf-8")
+        a, b = self.write("a/summary.csv", rows()), self.write("b.csv", rows())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = main([str(a), str(b)])
+        self.assertEqual(code, 0)   # số đếm vẫn so được; path_cost giống nhau nên TRÙNG
+        self.assertIn("A không rõ (run_info.json có cost = 'free'", out.getvalue())
+        self.assertIn("không loại trừ được việc chúng khác hàm chi phí", out.getvalue())
+
+    def test_unknown_cost_mode_is_noted(self):
+        code, out = self.run_main(rows(), rows())
+        self.assertEqual(code, 0)
+        self.assertIn("không xác định được chế độ chi phí", out)
+
+    def test_path_cost_compared_relatively(self):
+        """Tổng chi phí V13 lớn chỉ lệch ở chữ số cuối là trùng; lệch thật vẫn bị bắt."""
+        a, b = rows(), rows()
+        a[1]["path_cost"], b[1]["path_cost"] = "35287.0", "35287.00001"   # lệch tương đối 3e-10
+        self.assertEqual(compare(a, b)[0], [])
+        b[1]["path_cost"] = "35287.01"
+        self.assertEqual(compare(a, b)[0], ["original/01/dfs: path_cost '35287.0' ≠ '35287.01'"])
+
     def test_status_difference_fails(self):
         b = rows()
         b[1].update(status="timeout", steps="", path_cost="", expanded="")

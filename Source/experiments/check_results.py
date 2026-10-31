@@ -17,6 +17,8 @@ Phát lại lời giải đã làm sẵn trong run.py: dòng nào phát lại sa
         levels/original và đủ 5 thuật toán mặc định của run.py; mọi dòng của màn gốc (G1–G5, màn nào
         cũng có lời giải) đều solved
 Mã màn đọc được cả dạng run.py hiện tại (original/01) lẫn dạng cũ (01).
+In chế độ chi phí (cost: energy là V13, unit là 1 mỗi bước) đọc từ run_info.json nằm cạnh summary.csv;
+so path_cost tương đối (math.isclose), vì chi phí V13 là số lẻ.
 Các kiểm tra cần hàm chi phí riêng hoặc heuristic (04 §6: "đặt mọi chi phí bằng 1", "0 vi phạm") nằm ở
 test của UCS và tools/check_heuristics.py, không ở đây.
 """
@@ -25,9 +27,10 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from experiments.run import DEFAULT_ALGORITHMS, SUMMARY_COLUMNS
 
@@ -65,6 +68,49 @@ def load(summary: Path) -> List[Dict[str, str]]:
             seen.add(key)
             rows.append(row)
         return rows
+
+
+KNOWN_COSTS = ("energy", "unit")   # giá trị --cost của run.py: energy là V13 (bloxorz/costs.py), unit là 1 mỗi bước
+
+
+def run_info_for(summary: Path) -> Optional[Dict[str, Any]]:
+    """run_info.json cùng thư mục với summary.csv (run.py ghi cả hai), hoặc None nếu không có hay hỏng."""
+    path = summary.parent / "run_info.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def cost_mode(info: Optional[Dict[str, Any]]) -> Optional[str]:
+    """Chế độ chi phí ("energy", "unit") ghi trong run_info; None nếu không có, hoặc là giá trị lạ (không đoán)."""
+    mode = info.get("cost") if isinstance(info, dict) else None
+    return mode if mode in KNOWN_COSTS else None
+
+
+def cost_status(summary: Path) -> Tuple[Optional[str], str]:
+    """(chế độ chi phí, lý do khi không xác định được). Lý do nêu rõ trường hợp nào, để người dùng biết cách sửa."""
+    path = summary.parent / "run_info.json"
+    if not path.exists():
+        return None, f"không có {path.name} cạnh {summary.name}"
+    try:
+        info = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return None, f"{path.name} không đọc được ({type(exc).__name__}: {exc})"
+    if not isinstance(info, dict) or "cost" not in info:
+        return None, f"{path.name} không có khóa cost, tức run.py trước khi nối V13"
+    if info["cost"] not in KNOWN_COSTS:
+        return None, f"{path.name} có cost = {info['cost']!r}, không thuộc {KNOWN_COSTS}"
+    return info["cost"], ""
+
+
+def cost_line(summary: Path) -> str:
+    mode, why = cost_status(summary)
+    return f"Chế độ chi phí: {mode}" if mode else f"Chế độ chi phí: KHÔNG RÕ ({why})"
+
+
+def same_cost(a: float, b: float) -> bool:
+    return math.isclose(a, b, rel_tol=EPS, abs_tol=EPS)
 
 
 def level_pars(rows: List[Dict[str, str]], levels_root: Path) -> Dict[str, int]:
@@ -134,7 +180,7 @@ def check(rows: List[Dict[str, str]], pars: Dict[str, int],
             o = solved(lv, a)
             if u and o:
                 n += 1
-                if abs(num(o, "path_cost") - num(u, "path_cost")) >= EPS:
+                if not same_cost(num(o, "path_cost"), num(u, "path_cost")):
                     fails.append(f"{lv}: {a} {num(o, 'path_cost')} ≠ UCS {num(u, 'path_cost')}")
     record("K4", fails, n, "path_cost A* = UCS")
 
@@ -145,7 +191,8 @@ def check(rows: List[Dict[str, str]], pars: Dict[str, int],
             o = solved(lv, a)
             if u and o:
                 n += 1
-                if num(o, "path_cost") < num(u, "path_cost") - EPS:
+                cost_o, cost_u = num(o, "path_cost"), num(u, "path_cost")
+                if cost_o < cost_u and not same_cost(cost_o, cost_u):
                     fails.append(f"{lv}: {a} {num(o, 'path_cost')} < UCS {num(u, 'path_cost')}")
     record("K5", fails, n, "path_cost BFS, DFS ≥ UCS")
 
@@ -193,6 +240,7 @@ def main(argv=None) -> int:
     except (OSError, ValueError) as exc:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 2
+    print(cost_line(args.summary))
     results = check(rows, level_pars(rows, args.levels_root), original_stems(args.levels_root))
     for code, verdict, detail in results:
         print(f"{code} {verdict:<7} {detail}")
