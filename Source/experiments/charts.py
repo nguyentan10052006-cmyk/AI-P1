@@ -373,15 +373,15 @@ def make_charts(summary: Path, out_dir: Path, force: bool = False, only: Sequenc
 
 
 def main(argv=None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--only", default="", help="chỉ vẽ các hình này, ví dụ H1,H6")
     parser.add_argument("--force", action="store_true", help="ghi đè hình đã có")
     args = parser.parse_args(argv)
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8", errors="replace")
     only = [k.strip() for k in args.only.split(",") if k.strip()]
     try:
         report = make_charts(args.summary, args.out, args.force, only)
