@@ -32,7 +32,7 @@ from solvers.runner import CompareJob, SolveJob, start_compare, start_solver
 LEVELS_DIR = Path(__file__).resolve().parent.parent / "levels" / "original"
 # Dòng phím tắt dưới đáy chỉ ghi các phím hay dùng; F1 mở bảng đầy đủ (hud.SHORTCUTS)
 HELP = ("WASD / mũi tên: lăn   ·   Space: đổi khối   ·   R: chơi lại   ·   N / P: màn sau / trước"
-        "   ·   H: ẩn kết quả   ·   F1: tất cả phím tắt")
+        "   ·   H: ẩn kết quả   ·   G: chú giải ô   ·   F1: tất cả phím tắt")
 # Bảng màu theo GAME_UI_UX_SPECIFICATION.md §2.1
 THEME = {
     "bg_top": color.hex("#18212b"),   # nền gradient: xám đậm ở trên xuống đen ở dưới
@@ -268,12 +268,15 @@ class Game(Entity):
             if self.hud.overlay_open:
                 self.hud.close_picker()
                 self.hud.close_help()
+                self.hud.close_legend()
             else:
                 self.popup.hide()
         elif key == "control+k":
             self.hud.toggle_picker()
         elif key == "f1":
             self.hud.toggle_help()
+        elif key == "g":
+            self.hud.toggle_legend()
         elif key == "enter":
             if not self.hud.overlay_open:   # hộp kết thúc nằm dưới lớp phủ thì Enter không bấm hộ nút của nó
                 self.popup.press_primary()
@@ -286,7 +289,8 @@ class Game(Entity):
         elif key in ("scroll down", "wheel_down"):
             self.camera_ctrl.zoom(-1.0)
         elif self.state is None or self.busy or self.over or self.replay is not None or self.hud.overlay_open:
-            return   # đang tự lăn hoặc đang mở bảng chọn màn, phím tắt: không nhận phím lăn; R, N, P, camera vẫn được
+            # đang tự lăn hoặc đang mở bảng chọn màn, phím tắt, chú giải: không nhận phím lăn; R, N, P, camera vẫn được
+            return
         elif key == "space" and self.state.orient is Orient.SPLIT:
             self.active_cube = 1 - self.active_cube
             self.block.show(self.state, self.active_cube)
