@@ -2,6 +2,8 @@
 nút Solve, So sánh, Hủy và khối tự lăn theo lời giải (V21); khối lật quanh cạnh, đổ nghiêng khi rơi,
 mở màn, khử răng cưa (GAME_UI_UX_SPECIFICATION §6, §9).
 
+Mở game không kèm mã màn thì hiện trang chủ (gui/home.py) trước; có mã màn thì vào thẳng màn đó.
+
 Chạy trong Source/: python main.py [mã màn, ví dụ 05], hoặc python -m gui.app [mã màn]
 """
 from __future__ import annotations
@@ -10,8 +12,10 @@ import sys
 from pathlib import Path
 from typing import List, Optional, Union
 
-from ursina import (AmbientLight, DirectionalLight, Entity, Mesh, Text, Ursina, Vec3, camera, color, curve, destroy,
-                    invoke, time, window)
+import math
+
+from ursina import (AmbientLight, DirectionalLight, Entity, Mesh, Text, Ursina, Vec3, application, camera, color, curve,
+                    destroy, invoke, time, window)
 from panda3d.core import AntialiasAttrib, loadPrcFileData
 from ursina.shaders import unlit_shader
 
@@ -23,6 +27,8 @@ from bloxorz.state import DELTA, Action, Dir, Orient, State
 from gui.block_view import BlockView
 from gui.board_view import BoardView
 from gui.camera_controller import CameraController
+from gui.home import HomeScreen
+from gui.tutorial import HowToPlay
 from gui.hud import LABELS, Hud
 from gui.popup import ResultPopup
 from gui.theme import FONT_BOLD, FONT_SEMIBOLD, use_fonts
@@ -75,12 +81,20 @@ FALL_TEXTS = {
 }
 FALL_DEFAULT = ("Khối rơi khỏi bàn", "Có phần khối không còn ô đỡ bên dưới.")
 POPUP_DELAY = 0.15   # hộp kết thúc hiện sau khi hoạt ảnh rơi hoặc lọt lỗ gần xong
+# Trang chủ: camera đung đưa chậm quanh bàn của màn đầu (trong giới hạn ±40° của camera_controller), bàn dời
+# sang nửa phải màn hình để nhường nửa trái cho tên game và các nút
+HOME_SWAY = 24.0          # độ
+HOME_SWAY_PERIOD = 14.0   # giây cho một lượt qua lại
+HOME_PITCH = 40.0
+HOME_FILM_SHIFT = 0.25    # tỉ lệ bề rộng màn hình, dương là hình sang phải
+HOME_ZOOM_OUT = 1.45      # lùi camera xa hơn lúc chơi để cả bàn nằm gọn trong nửa phải, không lấn vào tên game
+HOME_FOOTER = "CSC14003 · Cơ sở Trí tuệ Nhân tạo · Project 1"
 
 
 class Game(Entity):
     """Giữ trạng thái chơi; mọi luật đi qua bloxorz.rules.step(), GUI không tự tính (docs/07 §5)."""
 
-    def __init__(self, paths: List[Path], start_index: int = 0) -> None:
+    def __init__(self, paths: List[Path], start_index: int = 0, show_home: bool = False) -> None:
         super().__init__()
         self.paths = paths
         self.index = start_index
@@ -126,10 +140,77 @@ class Game(Entity):
                        on_rotate_cam=self.camera_ctrl.rotate_preset,
                        on_tilt_cam=self.camera_ctrl.tilt_preset,
                        on_toggle_top_down=self.camera_ctrl.toggle_top_down,
-                       on_reset_cam=self.camera_ctrl.reset_view)
+                       on_reset_cam=self.camera_ctrl.reset_view,
+                       on_home=self.open_home)
+        self.hud.on_pick_level = self._pick_level   # chọn màn từ trang chủ thì đóng trang chủ rồi mới vào màn
         self.camera_ctrl.on_view_change = self._on_view_change
         self.hud.on_panel_change = self._frame_board
+        self.tutorial = HowToPlay(on_play=self.play, on_legend=self.hud.toggle_legend)
+        self.home = HomeScreen([("play", "Chơi ngay", self.play),
+                                ("pick", "Chọn màn", self.hud.toggle_picker),
+                                ("rules", "Cách chơi", self.tutorial.open),
+                                ("quit", "Thoát", application.quit)],
+                               is_blocked=lambda: self.hud.overlay_open or self.tutorial.visible,
+                               subtitle=HOME_FOOTER)
+        self._saved_view: Optional[tuple] = None   # góc camera của người chơi trước khi về trang chủ
         self.load(start_index)
+        if show_home:
+            self.open_home()
+
+    # ---- trang chủ ----
+
+    @property
+    def in_home(self) -> bool:
+        return self.home.visible
+
+    def open_home(self) -> None:
+        """Về trang chủ: dừng solver và khối tự lăn, ẩn HUD, bàn của màn hiện tại làm nền phía sau."""
+        if self.in_home:
+            return
+        self._stop_job()
+        self.replay = None
+        self.hud.clear_results()
+        self.hud.close_picker()
+        self.hud.close_help()
+        self.hud.close_legend()
+        self.tutorial.close()
+        self.popup.hide()
+        self.show_notice("")
+        self.hud.set_chrome_visible(False)
+        for text in (self.info, self.subtitle, self.moves, self.help, self.fps):
+            text.enabled = False
+        ctrl = self.camera_ctrl
+        self._saved_view = (ctrl.target_yaw, ctrl.target_pitch, ctrl.is_top_down)
+        ctrl.is_top_down = False
+        ctrl.target_pitch = HOME_PITCH
+        ctrl.target_distance = ctrl.base_distance
+        ctrl.set_frame(HOME_ZOOM_OUT, HOME_FILM_SHIFT)
+        self.restart()
+        self.home.show()
+
+    def play(self, index: Optional[int] = None) -> None:
+        """Rời trang chủ và vào màn index (mặc định: màn đang làm nền, tức màn đầu khi mới mở game)."""
+        if not self.in_home:
+            if index is not None:
+                self.load(index)
+            return
+        self.home.hide()
+        self.hud.set_chrome_visible(True)
+        for text in (self.info, self.subtitle, self.moves, self.help, self.fps):
+            text.enabled = True
+        if self._saved_view is not None:
+            ctrl = self.camera_ctrl
+            ctrl.target_yaw, ctrl.target_pitch, ctrl.is_top_down = self._saved_view
+            ctrl._notify_change()
+            self._saved_view = None
+        self._frame_board(self.hud.panel.enabled)
+        self.load(self.index if index is None else index)   # nạp lại để các ô trồi lên như lúc mở màn
+
+    def _pick_level(self, index: int) -> None:
+        if self.in_home:
+            self.play(index)
+        else:
+            self.load(index)
 
     # ---- đổi màn, chơi lại ----
 
@@ -248,7 +329,25 @@ class Game(Entity):
     # ---- phím ----
 
     def input(self, key: str) -> None:
-        if key == "n":
+        if self.in_home:
+            # trang chủ tự nhận ↑ ↓ Enter (gui/home.py), bảng Cách chơi tự nhận ← → Enter Esc (gui/tutorial.py);
+            # ở đây chỉ đóng / mở các bảng phủ của HUD
+            if self.tutorial.visible:
+                return
+            if key == "escape":
+                self.hud.close_picker()
+                self.hud.close_help()
+                self.hud.close_legend()
+            elif key == "control+k":
+                self.hud.toggle_picker()
+            elif key == "f1":
+                self.hud.toggle_help()
+            elif key == "g":
+                self.hud.toggle_legend()
+            return
+        if key == "m":
+            self.open_home()
+        elif key == "n":
             self.load(self.index + 1)
         elif key == "p":
             self.load(self.index - 1)
@@ -344,6 +443,8 @@ class Game(Entity):
             self.hud.set_running(False)
 
     def update(self) -> None:
+        if self.in_home:
+            self.camera_ctrl.target_yaw = HOME_SWAY * math.sin(time.time() * 2 * math.pi / HOME_SWAY_PERIOD)
         self.camera_ctrl.update()
         self._update_fps()
         if self.job is not None:
@@ -536,7 +637,11 @@ def setup_scene() -> None:
     AmbientLight(color=color.hex("#3d444d"))
 
 
-def run(level_id: str = "01") -> int:
+def run(level_id: str = "01", show_home: Optional[bool] = None) -> int:
+    """show_home: hiện trang chủ trước khi vào màn. None: hiện khi chạy không kèm mã màn
+    (python main.py hoặc python -m gui.app); có mã màn (python main.py 05) thì vào thẳng màn đó."""
+    if show_home is None:
+        show_home = len(sys.argv) <= 1
     paths = sorted(LEVELS_DIR.glob("*.json"))
     if not paths:
         print(f"Không có màn nào trong {LEVELS_DIR}", file=sys.stderr)
@@ -549,7 +654,7 @@ def run(level_id: str = "01") -> int:
     app = Ursina(title="Bloxorz Solver", development_mode=False)
     app.render.setAntialias(AntialiasAttrib.MMultisample)
     setup_scene()
-    Game(paths, start)
+    Game(paths, start, show_home=show_home)
     app.run()
     return 0
 

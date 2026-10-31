@@ -44,7 +44,7 @@ HOVER_SCALE = 1.03          # nút phóng nhẹ khi rê chuột (GAME_UI_UX_SPEC
 MARGIN = 0.02               # lề với mép màn hình
 GAP = 0.008                 # khoảng cách giữa hai nút
 NAV_H = 0.044
-NAV_BUTTONS = (("legend", "Chú giải", 0.1), ("new", "Màn đầu", 0.1), ("prev", "‹ Trước", 0.092),
+NAV_BUTTONS = (("home", "Trang chủ", 0.105), ("legend", "Chú giải", 0.1), ("new", "Màn đầu", 0.1), ("prev", "‹ Trước", 0.092),
                ("pick", "Chọn màn", 0.11), ("next", "Sau ›", 0.085), ("restart", "Chơi lại", 0.1))
 COL_W = 0.27                # bề rộng cột thẻ bên phải
 CARD_PAD = 0.016
@@ -78,7 +78,7 @@ SHORT_SUMMARY = {"Không có lời giải": "Vô nghiệm"}   # ô của bảng 
 # Không dùng "<" trong chữ: Ursina hiểu "<...>" là thẻ định dạng và bỏ ký tự; dùng ‹ › (font có sẵn)
 # Bảng phím tắt (F1): (phím, tác dụng)
 SHORTCUTS = (
-    ("W A S D / mũi tên", "Lăn khối"), ("Space", "Đổi khối con khi đã tách"), ("R", "Chơi lại màn"),
+    ("M", "Về trang chủ"), ("W A S D / mũi tên", "Lăn khối"), ("Space", "Đổi khối con khi đã tách"), ("R", "Chơi lại màn"),
     ("N / P", "Màn sau / màn trước"), ("Ctrl+K", "Mở lưới chọn màn"), ("Enter", "Nút chính của hộp kết thúc"),
     ("H", "Ẩn / hiện khung kết quả"), ("G", "Chú giải các loại ô"), ("Q / E", "Nghiêng camera trái / phải"),
     ("Z / X", "Hạ thấp / nâng cao góc"),
@@ -148,7 +148,8 @@ class Hud(Entity):
                  on_rotate_cam: Optional[Callable[[float], None]] = None,
                  on_tilt_cam: Optional[Callable[[float], None]] = None,
                  on_toggle_top_down: Optional[Callable[[], None]] = None,
-                 on_reset_cam: Optional[Callable[[], None]] = None) -> None:
+                 on_reset_cam: Optional[Callable[[], None]] = None,
+                 on_home: Optional[Callable[[], None]] = None) -> None:
         super().__init__(parent=camera.ui)
         self.on_pick_level = on_pick_level
         self.on_panel_change: Optional[Callable[[bool], None]] = None   # app.py căn lại camera khi khung hiện/ẩn
@@ -157,14 +158,14 @@ class Hud(Entity):
         right = window.right.x - MARGIN
 
         # ---- thanh điều hướng ----
-        nav_actions = {"legend": self.toggle_legend, "new": on_new_game, "prev": on_prev, "pick": self.toggle_picker,
+        nav_actions = {"home": on_home, "legend": self.toggle_legend, "new": on_new_game, "prev": on_prev, "pick": self.toggle_picker,
                        "next": on_next, "restart": on_restart}
-        x = right - sum(w for _, _, w in NAV_BUTTONS) - GAP * (len(NAV_BUTTONS) - 1)
+        shown = [(key, label, width) for key, label, width in NAV_BUTTONS if nav_actions[key] is not None]
+        x = right - sum(w for _, _, w in shown) - GAP * (len(shown) - 1)
         nav_y = window.top.y - MARGIN - NAV_H / 2
-        for key, label, width in NAV_BUTTONS:
-            if nav_actions[key] is not None:
-                tint = COLORS["solve"] if key == "pick" else COLORS["button"]
-                self._button(key, label, nav_actions[key], (x + width / 2, nav_y), (width, NAV_H), tint, 0.78)
+        for key, label, width in shown:
+            tint = COLORS["solve"] if key == "pick" else COLORS["button"]
+            self._button(key, label, nav_actions[key], (x + width / 2, nav_y), (width, NAV_H), tint, 0.78)
             x += width + GAP
 
         # ---- thẻ TÌM LỜI GIẢI ----
@@ -248,6 +249,7 @@ class Hud(Entity):
         self.current_level = 0
         self.picker_buttons: List[Button] = []
         self.solved_marks: List[Entity] = []   # chấm xanh trên nút các màn đã thắng trong lần chạy này
+        self._chrome_saved: Optional[List[Tuple[Entity, bool]]] = None   # set_chrome_visible(False) đã ẩn những gì
         self.picker = self._build_picker(level_ids)
         self.help = self._build_help()
         self.legend = self._build_legend()
@@ -385,6 +387,20 @@ class Hud(Entity):
 
     def close_legend(self) -> None:
         self.legend.enabled = False
+
+    def set_chrome_visible(self, visible: bool) -> None:
+        """Ẩn / hiện mọi thứ của HUD trừ ba bảng phủ (chọn màn, phím tắt, chú giải), để trang chủ vẫn mở được
+        các bảng đó. Hiện lại thì mỗi phần về đúng trạng thái trước khi ẩn (khung kết quả đang ẩn thì vẫn ẩn)."""
+        overlays = (self.picker, self.help, self.legend)
+        if not visible:
+            if self._chrome_saved is None:
+                self._chrome_saved = [(child, child.enabled) for child in self.children if child not in overlays]
+            for child, _ in self._chrome_saved:
+                child.enabled = False
+        elif self._chrome_saved is not None:
+            for child, was_enabled in self._chrome_saved:
+                child.enabled = was_enabled
+            self._chrome_saved = None
 
     @property
     def overlay_open(self) -> bool:
