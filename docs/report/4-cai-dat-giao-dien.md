@@ -1,6 +1,6 @@
 ## 4. Cài đặt và giao diện
 
-> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp lại ngày 31/10/2026 trên nhánh chính (sau PR #18: giao diện V21, bộ nạp màn V03, UCS, hàm chi phí V13), cửa sổ 2560 × 1440 thu về 1280 × 720; các bước đi trong ảnh lấy từ lời giải BFS và từ `rules.step()`.
+> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp lại ngày 31/10/2026 trên nhánh chính (sau PR #18: giao diện V21, bộ nạp màn V03, UCS, hàm chi phí V13), cửa sổ 2560 × 1440 thu về 1280 × 720; các bước đi trong ảnh lấy từ lời giải BFS và từ `rules.step()`. Hình 4.6–4.8 (có cột chi phí) chụp lại sau PR #23, khi bước làm khối tách đôi tính 1,62.
 
 ### 4.1. Công nghệ
 
@@ -166,7 +166,7 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 
 *Hình 4.8. Kết quả So sánh trên màn 23: BFS, UCS và A* với cả hai heuristic cùng tìm được lời giải 75 bước; DFS tìm được lời giải dài 1187 bước, đúng với việc DFS không bảo đảm đường ngắn nhất.*
 
-Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (docs/04 §2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 100,96, còn UCS và A* đi 75 bước khác tốn 99,96.
+Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (docs/04 §2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 101,58, còn UCS và A* đi 75 bước khác tốn 100,58.
 
 Thời gian và bộ nhớ trên giao diện chỉ để tham khảo, vì tiến trình con luôn bật `tracemalloc` để đo bộ nhớ, và việc này làm chậm thuật toán. Số liệu ở chương 5 lấy từ script thực nghiệm.
 

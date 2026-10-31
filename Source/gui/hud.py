@@ -69,7 +69,7 @@ DOT_SIZE = 0.013          # chấm trạng thái trước dòng đầu của khu
 DOT_GAP = 0.022           # dòng trạng thái lùi sang phải chừng này để chừa chỗ cho chấm
 # Cột của bảng So sánh: (tiêu đề, các chuỗi dài nhất có thể hiện trong cột). Vị trí cột tính lúc dựng HUD
 # theo bề rộng thật của chữ (Hud._table_layout), nên đổi font không làm các cột dính nhau. Chi phí lẻ theo
-# hàm chi phí V13, ví dụ DFS màn 23: 1524.13.
+# hàm chi phí V13, ví dụ DFS màn 23: 1525.37.
 TABLE_COLUMNS = (("Thuật toán", ("A* (h_M)",)), ("Kết quả", ("Giải được", "Vô nghiệm", "chạy 59.9s", "Hết giờ")),
                  ("Bước", ("9999",)), ("Chi phí", ("9999.99",)), ("Mở rộng", ("999999",)), ("Giây", ("59.99",)),
                  ("MB", ("999.9",)))
