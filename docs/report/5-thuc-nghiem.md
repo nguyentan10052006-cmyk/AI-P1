@@ -56,7 +56,12 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 - **Mỗi lần chạy là một tiến trình con riêng** (`multiprocessing`, kiểu `spawn`), có giới hạn 60 giây. Nhờ vậy, hết giờ thì dừng được tiến trình một cách an toàn, và bộ nhớ của lần chạy trước không dồn sang lần sau.
 - **Thời gian:** đo 5 lần bằng `time.perf_counter_ns()`, gọi `gc.collect()` trước mỗi lần, **không** bật `tracemalloc`; lấy trung vị, làm tròn 2 chữ số thập phân. `tracemalloc` làm chương trình chậm đi đáng kể, nên đo thời gian khi đang bật nó thì không tách được chi phí của thuật toán khỏi chi phí của việc đo.
 - **Bộ nhớ:** chạy thêm một lần riêng. `tracemalloc.start()` ngay trước `prepare()`, đọc giá trị đỉnh ngay sau `search()`; thời gian của lần này bị bỏ.
-- **Kiểm tra lời giải:** sau khi đo, phát lại lời giải bằng engine từ trạng thái đầu và tính lại tổng chi phí. Không tới đích, hoặc tổng chi phí lệch với solver báo, thì ghi `invalid`. Bước phát lại nằm ngoài phần đo thời gian.
+- **Hàm chi phí:** với `--cost energy`, script dựng `Problem(level, cost_fn=compute_step_cost)` (`Source/bloxorz/costs.py`, Bảng 2.7). Cả năm cấu hình đọc chi phí qua cùng một hàm `Problem.step_cost`:
+  - UCS và A* cộng chi phí này khi mở rộng nút;
+  - BFS và DFS không dùng nó khi chọn nút, chỉ dùng để tính tổng chi phí của lời giải.
+
+  `run_info.json` ghi chế độ chi phí ở khóa `cost`. Với `--cost unit`, mỗi bước tốn 1.
+- **Kiểm tra lời giải:** sau khi đo, phát lại lời giải bằng engine từ trạng thái đầu và tính lại tổng chi phí. Không tới đích, hoặc tổng chi phí lệch với solver báo, thì ghi `invalid`. Chi phí V13 là số lẻ, nên tổng chi phí được so tương đối (sai lệch tương đối tối đa $10^{-9}$): solver và bước phát lại cộng theo thứ tự khác nhau. Bước phát lại nằm ngoài phần đo thời gian.
 - **Nguồn gốc số liệu:** `run_info.json` ghi commit Git, cấu hình máy, các tham số chạy, mã băm sha256 của từng file màn, và đánh dấu `-dirty` nếu mã nguồn hoặc file màn khác với commit.
 
 **Bảng 5.2.** Thiết lập của lần chạy chính thức (T1).
@@ -75,6 +80,10 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 
 **Hàm chi phí.** Cột `path_cost` của cả năm cấu hình tính theo cùng một hàm chi phí V13 (Bảng 2.7, mục 3.3), để so được chất lượng lời giải. Chương này chỉ đưa ra kết luận về tổng chi phí, về việc UCS chọn đường khác BFS, và về heuristic **sau khi có số liệu chính thức**.
 
+**Kiểm tra chức năng của hàm chi phí** (kiểm tính đúng, không phải số liệu hiệu năng; chạy trên commit `02ea502`):
+- Công cụ `tools/check_heuristics.py` (TV4) với chi phí V13: 0 vi phạm chấp nhận được và 0 vi phạm nhất quán của $h_M$ và $h_P$. Phạm vi kiểm: 340 414 cạnh của 33 màn gốc, 2 015 147 cạnh của 14 màn tự sinh. Tổng chi phí của A* bằng UCS ở mọi màn.
+- Duyệt mọi cạnh tới được của 33 màn gốc: mọi bước có chi phí ít nhất 1, đúng điều kiện ở mục 2.8.
+
 Riêng **số bước và các số đếm của BFS và DFS không phụ thuộc hàm chi phí**, vì hai thuật toán này không dùng chi phí khi chọn nút. Ngược lại, số liệu của UCS và A* sẽ thay đổi khi đổi hàm chi phí.
 
 **Kiểm tra chéo trước khi dùng số liệu** (04 §6). Một dòng sai là dấu hiệu lỗi trong engine hoặc thuật toán; sửa xong mới đưa số liệu vào báo cáo.
@@ -92,13 +101,17 @@ Các mục trên được kiểm tự động bằng `experiments/check_results.
 
 *(Ghi kết quả kiểm tra của lần chạy chính thức ở đây: số mục đạt / tổng số mục.)*
 
-**Chạy lại.** Trong `Source/`:
+**Chạy lại.** Trong `Source/`, theo thứ tự ở `Source/experiments/README.md`:
 
 ```bash
-python -m experiments.run --out experiments/<thư mục>   # 5 cấu hình × các màn trong levels/original; ghi raw.csv, summary.csv, run_info.json
+python -m pip install -r requirements.txt                    # gồm matplotlib cho hình và bảng
+python tools/check_heuristics.py                             # chi phí V13 là mặc định; 0 vi phạm
+python -m experiments.run --levels levels/original levels/gen --cost energy --out experiments/<thư mục>
+python -m experiments.check_results experiments/<thư mục>/summary.csv          # K1–K8
+python -m experiments.charts --summary experiments/<thư mục>/summary.csv --out experiments/<thư mục>/figures
+python -m experiments.tables --summary experiments/<thư mục>/summary.csv --out experiments/<thư mục>/tables.md
+python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>      # kiểm tra tái lập
 ```
-
-*(Bổ sung lệnh chạy cả bộ màn tự sinh, lệnh vẽ hình và lệnh kiểm tra chéo khi các script này đã vào nhánh chính.)*
 
 ### 5.2. Bộ màn
 
