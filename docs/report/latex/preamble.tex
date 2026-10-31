@@ -84,7 +84,7 @@
 \linespread{1.18}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.55em}
-\setlength{\emergencystretch}{2em}   % bớt dòng tràn lề khi có nhiều tên hàm không ngắt được
+\setlength{\emergencystretch}{3em}   % bớt dòng tràn lề khi có nhiều tên hàm không ngắt được
 \setlist[itemize]{leftmargin=1.6em,itemsep=0.2em,topsep=0.2em}
 \setlist[enumerate]{leftmargin=1.8em,itemsep=0.2em,topsep=0.2em}
 \setcounter{tocdepth}{2}      % mục lục tới mục con 3.1
@@ -363,11 +363,24 @@
 \AtBeginEnvironment{longtable}{\tablefont\renewcommand{\arraystretch}{1.12}}
 \captionsetup[table]{position=top,skip=4pt,font=small}
 
-% Khối mã và mã giả: nền nhạt, tự xuống dòng khi dòng dài
+% Khối mã và mã giả: nền nhạt (lightbg), viền bo góc, tự xuống dòng khi dòng dài
 \RecustomVerbatimEnvironment{verbatim}{Verbatim}{%
   fontsize=\footnotesize, breaklines=true, breakanywhere=true,
-  frame=single, framesep=7pt, rulecolor=\color{codeborder},
+  frame=none,
   formatcom=\color{darkneutral}, baselinestretch=1.05}
+
+\tcolorboxenvironment{verbatim}{
+  enhanced,
+  boxrule=0.6pt,
+  colframe=codeborder,
+  colback=lightbg,
+  arc=3pt,
+  left=8pt,
+  right=8pt,
+  top=6pt,
+  bottom=6pt,
+  breakable
+}
 
 % Trích dẫn (> ...) trong Markdown hiện thành hộp ghi chú
 \renewenvironment{quote}{\begin{notebox}}{\end{notebox}}
@@ -376,3 +389,6 @@
 % Ký tự kết thúc chứng minh: DejaVu Serif không có glyph này
 \usepackage{newunicodechar}
 \newunicodechar{∎}{\ensuremath{\blacksquare}}
+
+% Kẻ ngang mảnh, màu xám giữa các hàng của bảng có ô xuống dòng (build.py chèn)
+\newcommand{\rowrule}{\arrayrulecolor{black!25}\specialrule{0.4pt}{2.5pt}{2.5pt}\arrayrulecolor{black}}

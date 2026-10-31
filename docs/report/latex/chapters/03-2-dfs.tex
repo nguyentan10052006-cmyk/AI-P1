@@ -63,14 +63,15 @@ Mã nguồn: \texttt{Source/\allowbreak{}solvers/\allowbreak{}dfs.\allowbreak{}p
 
 \textbf{Ví dụ.} Bảng 3.2.1 so sánh DFS với BFS trên màn 1 (nhóm G1, lời giải ít bước nhất 7 bước).
 
+
 \begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1250}}
   >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.4722}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0972}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1667}}@{}}
 \caption{\textbf{Bảng 3.2.1.} BFS và DFS trên màn 1. Số đếm theo quy ước ở mục 3.1.3.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -111,11 +112,15 @@ Mã nguồn: \texttt{Source/\allowbreak{}solvers/\allowbreak{}dfs.\allowbreak{}p
 \bottomrule\noalign{}
 \endlastfoot
 BFS & 7 & \texttt{R D D R R D R} & 48 & 130 & 21 & 65 \\
+\rowrule
 DFS & 37 & \texttt{D R U L U R D D R U L U L D R D R R U R D L U L D R D R R U L D L U R R D} & 63 & 167 & 22 & 83 \\
 \end{longtable}
 
 \emph{Chạy lại trong \texttt{Source/\allowbreak{}}:}
-\texttt{python -\allowbreak{}c "from pathlib import Path; from bloxorz.\allowbreak{}level import load\_\allowbreak{}level; from bloxorz.\allowbreak{}problem import Problem; from solvers.\allowbreak{}dfs import DFS; r = DFS().\allowbreak{}search(Problem(load\_\allowbreak{}level(Path('levels/\allowbreak{}original/\allowbreak{}01.\allowbreak{}json'), '01'))); print(len(r.\allowbreak{}path), r.\allowbreak{}expanded, r.\allowbreak{}generated, r.\allowbreak{}max\_\allowbreak{}frontier, r.\allowbreak{}visited)"}
+
+\begin{verbatim}
+python -c "from pathlib import Path; from bloxorz.level import load_level; from bloxorz.problem import Problem; from solvers.dfs import DFS; r = DFS().search(Problem(load_level(Path('levels/original/01.json'), '01'))); print(len(r.path), r.expanded, r.generated, r.max_frontier, r.visited)"
+\end{verbatim}
 
 Lời giải DFS dài gấp hơn 5 lần lời giải tối ưu, vì DFS chỉ dừng ở lần đầu gặp đích trên nhánh nó đang đi, không so sánh với các nhánh khác. Các số đếm này \textbf{không phụ thuộc hàm chi phí}: DFS không dùng \texttt{step\_\allowbreak{}cost} để chọn nút, chỉ dùng để tính tổng chi phí của lời giải sau khi đã tìm xong. Chúng cũng không phụ thuộc máy chạy: cùng commit thì luôn ra cùng kết quả (test \texttt{test\_\allowbreak{}deterministic}).
 

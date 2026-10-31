@@ -23,11 +23,12 @@ Chương này so sánh năm cấu hình thuật toán trên cùng một bộ mà
 
 \textbf{Thuật toán.} Năm cấu hình, dùng chung một engine luật, một hàm chi phí và một thứ tự hành động (U, D, L, R; khi đã tách U1 \ldots{} R1, U2 \ldots{} R2):
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4170}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3469}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4028}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3611}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1111}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -44,9 +45,13 @@ Chương này so sánh năm cấu hình thuật toán trên cùng một bộ mà
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{bfs} & BFS & khi sinh nút & 3.1 \\
+\rowrule
 \texttt{dfs} & DFS dạng tìm kiếm trên đồ thị & khi sinh nút & 3.2 \\
+\rowrule
 \texttt{ucs} & UCS & khi lấy ra khỏi hàng đợi & 3.3 \\
+\rowrule
 \texttt{astar} & A* với \(h_P\) (heuristic chính) & khi lấy ra khỏi hàng đợi & 3.4 \\
+\rowrule
 \texttt{astar\_\allowbreak{}m} & A* với \(h_M\) (để so sánh) & khi lấy ra khỏi hàng đợi & 3.4 \\
 \end{longtable}
 }
@@ -54,6 +59,7 @@ Chương này so sánh năm cấu hình thuật toán trên cùng một bộ mà
 Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và DFS dừng ngay khi sinh ra đích, còn UCS và A* phải chờ tới lúc lấy đích ra để giữ tính tối ưu. Khi đọc bảng, cần nhớ điều này.
 
 \textbf{Chỉ số.} Bốn chỉ số đề bắt buộc (thời gian tìm kiếm, bộ nhớ đỉnh, số nút mở rộng, độ dài lời giải), cộng năm chỉ số để giải thích kết quả.
+
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2778}}
@@ -83,14 +89,23 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 \bottomrule\noalign{}
 \endlastfoot
 Số bước & \texttt{steps} & Số lần lăn trong lời giải, gồm cả bước của khối con \\
+\rowrule
 Tổng chi phí & \texttt{path\_\allowbreak{}cost} & Tổng chi phí bước dọc lời giải, theo \textbf{cùng một} hàm chi phí cho cả 5 cấu hình \\
+\rowrule
 Số nút mở rộng & \texttt{expanded} & Số trạng thái được lấy ra khỏi biên để sinh con. \textbf{Chỉ số chính khi so sánh} \\
+\rowrule
 Số nút sinh & \texttt{generated} & Số trạng thái con hợp lệ, đếm trước khi xét tập đã thăm \\
+\rowrule
 Biên lớn nhất & \texttt{max\_\allowbreak{}frontier} & Số phần tử lớn nhất từng có trong biên. UCS và A* tính cả mục cũ còn trong heap (lazy deletion) \\
+\rowrule
 Trạng thái đã thăm & \texttt{visited} & Kích thước tập đã thăm lúc kết thúc \\
+\rowrule
 Bộ nhớ đỉnh & \texttt{peak\_\allowbreak{}mem\_\allowbreak{}kb} & Đỉnh bộ nhớ Python cấp phát trong \texttt{prepare()} và \texttt{search()}, đo bằng \texttt{tracemalloc} \\
+\rowrule
 Thời gian tìm kiếm & \texttt{search\_\allowbreak{}ms} & Thời gian chạy \texttt{search()}, trung vị 5 lần \\
+\rowrule
 Tổng thời gian & \texttt{total\_\allowbreak{}ms} & Từ lúc đọc file màn tới khi có lời giải: nạp màn, dựng bài toán, \texttt{prepare()}, \texttt{search()}; trung vị 5 lần \\
+\rowrule
 Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}solution}, \texttt{timeout}, \texttt{invalid} \\
 \end{longtable}
 
@@ -122,9 +137,10 @@ Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}soluti
   \textbf{Nguồn gốc số liệu:} \texttt{run\_\allowbreak{}info.\allowbreak{}json} ghi commit Git, cấu hình máy, các tham số chạy, mã băm sha256 của từng file màn, và đánh dấu \texttt{-\allowbreak{}dirty} nếu mã nguồn hoặc file màn khác với commit.
 \end{itemize}
 
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2507}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7493}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4722}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5278}}@{}}
 \caption{\textbf{Bảng 5.2.} Thiết lập của lần đo chính thức.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -145,14 +161,23 @@ Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}soluti
 \bottomrule\noalign{}
 \endlastfoot
 CPU, RAM & AMD64 Family 25 Model 117 (16 luồng), 15,3 GB \\
+\rowrule
 Hệ điều hành & Windows (\texttt{platform}: Windows-10-10.0.26200-SP0) \\
+\rowrule
 Python & CPython 3.11.9 \\
+\rowrule
 Commit Git & \texttt{0a35afd}, không có thay đổi chưa commit (\texttt{dirty\_\allowbreak{}reasons} rỗng) \\
+\rowrule
 Số lần đo thời gian & 5, lấy trung vị \\
+\rowrule
 Số lần đo bộ nhớ & 1, chạy riêng \\
+\rowrule
 Giới hạn thời gian & 60 giây mỗi lần chạy \\
+\rowrule
 Hàm chi phí & \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 3.3.1), bước tách khối 1,62; \texttt{run.\allowbreak{}py -\allowbreak{}-\allowbreak{}cost energy}, ghi ở khóa \texttt{cost} trong \texttt{run\_\allowbreak{}info.\allowbreak{}json} \\
+\rowrule
 Thời gian chạy toàn bộ & 9 phút 34 giây (04:43:38 → 04:53:12 UTC, 31/10/2026) \\
+\rowrule
 Cảnh báo, lần đo bộ nhớ thất bại & 0, 0 \\
 \end{longtable}
 
@@ -236,12 +261,13 @@ python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>  
 
 Đề gợi ý bốn nhóm: không có ô đặc biệt, có ô dễ vỡ, có công tắc, và kết hợp. Nhóm tách thêm các màn có công tắc tách thành nhóm riêng (G5), vì khi khối bị tách, trạng thái gồm hai khối con và không gian trạng thái khác hẳn.
 
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2870}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.4213}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0694}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3056}}@{}}
 \caption{\textbf{Bảng 5.3.} Năm nhóm màn gốc. ``Số bước tối ưu'' là số bước của lời giải ít bước nhất theo dữ liệu tham khảo; BFS của nhóm khớp ở cả 33 màn (test T24 và bước kiểm tra K2 của lần đo).}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -274,9 +300,13 @@ python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>  
 \bottomrule\noalign{}
 \endlastfoot
 G1 & Cơ bản: chỉ sàn, ô trống, đích & 1, 3, 6 & 3 & 7 -- 35 \\
+\rowrule
 G2 & Có ô dễ vỡ & 4, 13 & 2 & 28 -- 46 \\
+\rowrule
 G3 & Có công tắc mềm hoặc nặng và cầu & 2, 5, 7, 11, 12, 14, 17, 18, 19, 21, 22, 25, 29, 32, 33 & 15 & 17 -- 129 \\
+\rowrule
 G4 & Ô dễ vỡ kết hợp công tắc & 27, 30, 31 & 3 & 71 -- 114 \\
+\rowrule
 G5 & Có công tắc tách & 8, 9, 10, 15, 16, 20, 23, 24, 26, 28 & 10 & 10 -- 104 \\
 \end{longtable}
 
@@ -284,13 +314,14 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
 
 \textbf{14 màn tự sinh.} 33 màn gốc nhỏ, thời gian giải chỉ vài mili-giây nên dễ nhiễu, và khó thấy khác biệt giữa các thuật toán. Ba nhóm màn sinh bằng script cho số liệu ở quy mô lớn hơn, mỗi nhóm trả lời một câu hỏi ở mục 5.1.
 
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2639}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2710}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1025}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1806}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1126}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}@{}}
 \caption{\textbf{Bảng 5.4.} Ba nhóm màn tự sinh.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -327,7 +358,9 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
 \bottomrule\noalign{}
 \endlastfoot
 S1 Sân trống & Bàn N × N toàn sàn; xuất phát ở góc trên trái (0, 0), đích ở góc dưới phải (N − 1, N − 1) & N = 10, 25, 50, 100, 150, 200 & N × N & 12, 32, 66, 132, 200, 266 & 5 \\
+\rowrule
 S2 Cầu & Lưới 8 × 12 cố định. Hàng 0 là mép ngoài: ô trống, trừ k ô cầu đóng ở cột 1 \ldots{} k. k công tắc mềm ở hàng 1, cột 1 \ldots{} k; mỗi công tắc đảo ô cầu ngay trên nó. Xuất phát (3, 1), đích (3, 10); đường tới đích không qua cầu & k = 0, 2, 4, 6, 8, 10 & 8 × 12 & 6 với mọi k & 3 \\
+\rowrule
 S3 Không lời giải & Vùng trái N × N chứa điểm xuất phát (1, 1), một cột ô trống, rồi vùng phải N × 3 chứa đích (1, N + 2). Khối không qua được khe rộng 1 ô, vì lăn về phía khe thì luôn có một phần khối trên ô trống & N = 10, 50 & N × (N + 4) & không có lời giải & 5 \\
 \end{longtable}
 
@@ -403,11 +436,11 @@ G5 & 10 & 1 160,2 & 459,5 & 1 418,9 & 1 342,4 & 1 376,0 \\
 \end{longtable}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2278}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1861}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2139}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2778}}@{}}
 \caption{\textbf{Bảng 5.8.} Chất lượng lời giải trên 33 màn gốc. ``Tối ưu về số bước'': bằng số bước của BFS. ``Tối ưu về chi phí'': bằng tổng chi phí của UCS.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -516,16 +549,17 @@ G5 & 3 268 & 3 088 & 2 900 \\
 
 \textbf{Bộ màn tự sinh.} Số liệu chọn lọc từ \texttt{summary.\allowbreak{}csv}:
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1222}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1806}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1083}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1139}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1278}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1361}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
@@ -549,16 +583,27 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{s1\_\allowbreak{}200} & BFS & solved & 266 & 119 589 & 119 598 & 2 195,64 & 44 736,48 \\
+\rowrule
 \texttt{s1\_\allowbreak{}200} & DFS & solved & 35 287 & 43 013 & 98 095 & 914,64 & 39 080,73 \\
+\rowrule
 \texttt{s1\_\allowbreak{}200} & UCS & solved & 266 & 119 599 & 119 600 & 3 357,73 & 50 718,93 \\
+\rowrule
 \texttt{s1\_\allowbreak{}200} & A* (\(h_P\)) & solved & 266 & 119 597 & 119 600 & 3 439,23 & 55 926,54 \\
+\rowrule
 \texttt{s2\_\allowbreak{}00} & BFS & solved & 6 & 95 & 145 & 1,52 & 61,27 \\
+\rowrule
 \texttt{s2\_\allowbreak{}10} & BFS & solved & 6 & 197 & 414 & 3,41 & 200,24 \\
+\rowrule
 \texttt{s2\_\allowbreak{}10} & A* (\(h_P\)) & solved & 6 & 30 & 89 & 0,85 & 62,39 \\
+\rowrule
 \texttt{s3\_\allowbreak{}50} & BFS & no\_solution & & 7 400 & 7 400 & 122,87 & 3 004,41 \\
+\rowrule
 \texttt{s3\_\allowbreak{}50} & DFS & no\_solution & & 7 400 & 7 400 & 123,51 & 3 003,11 \\
+\rowrule
 \texttt{s3\_\allowbreak{}50} & UCS & no\_solution & & 7 400 & 7 400 & 164,30 & 3 081,45 \\
+\rowrule
 \texttt{s3\_\allowbreak{}50} & A* (\(h_P\)) & no\_solution & & 0 & 1 & 0,01 & 13,98 \\
+\rowrule
 \texttt{s3\_\allowbreak{}50} & A* (\(h_M\)) & no\_solution & & 7 400 & 7 400 & 184,18 & 3 107,64 \\
 \end{longtable}
 }
@@ -589,13 +634,14 @@ G5 & 3 268 & 3 088 & 2 900 \\
   UCS và A* khác thêm ở số đếm, vì chi phí bước tách đổi thứ tự lấy nút ra khỏi hàng đợi.
 \end{itemize}
 
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2288}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2222}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0972}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2010}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2018}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2018}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}@{}}
 \caption{\textbf{Bảng 5.10.} Nhóm G5 trước (\texttt{cd93624}, bước tách 1,0) và sau (\texttt{0a35afd}, bước tách 1,62) khi sửa.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -632,14 +678,23 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \bottomrule\noalign{}
 \endlastfoot
 08 & 11,98 → 12,60 & +0,62 & 594 → 594 & 492 → 492 & 507 → 508 \\
+\rowrule
 09 & 28,68 → 29,30 & +0,62 & 749 → 749 & 666 → 666 & 684 → 684 \\
+\rowrule
 10 & 66,82 → 67,44 & +0,62 & 3 611 → 3 505 & 3 153 → 3 086 & 3 391 → 3 356 \\
+\rowrule
 15 & 68,22 → 68,84 & +0,62 & 3 031 → 3 031 & 2 715 → 2 715 & 2 821 → 2 821 \\
+\rowrule
 16 & 33,88 → 38,22 & +4,34 & 160 → 168 & 149 → 160 & 155 → 160 \\
+\rowrule
 20 & 70,06 → 70,68 & +0,62 & 4 437 → 4 438 & 3 810 → 3 813 & 3 915 → 3 917 \\
+\rowrule
 23 & 99,96 → 100,58 & +0,62 & 3 804 → 3 755 & 3 682 → 3 682 & 3 737 → 3 711 \\
+\rowrule
 24 & 75,69 → 76,31 & +0,62 & 518 → 523 & 502 → 504 & 508 → 511 \\
+\rowrule
 26 & 124,26 → 125,50 & +1,24 & 4 910 → 4 910 & 4 704 → 4 704 & 4 778 → 4 778 \\
+\rowrule
 28 & 127,35 → 127,97 & +0,62 & 3 603 → 3 603 & 3 397 → 3 397 & 3 434 → 3 434 \\
 \end{longtable}
 

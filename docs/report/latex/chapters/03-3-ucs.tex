@@ -16,11 +16,12 @@ c(s, a, s') = c_{\text{lăn}}\big(o(s), o(s')\big) + \begin{cases} 0{,}5 & \text
 
 trong đó \(o(s)\) là tư thế của khối ở trạng thái \(s\), và \(\text{cells}(s')\) là các ô khối chiếm sau bước đi. Bảng 3.3.1 cho \(c_{\text{lăn}}\).
 
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2850}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2705}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2917}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2361}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}@{}}
 \caption{\textbf{Bảng 3.3.1.} Chi phí lăn theo tư thế trước và sau bước đi. \(\Delta h\) là độ cao trọng tâm phải nâng thêm để khối lật qua cạnh; \(m\) là khối lượng, lấy khối 1×1×2 có \(m = 1\).}\tabularnewline
 \toprule\noalign{}
@@ -54,10 +55,15 @@ trong đó \(o(s)\) là tư thế của khối ở trạng thái \(s\), và \(\t
 \bottomrule\noalign{}
 \endlastfoot
 Đứng → nằm (khối đứng lăn R) & \(1 \to \sqrt{5}/2 \approx 1{,}118\) & 0,118 & 0,118 & 1,12 \\
+\rowrule
 Nằm → đứng (khối nằm ngang lăn R) & \(0{,}5 \to \sqrt{5}/2 \approx 1{,}118\) & 0,618 & 0,618 & 1,62 \\
+\rowrule
 Nằm → nằm, lăn quanh trục dài (khối nằm ngang lăn U) & \(0{,}5 \to \sqrt{2}/2 \approx 0{,}707\) & 0,207 & 0,207 & 1,21 \\
+\rowrule
 Khối con 1×1×1 đi một ô, \(m = 1/2\) (lăn U1) & \(0{,}5 \to \sqrt{2}/2 \approx 0{,}707\) & 0,207 & 0,104 & 1,10 \\
+\rowrule
 Khối con đi rồi hai khối con ghép thành khối nằm & như khối con đi một ô & 0,207 & 0,104 & 1,10 \\
+\rowrule
 Nằm → đứng lên công tắc tách, rồi tách & như nằm → đứng & 0,618 & 0,618 & 1,62 \\
 \end{longtable}
 
@@ -104,12 +110,13 @@ Công cần để lật khối là công nâng trọng tâm từ độ cao lúc 
 
 \textbf{Hàm chi phí làm UCS chọn đường khác BFS ở đâu.} Trên 33 màn gốc, UCS và BFS luôn có cùng số bước, nhưng có tổng chi phí khác nhau ở 2 màn (Bảng 3.3.2). Ở màn 17, đường của UCS dựng khối đứng ít hơn một lần, thay bằng hai lần lăn khối nằm: bớt một bước ``nằm → đứng'' (1,62) và một bước ``đứng → nằm'' (1,12), thêm hai bước ``nằm → nằm'' (2 × 1,21), tức rẻ hơn 0,32. Ở màn 23, đường của UCS đè lên ô dễ vỡ 21 lần thay vì 23 lần, nên rẻ hơn 2 × 0,5 = 1,00. Test \texttt{test\_\allowbreak{}branching\_\allowbreak{}decisions\_\allowbreak{}on\_\allowbreak{}levels\_\allowbreak{}17\_\allowbreak{}and\_\allowbreak{}23} kiểm tra hai trường hợp này.
 
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.6250}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.5417}}@{}}
 \caption{\textbf{Bảng 3.3.2.} Hai màn có lời giải BFS khác lời giải UCS về tổng chi phí (cùng số bước).}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -142,6 +149,7 @@ Công cần để lật khối là công nâng trọng tâm từ độ cao lúc 
 \bottomrule\noalign{}
 \endlastfoot
 17 & 106 & 140,42 & 140,10 & UCS: 9 lần dựng khối đứng (BFS: 10), 25 lần lăn khối nằm ngang (BFS: 23) \\
+\rowrule
 23 & 75 & 101,58 & 100,58 & UCS: 21 bước đè ô dễ vỡ (BFS: 23); số lần đổi tư thế như nhau \\
 \end{longtable}
 
@@ -206,15 +214,15 @@ Gọi \(S\) là tập trạng thái tới được, \(b \le 8\) là số hành �
 \end{enumerate}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0880}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1019}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1019}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1250}}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1296}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1157}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1157}}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1296}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1019}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1157}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1296}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1250}}@{}}
 \caption{\textbf{Bảng 3.3.3.} UCS so với BFS trên một số màn gốc (hàm chi phí ở Bảng 3.3.1). Số đếm tất định, không phụ thuộc máy chạy.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright

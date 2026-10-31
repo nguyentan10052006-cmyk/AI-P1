@@ -4,10 +4,11 @@
 
 \subsection{B.1. Công cụ}
 
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4641}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3681}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2639}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2720}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3681}}@{}}
 \caption{\textbf{Bảng B.1.} Công cụ AI nhóm đã dùng.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -32,10 +33,15 @@
 \bottomrule\noalign{}
 \endlastfoot
 Claude Code (Anthropic), tiện ích VS Code, bản 2.1.300--2.1.312, mô hình \texttt{claude-\allowbreak{}opus-\allowbreak{}5-\allowbreak{}5} & TV1 (15/10--31/10) & Xem B.2, phần TV1 \\
+\rowrule
 Claude Code trên web (claude.ai/code, Anthropic) & TV1 (19/10) & Bản cân bằng lại phân công ngày 19/10 (commit \texttt{84c5a4e}) \\
+\rowrule
 Claude Code (Anthropic), tiện ích VS Code, bản 2.1.301--2.1.310, mô hình \texttt{claude-\allowbreak{}opus-\allowbreak{}5-\allowbreak{}5} & TV2 (19/10--31/10) & Xem B.2, phần TV2 \\
+\rowrule
 \placeholder{TV3 điền: công cụ AI đã dùng, hoặc ghi ``không dùng''} & TV3 & \\
+\rowrule
 Claude Code (Anthropic) & TV4 (20/10--26/10) & Xem B.2, phần TV4 \\
+\rowrule
 Claude Code (Anthropic), giao diện dòng lệnh, bản 2.1.303--2.1.310, mô hình \texttt{claude-\allowbreak{}opus-\allowbreak{}5-\allowbreak{}5} & TV5 (19/10--29/10) & Xem B.2, phần TV5 \\
 \end{longtable}
 
@@ -63,12 +69,13 @@ TV1 làm các việc sau:
   đọc lại kết quả và báo cáo kiểm tra sau mỗi đợt.
 \end{itemize}
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1389}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2751}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2699}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3162}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2870}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2870}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2870}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ngày}
@@ -84,13 +91,21 @@ TV1 làm các việc sau:
 \bottomrule\noalign{}
 \endlastfoot
 15--18/10 & Tạo repository; slide cho buổi họp đầu tiên; code luyện tập (engine, giao diện web demo, 18 màn tự thiết kế) & Repository nhóm; bản demo đầu, vào nhánh chính qua PR \#1 & Chạy thử demo; toàn bộ test của bản luyện tập \\
+\rowrule
 18--19/10 & Soạn bộ tài liệu nhóm \texttt{docs/\allowbreak{}01}--\texttt{06} và 7 file CSV cho Google Sheet; đối chiếu dữ liệu 33 màn gốc từ bốn nguồn và tính cột ``Bước tối ưu''; cân bằng lại phân công & \texttt{docs/\allowbreak{}}, Google Sheet ``AI-P1'' & Đối chiếu từng ô với bốn nguồn {[}3{]}--{[}6{]}; cột ``Bước tối ưu'' tính bằng BFS \\
+\rowrule
 20/10 & BFS (V08): cài đặt, quy ước đếm chỉ số, mã giả & \texttt{solvers/\allowbreak{}bfs.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}bfs.\allowbreak{}py}; PR \#3 & Đếm \texttt{expanded}, \texttt{generated}, \texttt{max\_\allowbreak{}frontier}, \texttt{visited} trên mê cung nhỏ, so với kết quả tính tay \\
+\rowrule
 21/10 & Test engine lõi T01--T06 (V02): bảng chuyển 12 trường hợp, rơi, thắng, phát lại lời giải & \texttt{tests/\allowbreak{}test\_\allowbreak{}rules.\allowbreak{}py}; PR \#5 & Toàn bộ test qua \\
+\rowrule
 22/10 & Test tách và ghép khối T17--T23 (V06); màn 8, 9, 16 & \texttt{tests/\allowbreak{}test\_\allowbreak{}rules.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}bfs.\allowbreak{}py}; PR \#6 & Màn 8, 9, 16 ra đúng 10, 24, 28 bước \\
+\rowrule
 24/10 & Kiểm tra tiến độ các nhánh trên GitHub & Ghi chú riêng của TV1 & Đối chiếu với GitHub API \\
+\rowrule
 25/10 & Test T24: BFS trên đủ 33 màn gốc (V09); khung báo cáo LaTeX; nháp chương 2 và mục 3.1 & \texttt{tests/\allowbreak{}test\_\allowbreak{}bfs.\allowbreak{}py}; PR \#12; bản nháp riêng & BFS khớp số bước tối ưu ở 33/33 màn, lời giải phát lại tới đích \\
+\rowrule
 30/10 & Đánh giá bài của nhóm theo thang điểm của đề; cập nhật chương 2 và mục 3.1 theo code mới nhất; viết mục 5.4.1 và phần này; thử cài theo README trong môi trường ảo mới (V37) & \texttt{docs/\allowbreak{}report/\allowbreak{}2-\allowbreak{}mo-\allowbreak{}hinh-\allowbreak{}hoa.\allowbreak{}md}, \texttt{3.\allowbreak{}1-\allowbreak{}bfs.\allowbreak{}md}, \texttt{5.\allowbreak{}4-\allowbreak{}nhan-\allowbreak{}xet-\allowbreak{}bfs.\allowbreak{}md}, \texttt{phu-\allowbreak{}luc-\allowbreak{}b-\allowbreak{}tv1.\allowbreak{}md} & Mọi ví dụ và con số được chạy lại bằng engine và script thực nghiệm ở commit \texttt{44dc9e3}; trên bản cài mới, 205/206 test qua (test còn lại cần thư mục \texttt{.\allowbreak{}git}) và giao diện import được \\
+\rowrule
 31/10 & Ghép báo cáo và xuất PDF. Viết mục 3.3 (UCS và hàm chi phí) và 5.4.3 (nhận xét UCS), là hai phần được giao cho TV3 nhưng chưa có khi ghép; viết chương 1, chương 6, phần Tóm tắt; viết lại mục 5.4.4 và cập nhật Bảng 3.4.1, 3.4.2, mục 5.4.1 theo lần đo chính thức; bỏ ghi chú nháp và tham chiếu tới tài liệu nội bộ & Toàn bộ báo cáo (\texttt{docs/\allowbreak{}report/\allowbreak{}}, \texttt{Report.\allowbreak{}pdf}) & Mọi con số đối chiếu với \texttt{summary.\allowbreak{}csv} của lần đo \texttt{0a35afd}; chạy lại \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} (0 vi phạm); so lời giải BFS và UCS ở màn 17, 23 bằng engine; đối chiếu mô tả test với code test; chạy lại toàn bộ test (246 test qua) \\
 \end{longtable}
 }
@@ -183,12 +198,13 @@ TV2 làm các việc sau:
 
 Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phiên. Kết quả ghi trong các báo cáo nghiệm thu của TV2.
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1405}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2917}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2702}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2976}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ngày}
@@ -204,14 +220,23 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
 \bottomrule\noalign{}
 \endlastfoot
 19--20/10 & Chuyển 33 màn gốc từ bloxorz\_gba (NV4, V07), sửa màn 3; DFS dạng tìm kiếm trên đồ thị (NV6, V10, V11); đánh giá chọn DFS hay IDS & \texttt{experiments/\allowbreak{}convert\_\allowbreak{}original\_\allowbreak{}levels.\allowbreak{}py}, \texttt{levels/\allowbreak{}original/\allowbreak{}}, \texttt{solvers/\allowbreak{}dfs.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}original\_\allowbreak{}levels.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}dfs.\allowbreak{}py}; PR \#10 & Test đối chiếu từng ô với dữ liệu gốc; DFS giải 27 màn nạp được (6 màn \texttt{links} chờ V03), phát lại tới đích, số bước không nhỏ hơn tối ưu; sha256 của dữ liệu nguồn \\
+\rowrule
 23/10 & Đọc chéo PR \#7 (GUI Ursina của TV5); thêm \texttt{matplotlib} vào \texttt{requirements.\allowbreak{}txt}; script đo V23 và solver giả để thử & Nhận xét PR \#7 (không đăng lên GitHub); \texttt{experiments/\allowbreak{}run.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}experiments.\allowbreak{}py}; PR \#11 & Chạy test ở head của PR và sau khi gộp; chạy GUI ở chế độ offscreen; thử script với solver giả trả kết quả cố định \\
+\rowrule
 28/10 & Sửa 5 lỗi của V23 (F1--F5) kèm test hồi quy & \texttt{experiments/\allowbreak{}run.\allowbreak{}py}; PR \#13 & 10 test hồi quy mới đều thất bại trên code cũ và qua trên code mới; cả bộ test qua trong một worktree sạch \\
+\rowrule
 28/10 & Ghép tạm code UCS, \(h_P\) và bộ nạp \texttt{links} của TV3, TV4 trên một nhánh riêng để chạy thử; viết tạm bộ màn S1--S3; vẽ biểu đồ V25; kiểm tra chéo số liệu & Nhánh \texttt{integration/\allowbreak{}Tien/\allowbreak{}V24} (chưa push); số liệu chạy thử \textbf{không} dùng trong báo cáo & Kiểm tra chéo 04 §6 trên số liệu chạy thử; xem lại từng hình đã vẽ; công cụ \texttt{check\_\allowbreak{}heuristics.\allowbreak{}py} của TV4 cho 0 vi phạm \\
+\rowrule
 28/10 & Kiểm tra hồi cứu cách đã khảo sát repository; đối chiếu đề bài với tài liệu nhóm; đọc chéo GUI V20, V21 của TV5 & Các báo cáo trong \texttt{docs/\allowbreak{}nghiem-\allowbreak{}thu/\allowbreak{}} (không nộp); ghi chú gửi TV3, TV4, TV5 & Lái GUI ở chế độ offscreen: 13/13 kiểm tra đạt khi có đủ code của TV3, TV4; tái hiện các lỗi tìm được bằng script \\
+\rowrule
 28/10 & Nháp chương 3.2, chương 5 (5.1, 5.2, khung 5.3 và 5.5), mục 5.4.2 và phần này & \texttt{docs/\allowbreak{}report/\allowbreak{}} & Đối chiếu từng câu với code \texttt{dfs.\allowbreak{}py}, \texttt{run.\allowbreak{}py} và test; lệnh tái hiện ví dụ ở Bảng 3.2.1 chạy lại ra đúng số \\
+\rowrule
 28/10 (chiều) & Mở PR báo cáo; sửa các công cụ thực nghiệm để từ chối dữ liệu hỏng (5 lỗi tái hiện bằng file cố ý làm hỏng); thêm kiểm tra đủ dòng K8 và \texttt{compare\_\allowbreak{}runs.\allowbreak{}py}; tách các công cụ ra một nhánh sạch từ \texttt{main} & PR \#14, \#16, \#17: \texttt{check\_\allowbreak{}results.\allowbreak{}py}, \texttt{charts.\allowbreak{}py}, \texttt{tables.\allowbreak{}py}, \texttt{compare\_\allowbreak{}runs.\allowbreak{}py}, \texttt{experiments/\allowbreak{}README.\allowbreak{}md} & Test mới thất bại trên code cũ; chạy thử 235 cặp, so hai lần chạy cho số đếm trùng hẳn \\
+\rowrule
 31/10 & Rà cách nối hàm chi phí V13 sau PR \#18 (đọc code, chạy \texttt{check\_\allowbreak{}heuristics} với V13, duyệt mọi cạnh của 33 màn); phát hiện bước làm khối tách đôi có chi phí 1,0 (module của TV3); làm công cụ biết chế độ chi phí & PR \#20; tài liệu bàn giao và bản vá đề xuất cho TV3 (không áp vào code của TV3) & 0 vi phạm heuristic; bản vá đề xuất qua 233 test. \textbf{Sự cố do Claude gây ra:} lần đo kỹ thuật đầu chạy trong worktree mà Claude đang sửa tạm \texttt{costs.\allowbreak{}py}, nên dữ liệu có thể bị nhiễm. Lần đo đó bị dừng, dữ liệu được đánh dấu loại bỏ, và đo lại trong worktree riêng \\
+\rowrule
 31/10 & Đo thực nghiệm trên commit sạch \texttt{cd93624} theo 04 §4; kiểm tra K1--K8, tái lập và kiểm tra độc lập; viết mục 5.3, 5.5, 5.4.2 và Phụ lục A & PR \#21: chương 5, Phụ lục A, \texttt{Source/\allowbreak{}experiments/\allowbreak{}benchmark-\allowbreak{}2026-\allowbreak{}10-\allowbreak{}31-\allowbreak{}cd93624/\allowbreak{}} & Đo lần hai trùng số đếm 235/235 cặp; phát lại 225 lời giải; tính lại 75 ô trung vị; mỗi con số trong chương đối chiếu với \texttt{summary.\allowbreak{}csv}. Rà lại chương trước khi merge và sửa 3 câu không khớp số liệu \\
+\rowrule
 31/10 (trưa, chiều) & Theo cho phép của TV2, đặt chi phí bước làm khối tách đôi bằng 1,62 (bằng nằm → đứng) trong \texttt{costs.\allowbreak{}py}, kèm test hồi quy. Đây là quyết định áp dụng để hoàn thiện phép đo; TV3 chưa review. Đo lại trên commit \texttt{0a35afd}; cập nhật chương 5, 5.4.2, Phụ lục A và hình; ghi khác biệt trước và sau khi sửa & PR \#23 (\texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}costs\_\allowbreak{}split.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}ucs.\allowbreak{}py}); PR \#24: chương 5, Phụ lục A, \texttt{Source/\allowbreak{}experiments/\allowbreak{}benchmark-\allowbreak{}2026-\allowbreak{}10-\allowbreak{}31-\allowbreak{}0a35afd/\allowbreak{}} & 3 test mới thất bại trên code cũ, qua trên code mới; cả bộ test qua (246 OK, 1 skip). K1--K8 PASS. So với lần đo \texttt{cd93624}: chỉ 50 cặp của 10 màn G5 khác, số bước không đổi. Đo lần hai trùng số đếm 235/235 cặp; kiểm tra độc lập 0 lệch. Rà lại chương và sửa thêm chú thích Hình 5.6 (ghi ``thang log'' trong khi hình dùng thang tuyến tính) \\
 \end{longtable}
 }
@@ -307,6 +332,7 @@ AI-P1 --- Hoàn thành tối đa công việc TV2 trong hôm nay
 
 \textbf{Danh sách đủ các đợt} (tiêu đề hoặc câu đầu của prompt, nguyên văn):
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1806}}
@@ -322,38 +348,71 @@ AI-P1 --- Hoàn thành tối đa công việc TV2 trong hôm nay
 \bottomrule\noalign{}
 \endlastfoot
 19/10 20:32 & \texttt{\# ROLE: TV2 — Bloxorz Solver (CSC14003, Project 1)} \\
+\rowrule
 19/10 20:50 & \texttt{Cần nghiệm thu và chốt trước hoàn thành M1 đúng hạn, …} \\
+\rowrule
 19/10 21:08 & \texttt{Tiếp tục nghiệm thu và chốt M1 cho phần TV2.\allowbreak{} …} \\
+\rowrule
 20/10 08:42 & \texttt{Tạo nhánh và push lên github, không cần merg, không cần push file nghiệm thu lên} \\
+\rowrule
 20/10 08:49 & \texttt{đã sửa gì trong docs/\allowbreak{}03} \\
+\rowrule
 22/10 20:52 & \texttt{\# Nhiệm vụ: Rà soát sau M1 và lập kế hoạch tiếp theo cho TV2 — Bloxorz Solver} \\
+\rowrule
 23/10 14:51 & \texttt{Tiếp tục ở trạng thái hiện tại} \\
+\rowrule
 23/10 15:08 & \texttt{\# Tiếp tục Bloxorz Solver sau M1 — Review PR \#7 và bổ sung matplotlib} \\
+\rowrule
 23/10 15:19 & \texttt{\# Bloxorz Solver — Xử lý PR \#7, cập nhật matplotlib và triển khai V23} \\
+\rowrule
 23/10 15:43 & \texttt{Tiếp tục project Bloxorz Solver với vai trò TV2.\allowbreak{} …} \\
+\rowrule
 23/10 15:49 & \texttt{\# Chuẩn bị PR M1 đưa NV4 và DFS vào main} \\
+\rowrule
 23/10 16:03 & \texttt{\# Tiếp tục Bloxorz Solver — Chuẩn bị V23 và bảo toàn PR \#10} \\
+\rowrule
 23/10 16:10 & \texttt{\# Theo dõi PR \#10 và chuẩn bị V23 — Chưa thao tác Git} \\
+\rowrule
 23/10 16:27 & \texttt{\# Tiếp tục V23 sau khi PR \#10 đã merge} \\
+\rowrule
 23/10 16:36 & \texttt{\# Push nhánh V23 và mở Pull Request} \\
+\rowrule
 23/10 22:19 & \texttt{\# Nhiệm vụ: Theo dõi PR \#11 và chuẩn bị bước tiếp theo cho V23} \\
+\rowrule
 28/10 12:24 & \texttt{\# Nhiệm vụ: Chuẩn bị hoàn thiện V23 sau khi PR \#11 merge} \\
+\rowrule
 28/10 12:28 & \texttt{\# AI-\allowbreak{}P1 — Hoàn thành tối đa công việc TV2 trong hôm nay} \\
+\rowrule
 28/10 12:44 & \texttt{\# AI-\allowbreak{}P1 — Chủ động xử lý dependency của các thành viên để hoàn thành công việc TV2} \\
+\rowrule
 28/10 13:02 & \texttt{Khi nào biết xong?} \\
+\rowrule
 28/10 13:13 & \texttt{Trước khi tiếp tục dự án AI-\allowbreak{}P1 /\allowbreak{} Bloxorz Solver, hãy thực hiện **kiểm tra hồi cứu việc khảo sát repository Git** …} \\
+\rowrule
 28/10 13:18 & \texttt{\# AI-\allowbreak{}P1 — Phát hành V23 riêng và bảo toàn nhánh tích hợp V24} \\
+\rowrule
 28/10 13:24 & \texttt{Tiếp tục dự án AI-\allowbreak{}P1 từ trạng thái hiện tại, nhưng trước khi phát triển thêm V24/\allowbreak{}V25, hãy hoàn tất kiểm tra repository …} \\
+\rowrule
 28/10 13:35 & \texttt{\# AI-\allowbreak{}P1 /\allowbreak{} Bloxorz Solver — Hoàn thành toàn bộ công việc thuộc phạm vi TV2} \\
+\rowrule
 28/10 14:12 & \texttt{Tiếp tục công việc TV2 trong repository Bloxorz-\allowbreak{}Solver dựa trên báo cáo trạng thái gần nhất.\allowbreak{}} \\
+\rowrule
 28/10 14:27 & \texttt{Tiếp tục công việc TV2 trong repository Bloxorz-\allowbreak{}Solver theo hướng chủ động hoàn thành công việc, không chờ review của TV1 …} \\
+\rowrule
 28/10 20:07 & \texttt{Tiếp tục ở trạng thái hiện tại.\allowbreak{}} \\
+\rowrule
 31/10 01:35 & \texttt{\# TIẾP TỤC HOÀN THÀNH CÔNG VIỆC TV2 — BẢO ĐẢM TÍCH HỢP VÀ BÀN GIAO} \\
+\rowrule
 31/10 10:11 & \texttt{\# PROMPT CLAUDE CODE — TIẾP TỤC TÍCH HỢP V13 VÀ HOÀN THÀNH THỰC NGHIỆM BLOXORZ SOLVER (TV2)} \\
+\rowrule
 31/10 10:27 & \texttt{thông báo hoàn tất ở đâu?} \\
+\rowrule
 31/10 10:35 & \texttt{\# NHIỆM VỤ: HOÀN TẤT PHẦN VIỆC TV2 – BLOXORZ SOLVER} \\
+\rowrule
 31/10 10:50 & \texttt{\# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR \#20/\allowbreak{}\#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER} \\
+\rowrule
 31/10 11:34 & \texttt{\# BỔ SUNG QUYỀN TỰ QUYẾT VÀ HOÀN TẤT TV2} \\
+\rowrule
 31/10 14:23 & \texttt{Tiếp tục ở trạng thái hiện tại} \\
 \end{longtable}
 }
@@ -366,12 +425,13 @@ AI-P1 --- Hoàn thành tối đa công việc TV2 trong hôm nay
 
 Dùng Claude Code để viết code và nháp báo cáo cho các việc sau; mọi kết quả đều được kiểm tra bằng test và công cụ đo trước khi gộp:
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2971}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3527}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2530}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ngày}
@@ -387,8 +447,11 @@ Dùng Claude Code để viết code và nháp báo cáo cho các việc sau; m�
 \bottomrule\noalign{}
 \endlastfoot
 20/10 & Hai biến thể A* (\texttt{astar}, \texttt{astar\_\allowbreak{}m}); vẽ mê cung mẫu & \texttt{solvers/\allowbreak{}astar.\allowbreak{}py}, \texttt{tools/\allowbreak{}draw\_\allowbreak{}mazes.\allowbreak{}py}, \texttt{docs/\allowbreak{}gridmaze/\allowbreak{}} & Toàn bộ test; xem ảnh SVG \\
+\rowrule
 20/10 & A* trên mê cung (V15), module chạy nền không chặn (V39) & \texttt{solvers/\allowbreak{}astar.\allowbreak{}py}, \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py}, \texttt{solvers/\allowbreak{}runner.\allowbreak{}py} & Test trên mê cung có đáp án; test runner với tiến trình con thật \\
+\rowrule
 23/10 & \(h_P\) cho Bloxorz (V16), A* trên 33 màn (V17) & \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py}, \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} & 0 vi phạm trên 340 414 cạnh; cùng chi phí với UCS ở 33/33 màn \\
+\rowrule
 26/10 & Nháp chương 3.4, mục 5.4 (A*), khung chương 1, 6, tài liệu tham khảo & \texttt{docs/\allowbreak{}report/\allowbreak{}} & TV4 đọc lại từng bước chứng minh; số liệu lấy từ công cụ đo \\
 \end{longtable}
 }
@@ -413,12 +476,13 @@ TV5 làm các việc sau:
 
 Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phiên.
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0972}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3343}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2657}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3027}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3009}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ngày}
@@ -434,13 +498,21 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
 \bottomrule\noalign{}
 \endlastfoot
 19/10 & Soạn tài liệu kiến trúc và tích hợp GUI Ursina từ đặc tả kỹ thuật riêng của TV5 & \texttt{docs/\allowbreak{}07-\allowbreak{}kien-\allowbreak{}truc-\allowbreak{}gui-\allowbreak{}ursina.\allowbreak{}md}; nhánh \texttt{docs/\allowbreak{}kien-\allowbreak{}truc-\allowbreak{}gui-\allowbreak{}ursina} & TV5 đọc lại trước khi push; đối chiếu với \texttt{docs/\allowbreak{}01}--\texttt{06} \\
+\rowrule
 21/10 & Rà các nhánh trên GitHub; sửa biên bản \#3; cài Python 3.11 và Ursina, chốt phiên bản; vẽ bàn từ file màn (V18) và chơi tay bằng engine (V19) & \texttt{docs/\allowbreak{}sheet/\allowbreak{}7-\allowbreak{}bien-\allowbreak{}ban.\allowbreak{}csv}; \texttt{requirements.\allowbreak{}txt}; \texttt{gui/\allowbreak{}app.\allowbreak{}py}, \texttt{board\_\allowbreak{}view.\allowbreak{}py}, \texttt{block\_\allowbreak{}view.\allowbreak{}py}; PR \#7, \#8 & Mở được cửa sổ thử; màn 1 thắng đúng 7 bước; lời giải BFS màn 2, 8, 9, 16 thắng đúng 17, 10, 24, 28 bước \\
+\rowrule
 23/10 & Check-in; ô đặc biệt, cầu, tách khối (V20); nút Giải, So sánh, Hủy, chọn màn, khối tự lăn (V21); README (V22); nháp chương 4 (V30) & \texttt{gui/\allowbreak{}}; PR \#9; nhánh \texttt{feature/\allowbreak{}vo/\allowbreak{}V22-\allowbreak{}readme}; \texttt{docs/\allowbreak{}report/\allowbreak{}4-\allowbreak{}cai-\allowbreak{}dat-\allowbreak{}giao-\allowbreak{}dien.\allowbreak{}md} & Ghép thử với nhánh của TV2, TV3, TV4: BFS tự lăn thắng 33/33 màn, So sánh đủ năm dòng ở 33/33 màn; Hủy dừng đúng \\
+\rowrule
 25/10 & Giới hạn góc camera (nghiêng tối đa 40°, bốn nấc góc cao, nhìn từ đỉnh); làm lại màu sắc theo đặc tả giao diện; bỏ bóng đổ; dời khung kết quả sang cột trái và căn bàn để không bị che; sửa lỗi sau khi TV5 tự sửa lưới chọn màn & \texttt{gui/\allowbreak{}}; PR \#15 & Chụp màn hình ở màn 8, 28 sau mỗi thay đổi; đo góc camera không bị xoay nghiêng; cả bộ test qua \\
+\rowrule
 29/10 & Cập nhật README theo phím mới; chụp lại toàn bộ hình chương 4 trên bản ghép thử với \texttt{integration/\allowbreak{}M2}; chạy lại kiểm thử giao diện; phần này & \texttt{Source/\allowbreak{}README.\allowbreak{}md}; \texttt{docs/\allowbreak{}report/\allowbreak{}4-\allowbreak{}cai-\allowbreak{}dat-\allowbreak{}giao-\allowbreak{}dien.\allowbreak{}md}, \texttt{hinh/\allowbreak{}}; \texttt{docs/\allowbreak{}report/\allowbreak{}phu-\allowbreak{}luc-\allowbreak{}b-\allowbreak{}tv5.\allowbreak{}md} & Ghép thử \texttt{main} với \texttt{integration/\allowbreak{}M2} không xung đột, cả bộ test qua, 33/33 màn nạp được; script kiểm tra camera qua mọi nấc; BFS tự lăn trên 33 màn \\
+\rowrule
 30/10 & Rà các nhánh trên GitHub và trên máy; gộp V22, V30 và nháp báo cáo TV4 vào nhánh tích hợp \texttt{thu/\allowbreak{}test-\allowbreak{}main-\allowbreak{}m2}; tạm nối hàm chi phí V13 vào giao diện và script thực nghiệm (thêm \texttt{-\allowbreak{}-\allowbreak{}cost}); nới cột Chi phí của bảng So sánh; cập nhật README & \texttt{gui/\allowbreak{}app.\allowbreak{}py}, \texttt{gui/\allowbreak{}hud.\allowbreak{}py}, \texttt{experiments/\allowbreak{}run.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}experiments.\allowbreak{}py}, \texttt{Source/\allowbreak{}README.\allowbreak{}md}, chương 4 & 206 test qua; với chi phí thật, A* cùng chi phí với UCS ở 33/33 màn và \texttt{check\_\allowbreak{}heuristics.\allowbreak{}py} báo 0 vi phạm; mở giao diện thật chạy So sánh ở màn 23 và chụp màn hình để kiểm tra bảng \\
+\rowrule
 30/10 & Hoàn thiện đồ họa V21 (\texttt{ef1f10c}, \texttt{c73bb35}, \texttt{44dc9e3}): khối lật quanh cạnh, đổ nghiêng khi rơi, ô vát cạnh, lỗ đích nhìn xuyên, hộp kết thúc màn kéo thả được, font Be Vietnam Pro, thẻ kiểu kính mờ. Rà soát GUI rồi sửa 6 lỗi: Hủy không dừng được khối tự lăn; bấm Giải/So sánh khi đang tự lăn hoặc vừa thắng/rơi; cầu vẽ sai khi bấm R lúc cầu đang đổi; dòng trạng thái đè chữ ``H: ẩn'' và bảng So sánh; Enter lọt qua bảng F1/Ctrl+K; thu phóng không căn lại bàn & \texttt{gui/\allowbreak{}app.\allowbreak{}py}, \texttt{hud.\allowbreak{}py}, \texttt{board\_\allowbreak{}view.\allowbreak{}py}, \texttt{camera\_\allowbreak{}controller.\allowbreak{}py}, \texttt{popup.\allowbreak{}py}; \texttt{Source/\allowbreak{}README.\allowbreak{}md}, chương 4 & Script chạy giao diện thật (cửa sổ offscreen) tái hiện được cả 6 lỗi trước khi sửa, sau khi sửa không còn; kiểm tra hồi quy hộp thắng, hộp rơi, bảng So sánh và chụp màn hình khung kết quả; 206 test qua (1 bỏ qua) \\
+\rowrule
 31/10 & Bảng chú giải các loại ô (phím G, nút ``Chú giải'') cho kịch bản video; chụp lại 10 hình chương 4 trên nhánh chính và thêm Hình 4.11; sửa test chạy được khi giải nén file nộp không có \texttt{.\allowbreak{}git}; README có lệnh vẽ hình và bảng & \texttt{gui/\allowbreak{}hud.\allowbreak{}py}, \texttt{gui/\allowbreak{}app.\allowbreak{}py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}experiments.\allowbreak{}py}, \texttt{Source/\allowbreak{}README.\allowbreak{}md}, chương 4, \texttt{hinh/\allowbreak{}} & Script mở giao diện thật bấm G, Esc, F1, Enter, phím lăn khi bảng mở; script chụp hình đi theo lời giải BFS và \texttt{rules.\allowbreak{}step()}, xem lại từng hình; số liệu trong hình khớp chữ của chương 4 (BFS 75 bước, chi phí 100,96; UCS, A* 99,96; DFS 1187 bước); bộ test qua cả trong thư mục không có \texttt{.\allowbreak{}git} \\
+\rowrule
 31/10 & Cập nhật chương 4 và README theo PR \#23 (bước làm khối tách đôi tính 1,62): số liệu màn 23, dòng mới trong bảng chi phí; chụp lại Hình 4.6--4.8 & chương 4, \texttt{hinh/\allowbreak{}}, \texttt{Source/\allowbreak{}README.\allowbreak{}md}, \texttt{gui/\allowbreak{}hud.\allowbreak{}py} (ghi chú) & Tính lại 5 thuật toán trên 33 màn: màn 23 BFS 101,58, UCS và A* 100,58, DFS 1525,37; BFS vẫn đắt hơn UCS đúng ở màn 17, 23; số trong hình khớp chữ của chương \\
 \end{longtable}
 }
@@ -501,6 +573,7 @@ Tôi vừa sửa khi bấm nút chọn màng thì nó không hiện màng hiện
 
 \textbf{Danh sách đủ các đợt} (nguyên văn, prompt dài chỉ ghi câu đầu):
 
+
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1806}}
@@ -516,36 +589,67 @@ Tôi vừa sửa khi bấm nút chọn màng thì nó không hiện màng hiện
 \bottomrule\noalign{}
 \endlastfoot
 19/10 21:17 & \texttt{Thư mục docs\_\allowbreak{}private là thư mục tôi dùng tạm để làm các việc cá nhân cho đồ án mà chưa public cho nhóm, … bạn giúp tôi pull về vô Project đi} \\
+\rowrule
 19/10 21:22 & \texttt{Tạm thời cái Source chỉ là do nhóm trưởng vibe code để demo họp buổi đầu thôi, nhóm đang quyết dùng Ursina Engine.\allowbreak{} …} \\
+\rowrule
 19/10 21:33 & \texttt{giúp tôi push lên đi, tài liệu ổn rồi, nhớ tạo nhánh riêng nha, đừng có push thảng lên main hay dev} \\
+\rowrule
 21/10 13:42 & \texttt{Giờ bạn lên github kiểm tra xem có những gì thay đổi không? …} \\
+\rowrule
 21/10 13:58 & \texttt{Sửa 7-\allowbreak{}bien-\allowbreak{}ban.\allowbreak{}csv \#3, và nêu các công việc tôi cần làm trong hôm nay} \\
+\rowrule
 21/10 14:01 & \texttt{push bien-\allowbreak{}ban lên đi và tạo danh sách công việc bằng markdown vào trong docs\_\allowbreak{}private và thực hiện 1.\allowbreak{} …} \\
+\rowrule
 21/10 14:08 & \texttt{ở 1 còn 1 việc chuwwa làm, bạn thực hiện luôn đi, pull các màng từ feature/\allowbreak{}Tien/\allowbreak{}M1 cũng được và thực hiện công việc số 2} \\
+\rowrule
 21/10 14:16 & \texttt{ủa tôi chạy thử để test bằng cách nào} \\
+\rowrule
 21/10 14:31 & \texttt{Làm luôn phần 3 đi (V19)} \\
+\rowrule
 21/10 14:38 & \texttt{Từ từ tôi hỏi tí, thao tác lăn là sửa ở V mấy hay M mấy tôi nhìn không ưng lắm} \\
+\rowrule
 21/10 20:21 & \texttt{Bạn quét github xem các nhánh khác sao rồi, tôi có thể hoàn thành toàn bộ công việc cho hôm nay chưa …} \\
+\rowrule
 21/10 20:23 & \texttt{commit rồi ush lên giùm tôi đi} \\
+\rowrule
 23/10 14:11 & \texttt{đọc tài liệu AGENTS.\allowbreak{}md để nắm bắt khái quát lại đồ án, …} \\
+\rowrule
 23/10 14:25 & \texttt{bạn giúp tôi viết check-\allowbreak{}in tôi tự copy lên google sheet và giúp tôi bắt đầu V20 sau khi xong checkin đi} \\
+\rowrule
 23/10 14:28 & \texttt{làm tiếp đi, tôi lỡi tay bấm dừng thôi} \\
+\rowrule
 23/10 14:47 & \texttt{bạn kiểm tra lại trên github sao rồi, tôi đãcho PR rồi} \\
+\rowrule
 23/10 14:51 & \texttt{bạn giúp tôi cho lệnh terminal để tuự động giải màn 33 với, chỉ cần cho code không cần chạy} \\
+\rowrule
 23/10 14:56 & \texttt{tự động tạo script tự động chạy toàn bộ  33 màn  (không cần lưu script hoặc} \\
+\rowrule
 23/10 14:57 & \texttt{lưu script đó vào doc\_\allowbreak{}private đi} \\
+\rowrule
 23/10 14:59 & \texttt{ý là script khi chạy sẽ mở luôn GUI cho chạy tự động và tôi có thể thể nhìn luôn á} \\
+\rowrule
 23/10 15:02 & \texttt{commit và push lên github đi, nhớ là dưới danh nghiax tôi chứ không phải claude code} \\
+\rowrule
 23/10 15:05 & \texttt{Trước làm tiếp V21 thì kiểm tra các màn còn lại của trọng đã push nhánh lên chưa rồi thì pull về máy tôi hết đi, …} \\
+\rowrule
 23/10 15:20 & \texttt{commit và push và soạn nội dung PR.\allowbreak{} …} \\
+\rowrule
 23/10 15:25 & \texttt{ủa sao python main.\allowbreak{}py mà cái DFS vẫn hiện là chưa nạp vậy, tôi tưởng bạn pull về rồi} \\
+\rowrule
 23/10 15:29 & \texttt{quay lại nhánh hồi nãy lam đi và giúp tôi commit và push lên nếu chưa làm với, …} \\
+\rowrule
 23/10 15:31 & \texttt{làm V22 và V30 trước đi trên tiền đề phải không ảnh hưởng đến các công việc của các thành viên khác} \\
+\rowrule
 25/10 16:56 & \texttt{Bạn xem lại hững thay đổi gần đây đi, nhưng toi thấy phần xoay camera mó không ổn lắm, …} \\
+\rowrule
 25/10 17:05 & \texttt{Từ từ, bạn xem GAME\_\allowbreak{}UI\_\allowbreak{}UX\_\allowbreak{}SPECIFICATION.\allowbreak{}md coi có thiết kế giao diện gì không kiểu như là theme gì đó, …} \\
+\rowrule
 25/10 17:17 & \texttt{Bỏ cái bón đổ đi, sửa lại cái tài liệu GAME\_\allowbreak{}UI\_\allowbreak{}UX\_\allowbreak{}SPECIFICATION.\allowbreak{}md cho nó hợp lý} \\
+\rowrule
 25/10 17:24 & \texttt{có mấy bảng thông số hiện lên khi chọn giải bằng thuật toán nó cho mất cái bàn rồi, bạn giúp  tôi tối ưu chỉnh lại đi} \\
+\rowrule
 25/10 18:00 & \texttt{Tôi vừa sửa khi bấm nút chọn màng thì nó không hiện màng hiện tại, …} \\
+\rowrule
 29/10 20:18 & \texttt{Giúp tôi hoàn thiện các phần còn lại của đồ án đi} \\
 \end{longtable}
 }

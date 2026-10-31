@@ -59,28 +59,59 @@ local function set_widths(tbl)
     for j = 1, ncols do tbl.colspecs[j] = {tbl.colspecs[j][1], nil} end
     return
   end
-  -- Cột ngắn giữ đủ rộng cho dữ liệu (không ngắt dòng); cột dài chia phần còn lại.
-  local function bases(short_ok)
-    local base, extra, sb, se = {}, {}, 0, 0
-    for j = 1, ncols do
-      local b = math.min(maxword[j], 16)
-      if short_ok and maxlen[j] <= 20 then b = math.max(maxlen[j], b) end
-      base[j] = b + 2
-      extra[j] = math.max(maxlen[j] + 2 - base[j], 0)
-      sb = sb + base[j]
-      se = se + extra[j]
-    end
-    return base, extra, sb, se
+  -- Mỗi cột có sàn (từ dài nhất không bị ngắt; tiêu đề tối đa khoảng 2 dòng) và độ rộng mong muốn
+  -- (đủ cho chữ dài nhất trên một dòng). Tìm ngưỡng T: cột nào muốn rộng hơn T thì chỉ được T,
+  -- nên cột ngắn giữ đủ chỗ còn các cột dài chia đều phần còn lại.
+  local floor1, floor2, desired = {}, {}, {}
+  local s1, s2 = 0, 0
+  for j = 1, ncols do
+    floor1[j] = math.min(maxword[j], 16) + 2
+    floor2[j] = math.max(floor1[j], math.min(math.ceil(head[j] * 0.55), 20) + 2)
+    desired[j] = math.max(maxlen[j] + 2, floor2[j])
+    s1 = s1 + floor1[j]
+    s2 = s2 + floor2[j]
   end
-  local base, extra, sb, se = bases(true)
-  if sb > LINE then base, extra, sb, se = bases(false) end
-  local room = math.max(LINE - sb, 0)
+  local fl = (s2 <= LINE) and floor2 or floor1
+  local function width_at(t)
+    local sum = 0
+    for j = 1, ncols do sum = sum + math.max(fl[j], math.min(desired[j], t)) end
+    return sum
+  end
+  local lo, hi = 0, 0
+  for j = 1, ncols do hi = math.max(hi, desired[j]) end
+  for _ = 1, 50 do
+    local mid = (lo + hi) / 2
+    if width_at(mid) > LINE then hi = mid else lo = mid end
+  end
   local w, total = {}, 0
   for j = 1, ncols do
-    w[j] = base[j] + (se > 0 and room * extra[j] / se or room / ncols)
+    w[j] = math.max(fl[j], math.min(desired[j], lo))
     total = total + w[j]
   end
-  for j = 1, ncols do tbl.colspecs[j] = {tbl.colspecs[j][1], w[j] / total} end
+  total = math.max(total, LINE)
+  local caps = {}
+  for j = 1, ncols do
+    tbl.colspecs[j] = {tbl.colspecs[j][1], w[j] / total}
+    caps[j] = w[j] / total * LINE - 2
+  end
+  return caps
+end
+
+-- Bảng có ô xuống dòng thì kẻ ngang mảnh giữa các hàng cho dễ đọc; bảng mỗi hàng một dòng thì không.
+local function wraps(tbl, caps)
+  for _, body in ipairs(tbl.bodies) do
+    for _, row in ipairs(body.body) do
+      local j = 1
+      for _, cell in ipairs(row.cells) do
+        if #cell.contents > 1 then return true end
+        local s = stringify(cell.contents)
+        if s:find("\n") then return true end
+        if caps and ulen(s) > caps[j] + 0.5 then return true end
+        j = j + (cell.col_span or 1)
+      end
+    end
+  end
+  return false
 end
 
 local function bold_header(tbl)
@@ -94,8 +125,11 @@ local function bold_header(tbl)
 end
 
 function Table(tbl)
-  set_widths(tbl)
+  local caps = set_widths(tbl)
   bold_header(tbl)
+  if wraps(tbl, caps) then
+    return {pandoc.RawBlock("latex", "%ROWRULES"), tbl}
+  end
   return tbl
 end
 

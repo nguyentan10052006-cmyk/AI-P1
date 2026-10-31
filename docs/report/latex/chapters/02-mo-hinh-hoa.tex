@@ -8,18 +8,19 @@ Bloxorz {[}2{]} đặt một khối 1×1×2 trên một bàn ô vuông. Khối b
 
 Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3056}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}@{}}
 \caption{\textbf{Bảng 2.1.} Cách xử lý từng loại ô.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Loại ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Ký hiệu trong file màn}
+\textbf{Ký hiệu}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Khối đứng}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -33,7 +34,7 @@ Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Loại ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Ký hiệu trong file màn}
+\textbf{Ký hiệu}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Khối đứng}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -45,15 +46,24 @@ Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Trống hoặc ngoài bàn & \texttt{.\allowbreak{}} & rơi & rơi, kể cả khi chỉ một nửa khối ở trên & rơi \\
+Trống, ngoài bàn & \texttt{.\allowbreak{}} & rơi & rơi, kể cả khi chỉ một nửa khối ở trên & rơi \\
+\rowrule
 Sàn & \texttt{\#} & được & được & được \\
+\rowrule
 Xuất phát & \texttt{S} & như sàn & như sàn & như sàn \\
+\rowrule
 Đích & \texttt{G} & thắng & được, không thắng & được, không thắng \\
+\rowrule
 Ô dễ vỡ & \texttt{F} & ô vỡ, khối rơi & được & được, ô không vỡ \\
+\rowrule
 Cầu đang đóng & \texttt{b} & rơi & rơi & rơi \\
+\rowrule
 Cầu đang mở & \texttt{B} & được & được & được \\
+\rowrule
 Công tắc mềm & \texttt{o} & kích hoạt & kích hoạt & kích hoạt \\
+\rowrule
 Công tắc nặng & \texttt{x} & kích hoạt & không kích hoạt & không kích hoạt \\
+\rowrule
 Công tắc tách & \texttt{@} & tách khối & không có tác dụng & không có tác dụng \\
 \end{longtable}
 
@@ -188,12 +198,12 @@ Trạng thái không lưu ba thông tin sau, vì chúng không cần thiết:
 Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợp có thể có. Duyệt hết các trạng thái tới được từ trạng thái đầu (không đi tiếp từ trạng thái đích), 33 màn gốc có tổng cộng 70 062 trạng thái (Bảng 2.3).
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1481}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1620}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1481}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1898}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1898}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1620}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0972}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1944}}@{}}
 \caption{\textbf{Bảng 2.3.} Số trạng thái tới được ở một số màn.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -240,7 +250,9 @@ Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợ
 
 Bảng 2.3 cho thấy hai điều. Thứ nhất, trạng thái đã tách chiếm phần lớn không gian ở các màn có công tắc tách: 95 \% ở màn 23 và 90 \% ở màn 20, vì hai khối con đặt ở hai ô bất kỳ tạo ra nhiều tổ hợp hơn một khối nguyên. Thứ hai, số cấu hình cầu thực tế rất nhỏ: màn 29 có 17 ô cầu, tức tối đa \(2^{17} = 131\,072\) cấu hình, nhưng chỉ 21 cấu hình tới được, vì mỗi công tắc chỉ đổi một nhóm cầu cố định.
 
-\emph{Chạy lại trong \texttt{Source/\allowbreak{}}:} duyệt BFS từ \texttt{level.\allowbreak{}initial\_\allowbreak{}state()} với \texttt{Problem.\allowbreak{}actions()} và \texttt{Problem.\allowbreak{}result()}, không mở rộng trạng thái đích, rồi đếm kích thước tập đã thăm. Công cụ \texttt{tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} in cùng tổng 70 062.
+\begin{quote}
+\textbf{Chạy lại trong \texttt{Source/\allowbreak{}}:} duyệt BFS từ \texttt{level.\allowbreak{}initial\_\allowbreak{}state()} với \texttt{Problem.\allowbreak{}actions()} và \texttt{Problem.\allowbreak{}result()}, không mở rộng trạng thái đích, rồi đếm kích thước tập đã thăm. Lệnh \texttt{python tools/\allowbreak{}check\_\allowbreak{}heuristics.\allowbreak{}py} in cùng tổng 70 062 trạng thái của 33 màn gốc.
+\end{quote}
 
 \subsection{2.4. Hành động}
 
@@ -253,6 +265,7 @@ Hàm \texttt{Problem.\allowbreak{}actions(state)} trả về mọi hành động
 \subsection{2.5. Hàm chuyển}
 
 Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế và mỗi hướng lăn là tư thế mới và vị trí ô neo mới.
+
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1528}}
@@ -292,7 +305,9 @@ Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế v
 \bottomrule\noalign{}
 \endlastfoot
 Đứng & nằm dọc tại (r − 2, c) & nằm dọc tại (r + 1, c) & nằm ngang tại (r, c − 2) & nằm ngang tại (r, c + 1) \\
+\rowrule
 Nằm ngang & nằm ngang tại (r − 1, c) & nằm ngang tại (r + 1, c) & đứng tại (r, c − 1) & đứng tại (r, c + 2) \\
+\rowrule
 Nằm dọc & đứng tại (r − 1, c) & đứng tại (r + 2, c) & nằm dọc tại (r, c − 1) & nằm dọc tại (r, c + 1) \\
 \end{longtable}
 
@@ -345,12 +360,13 @@ Chỉ khối nguyên đứng trên công tắc tách mới bị tách. Khi đó 
 
 Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con không làm vỡ ô dễ vỡ; đi vào ô đích cũng không thắng. Khi hai khối con kề cạnh nhau (chung một cạnh), chúng tự ghép thành khối nằm. Nếu cùng hàng thì thành khối nằm ngang với ô neo bên trái; nếu cùng cột thì thành khối nằm dọc với ô neo bên trên. Hai khối con kề chéo thì không ghép.
 
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1944}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2775}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2225}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2500}}@{}}
 \caption{\textbf{Bảng 2.6.} Lời giải BFS của màn 8, có tách và ghép, 10 bước. Công tắc tách ở (4, 4), hai ô đáp là (1, 10) và (7, 10).}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -383,12 +399,19 @@ Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con kh�
 \bottomrule\noalign{}
 \endlastfoot
 0 & & đứng & (4, 1) & \\
+\rowrule
 1 & R & nằm ngang & (4, 2), (4, 3) & \\
+\rowrule
 2 & R & đã tách & (1, 10), (7, 10) & khối đứng lên công tắc tách tại (4, 4) và tách \\
+\rowrule
 3--6 & D1 (bốn lần) & đã tách & khối con 1 đi từ (1, 10) xuống (5, 10); khối con 2 ở yên (7, 10) & \\
+\rowrule
 7 & U2 & nằm dọc & (5, 10), (6, 10) & hai khối con kề cạnh, ghép thành khối nằm dọc \\
+\rowrule
 8 & U & đứng & (4, 10) & \\
+\rowrule
 9 & R & nằm ngang & (4, 11), (4, 12) & \\
+\rowrule
 10 & R & đứng trên đích & (4, 13) & thắng \\
 \end{longtable}
 
@@ -440,10 +463,11 @@ Bốn thuật toán đều là tìm kiếm trên đồ thị (graph search): ghi
 
 \subsection{2.10. Tóm tắt mô hình}
 
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2222}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3991}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3787}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3889}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3889}}@{}}
 \caption{\textbf{Bảng 2.8.} Mô hình bài toán tìm kiếm và nơi cài đặt.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
@@ -468,11 +492,18 @@ Bốn thuật toán đều là tìm kiếm trên đồ thị (graph search): ghi
 \bottomrule\noalign{}
 \endlastfoot
 Trạng thái & (tư thế, ô neo, ô khối con thứ hai, tập cầu đang mở) & \texttt{bloxorz/\allowbreak{}state.\allowbreak{}py}, lớp \texttt{State} \\
+\rowrule
 Trạng thái đầu & khối đứng tại \texttt{S}; cầu mở là các ô \texttt{B} & \texttt{Level.\allowbreak{}initial\_\allowbreak{}state()} \\
+\rowrule
 Hành động & U, D, L, R; khi đã tách U1 \ldots{} R1, U2 \ldots{} R2 & \texttt{Problem.\allowbreak{}actions()} \\
+\rowrule
 Hàm chuyển & Bảng 2.4 và thứ tự xử lý ở mục 2.5; \texttt{None} khi khối rơi & \texttt{rules.\allowbreak{}step()}, \texttt{Problem.\allowbreak{}result()} \\
+\rowrule
 Kiểm tra đích & khối nguyên đứng trên ô đích & \texttt{Problem.\allowbreak{}is\_\allowbreak{}goal()} \\
+\rowrule
 Chi phí bước & Bảng 2.7, mọi bước ≥ 1 & \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost()}, \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} \\
+\rowrule
 Heuristic & \(h_M\) và \(h_P\) (mục 3.4) & \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py} \\
+\rowrule
 Tránh lặp & tập đã thăm (BFS, DFS); bảng \texttt{best\_\allowbreak{}g} (UCS, A*) & \texttt{solvers/\allowbreak{}*.\allowbreak{}py} \\
 \end{longtable}

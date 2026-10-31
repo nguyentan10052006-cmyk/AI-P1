@@ -10,9 +10,9 @@ Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 
 **Bảng 2.1.** Cách xử lý từng loại ô.
 
-| Loại ô | Ký hiệu trong file màn | Khối đứng | Khối nằm | Khối con (sau khi tách) |
+| Loại ô | Ký hiệu | Khối đứng | Khối nằm | Khối con (sau khi tách) |
 |---|---|---|---|---|
-| Trống hoặc ngoài bàn | `.` | rơi | rơi, kể cả khi chỉ một nửa khối ở trên | rơi |
+| Trống, ngoài bàn | `.` | rơi | rơi, kể cả khi chỉ một nửa khối ở trên | rơi |
 | Sàn | `#` | được | được | được |
 | Xuất phát | `S` | như sàn | như sàn | như sàn |
 | Đích | `G` | thắng | được, không thắng | được, không thắng |
@@ -125,7 +125,7 @@ Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợ
 
 Bảng 2.3 cho thấy hai điều. Thứ nhất, trạng thái đã tách chiếm phần lớn không gian ở các màn có công tắc tách: 95 % ở màn 23 và 90 % ở màn 20, vì hai khối con đặt ở hai ô bất kỳ tạo ra nhiều tổ hợp hơn một khối nguyên. Thứ hai, số cấu hình cầu thực tế rất nhỏ: màn 29 có 17 ô cầu, tức tối đa $2^{17} = 131\,072$ cấu hình, nhưng chỉ 21 cấu hình tới được, vì mỗi công tắc chỉ đổi một nhóm cầu cố định.
 
-*Chạy lại trong `Source/`:* duyệt BFS từ `level.initial_state()` với `Problem.actions()` và `Problem.result()`, không mở rộng trạng thái đích, rồi đếm kích thước tập đã thăm. Công cụ `tools/check_heuristics.py` in cùng tổng 70 062.
+> **Chạy lại trong `Source/`:** duyệt BFS từ `level.initial_state()` với `Problem.actions()` và `Problem.result()`, không mở rộng trạng thái đích, rồi đếm kích thước tập đã thăm. Lệnh `python tools/check_heuristics.py` in cùng tổng 70 062 trạng thái của 33 màn gốc.
 
 ### 2.4. Hành động
 

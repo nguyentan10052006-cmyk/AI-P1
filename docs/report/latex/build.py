@@ -111,6 +111,28 @@ def to_latex(pandoc: str, md: str, shift: int, line: int = 72) -> str:
     return res.stdout
 
 
+def add_row_rules(tex: str) -> str:
+    """Sau dấu %ROWRULES (filter.lua đặt trước bảng có ô xuống dòng): kẻ \\rowrule giữa các hàng thân bảng."""
+    out, pending, in_body, row_ended = [], False, False, False
+    for line in tex.split("\n"):
+        stripped = line.strip()
+        if stripped == "%ROWRULES":
+            pending = True
+            continue
+        if in_body:
+            if stripped.startswith("\\end{longtable}"):
+                in_body = pending = False
+            elif stripped and row_ended:
+                out.append("\\rowrule")
+                row_ended = False
+            if stripped.endswith("\\\\"):
+                row_ended = True
+        elif pending and stripped.startswith("\\endlastfoot"):
+            in_body, row_ended = True, False
+        out.append(line)
+    return "\n".join(out)
+
+
 def convert() -> None:
     pandoc = find_pandoc()
     OUT.mkdir(exist_ok=True)
@@ -118,7 +140,7 @@ def convert() -> None:
         old.unlink()
     body = []
     for name, spec, shift in PARTS:
-        tex = to_latex(pandoc, read_part(spec), shift, 118 if name in LANDSCAPE else 72)
+        tex = add_row_rules(to_latex(pandoc, read_part(spec), shift, 130 if name in LANDSCAPE else 72))
         (OUT / f"{name}.tex").write_text(tex, encoding="utf-8")
         if name == APPENDIX_FROM:
             body.append("\\appendix")
