@@ -210,7 +210,7 @@ Mỗi nhóm việc ghi: người chủ, người đọc chéo, hạn và mã vi�
    h_P là heuristic chính; h_M dùng để so sánh trong thực nghiệm.
 4. Phạt hướng phải chứng minh lại. Ví dụ ⌈Φ/2⌉ + 1 khi khối đang nằm là **không** chấp nhận được: khối nằm sát đích chỉ cần 1 bước để đứng lên đích. Có thể dùng max(⌈Φ/2⌉, 1) khi khối chưa đứng trên đích.
 5. Viết chứng minh heuristic chấp nhận được (h(s) không lớn hơn chi phí thật còn lại) và nhất quán (h(s) ≤ c(s, a, s') + h(s')), theo đúng hàm chi phí đã chốt. Khung chứng minh: (i) mỗi bước, Φ giảm tối đa 2 (khối nguyên) hoặc 1 (khối con); (ii) dịch chuyển không làm Φ giảm thêm, vì khoảng cách tại công tắc tách không lớn hơn khoảng cách tại các ô đáp của nó; (iii) ở đích Φ = 0; (iv) mỗi bước tốn ít nhất 1.
-6. Kiểm tra bằng số liệu, bổ sung cho chứng minh: dọc lời giải tối ưu của UCS, mọi trạng thái có h(s) ≤ chi phí còn lại; trên mọi cạnh A* đã duyệt, h(s) ≤ c + h(s'). Đếm số vi phạm; phải bằng 0 ở cả 33 màn.
+6. Kiểm tra bằng số liệu, bổ sung cho chứng minh: dọc lời giải tối ưu của UCS, mọi trạng thái có h(s) ≤ chi phí còn lại; trên mọi cạnh A* đã duyệt, h(s) ≤ c + h(s'). Đếm số vi phạm; phải bằng 0 ở cả 33 màn. Công cụ: `python tools/check_heuristics.py` (trong `Source/`) kiểm tra cả hai heuristic trên mọi cạnh của không gian trạng thái, so chi phí với A* h = 0 và với UCS nếu đã cài; chạy lại sau khi chốt hàm chi phí (V13).
 7. Kiểm tra trên 33 màn: tổng chi phí của A* phải bằng UCS, và số nút mở rộng của A* không lớn hơn UCS. Nếu lệch thì heuristic không chấp nhận được hoặc cài sai.
 
 **Xong khi**

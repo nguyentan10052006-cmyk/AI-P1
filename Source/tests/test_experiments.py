@@ -110,6 +110,11 @@ class ExperimentRunTests(unittest.TestCase):
         self.assertEqual(summary[0]["status"], "invalid")
         self.assertIn("path_cost", raw[0]["error"])
 
+    def test_rounding_in_path_cost_is_not_invalid(self):
+        """DFS màn s1_200 (35287 bước, chi phí V13) từng bị ghi invalid chỉ vì tổng chi phí lệch 2.6e-9."""
+        summary, _ = self.run_fake("tests.experiment_fakes:RoundingCostSolver")
+        self.assertEqual(summary[0]["status"], "solved")
+
     def test_timeout(self):
         summary, raw = self.run_fake("tests.fakes:SleepySolver", repeat=3, timeout=1.0)
         self.assertEqual(summary[0]["status"], "timeout")
@@ -264,6 +269,24 @@ class ExperimentRunTests(unittest.TestCase):
         self.assertTrue(label.endswith("-dirty") and reasons)
         self.assertIn("đã theo dõi bị sửa: lv.json", reasons[0])   # tên file đầy đủ, không mất ký tự đầu
 
+    def test_energy_cost_uses_cost_function(self):
+        """--cost energy: S##G đi R R tốn 1.12 (đứng → nằm) + 1.62 (nằm → đứng) theo bloxorz/costs.py."""
+        info = exp.run_experiment([self.levels], ["bfs"], self.out, repeat=1, log=quiet, cost="energy")
+        self.assertEqual(info["cost"], "energy")
+        _, summary = read_csv(self.out / "summary.csv")
+        self.assertEqual((summary[0]["status"], summary[0]["steps"]), ("solved", "2"))
+        self.assertAlmostEqual(float(summary[0]["path_cost"]), 2.74)
+
+    def test_energy_cost_flags_unit_cost_solver(self):
+        """Solver báo chi phí 1 mỗi bước trong khi bài toán dùng hàm chi phí: phát lại phải ra invalid."""
+        exp.run_experiment([self.levels], ["tests.fakes:FakeSolver"], self.out, repeat=1, log=quiet, cost="energy")
+        _, summary = read_csv(self.out / "summary.csv")
+        self.assertEqual(summary[0]["status"], "invalid")
+
+    def test_unknown_cost_rejected(self):
+        with self.assertRaises(ValueError):
+            exp.run_experiment([self.levels], ["bfs"], self.out, repeat=1, log=quiet, cost="free")
+
     def test_f3_run_info_records_level_hashes(self):
         info = exp.run_experiment([self.levels], ["tests.fakes:FakeSolver"], self.out, repeat=1, log=quiet)
         entry = info["level_files"][0]
@@ -298,8 +321,9 @@ class ExperimentRunTests(unittest.TestCase):
                   f"False, 30.0)\nprint('STATUS=' + r['status'])\n")
         started = time.perf_counter()
         proc = subprocess.run([sys.executable, "-"], input=script, cwd=SOURCE_DIR, capture_output=True, text=True,
-                              encoding="utf-8", timeout=120)
-        self.assertIn("STATUS=error", proc.stdout, proc.stderr[-500:])
+                              encoding="utf-8", errors="replace", timeout=120)
+        stderr_tail = proc.stderr[-500:] if proc.stderr else ""
+        self.assertIn("STATUS=error", proc.stdout or "", stderr_tail)
         self.assertLess(time.perf_counter() - started, 25.0)
 
     def test_command_line(self):

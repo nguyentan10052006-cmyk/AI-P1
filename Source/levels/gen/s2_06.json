@@ -1,0 +1,97 @@
+{
+  "name": "S2 Cầu k=6",
+  "passcode": "000000",
+  "group": "S2",
+  "source": "tự sinh bằng gen_levels.py",
+  "par": 6,
+  "grid": [
+    ".bbbbbb.....",
+    "#oooooo#####",
+    "############",
+    "#S########G#",
+    "############",
+    "############",
+    "############",
+    "############"
+  ],
+  "switches": [
+    {
+      "at": [
+        1,
+        1
+      ],
+      "bridges": [
+        [
+          0,
+          1
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        1,
+        2
+      ],
+      "bridges": [
+        [
+          0,
+          2
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        1,
+        3
+      ],
+      "bridges": [
+        [
+          0,
+          3
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        1,
+        4
+      ],
+      "bridges": [
+        [
+          0,
+          4
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        1,
+        5
+      ],
+      "bridges": [
+        [
+          0,
+          5
+        ]
+      ],
+      "effect": "toggle"
+    },
+    {
+      "at": [
+        1,
+        6
+      ],
+      "bridges": [
+        [
+          0,
+          6
+        ]
+      ],
+      "effect": "toggle"
+    }
+  ]
+}

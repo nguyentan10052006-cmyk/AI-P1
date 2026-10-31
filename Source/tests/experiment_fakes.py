@@ -56,6 +56,14 @@ class HardExitSolver(Solver):
         os._exit(3)
 
 
+class RoundingCostSolver(Solver):
+    """Đường đi đúng, path_cost lệch 1.5e-9 như sai số khi cộng chi phí lẻ theo thứ tự khác: vẫn là solved."""
+
+    def search(self, problem):
+        return SearchResult(SOLVED, [Action(Dir.RIGHT), Action(Dir.RIGHT)], path_cost=2 + 1.5e-9,
+                            expanded=1, generated=2, max_frontier=1, visited=3)
+
+
 class WrongCostSolver(Solver):
     """Đường đi đúng nhưng báo sai path_cost: script phải ghi invalid."""
 

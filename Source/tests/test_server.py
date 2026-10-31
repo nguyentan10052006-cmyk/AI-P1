@@ -59,7 +59,7 @@ class ApiSolveTests(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertTrue(data["found"])
         self.assertEqual(data["stats"]["length"], 2)
-        self.assertEqual(data["stats"]["cost"], 2)
+        self.assertAlmostEqual(data["stats"]["cost"], 1.12 + 1.62)   # V13: đứng -> nằm -> đứng
         self.assertEqual(data["steps"][-1]["status"], "won")
         self.assertIn("time_ms", data["stats"])
         self.assertIn("prepare_ms", data["stats"])
