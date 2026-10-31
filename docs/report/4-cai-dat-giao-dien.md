@@ -1,6 +1,6 @@
 ## 4. Cài đặt và giao diện
 
-> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp ngày 29/10/2026 trên bản ghép thử nhánh chính (a3d988b, đã có giao diện V21) với nhánh `integration/M2` (04d8a9a, có bộ nạp màn V03, UCS, hàm chi phí); đây cũng là nội dung của nhánh tích hợp `thu/test-main-m2`, trên đó cả 33 màn nạp được. Ảnh chụp trước khi đổi đồ họa ngày 30/10 (hộp vát cạnh, khối lật, bóng mềm); cần chụp lại trước khi nộp.
+> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp lại ngày 31/10/2026 trên nhánh chính (sau PR #18: giao diện V21, bộ nạp màn V03, UCS, hàm chi phí V13), cửa sổ 2560 × 1440 thu về 1280 × 720; các bước đi trong ảnh lấy từ lời giải BFS và từ `rules.step()`.
 
 ### 4.1. Công nghệ
 
@@ -70,11 +70,17 @@ Thuật toán chạy ở tiến trình riêng bằng `multiprocessing` kiểu `s
 
 ### 4.4. Bàn chơi và các loại ô
 
-Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi tên màn, nhóm độ khó, số bước tối ưu tham khảo và số bước đã đi; các nút ở bên phải; dòng dưới cùng tóm tắt các phím hay dùng (F1 mở bảng đầy đủ). Chữ dùng font Be Vietnam Pro [13], thiết kế cho tiếng Việt nên dấu rõ ở cỡ nhỏ.
+Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi tên màn, nhóm độ khó, số bước tối ưu tham khảo và số bước đã đi; các nút ở bên phải; dòng dưới cùng tóm tắt các phím hay dùng (F1 mở bảng đầy đủ). Phím G hoặc nút "Chú giải" mở bảng chú giải các loại ô (Hình 4.11). Chữ dùng font Be Vietnam Pro [13], thiết kế cho tiếng Việt nên dấu rõ ở cỡ nhỏ.
 
 ![Hình 4.1](hinh/h4-1-man23-du-loai-o.png)
 
-*Hình 4.1. Màn 23 lúc bắt đầu: đủ 9 loại ô trên cùng một bàn, phân biệt được bằng màu và hình mà không cần chú giải.*
+*Hình 4.1. Màn 23 lúc bắt đầu: đủ 9 loại ô trên cùng một bàn, phân biệt được bằng màu và hình.*
+
+Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như bảng phím tắt: mỗi mục có một ô mẫu, tên và cách ô hoạt động theo luật. Ô mẫu vẽ bằng đúng màu và ký hiệu của bàn (lấy từ `board_view.COLORS`), nên đổi màu ô trên bàn thì chú giải đổi theo. Khi bảng đang mở, phím lăn và Enter bị bỏ qua; G hoặc Esc đóng bảng.
+
+![Hình 4.11](hinh/h4-11-chu-giai.png)
+
+*Hình 4.11. Bảng chú giải các loại ô (phím G) trên màn 23: cột trái là ô và khối, cột phải là cầu và ba loại công tắc.*
 
 *Bảng 4.1. Cách vẽ từng loại ô.*
 
@@ -112,7 +118,7 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 
 ![Hình 4.5](hinh/h4-5-o-de-vo.png)
 
-*Hình 4.5. Màn 4: khối đứng thẳng lên ô dễ vỡ, ô vỡ và đang rơi cùng khối; thông báo nêu đúng lý do thua.*
+*Hình 4.5. Màn 4, bước 18: khối đứng thẳng lên ô dễ vỡ, ô cam vỡ và đang rơi cùng khối (giữa phía dưới); hộp kết thúc (được kéo lên mép trên) nêu đúng lý do thua.*
 
 ### 4.5. Chơi tay
 
@@ -126,8 +132,9 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 | H | Ẩn hoặc hiện khung kết quả (mục 4.7) |
 | Ctrl+K | Mở hoặc đóng lưới chọn màn |
 | Enter | Nút chính của hộp kết thúc màn |
+| G | Bảng chú giải các loại ô (Hình 4.11) |
 | F1 | Bảng tất cả phím tắt |
-| Esc | Đóng hộp kết thúc màn, lưới chọn màn hoặc bảng phím tắt |
+| Esc | Đóng hộp kết thúc màn, lưới chọn màn, bảng phím tắt hoặc bảng chú giải |
 
 Một lượt đi diễn ra theo thứ tự: phím được đổi thành hành động và gửi vào `rules.step()`; khối lật 90° quanh cạnh đáy theo hướng đi, tới vị trí ngay sau khi lăn (khối được gắn tạm vào một trục đặt ở cạnh đó rồi xoay trục; lật xong thì đặt lại đúng vị trí và góc theo trạng thái, nên sai số không dồn qua các bước); sau đó giao diện cập nhật cầu, hiện thông báo sự kiện, rồi vẽ trạng thái cuối (tách, ghép, rơi hoặc thắng). Trong lúc hoạt ảnh chạy, phím mới bị bỏ qua, để trạng thái giao diện đang giữ không đi trước hình đang vẽ. Mỗi lần chơi lại hoặc đổi màn, giao diện tăng một số đếm lượt; lệnh hẹn giờ nào của lượt cũ còn sót lại thấy số đếm đã đổi thì bỏ qua, nên bấm R giữa lúc khối đang lăn không làm trạng thái cũ ghi đè lên màn vừa chơi lại.
 
@@ -137,7 +144,7 @@ Khi vào màn, các ô trồi lên lần lượt theo đường chéo rồi kh�
 
 ### 4.6. Giải tự động và So sánh
 
-Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
+Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Chú giải (Hình 4.11), Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
 
 **Hộp kết thúc màn.** Khi thắng hoặc rơi, sau khi hoạt ảnh gần xong, một hộp hiện giữa vùng bàn (không che khung kết quả và cột nút). Khi thắng, hộp ghi số bước so với số bước tối ưu, và tên thuật toán nếu khối vừa tự lăn theo lời giải; nút chính là Màn tiếp. Khi rơi, hộp ghi lý do (ô dễ vỡ, cầu đóng, hụt khỏi bàn) theo sự kiện của engine; nút chính là Chơi lại. Enter bấm nút chính, Esc đóng hộp; chơi lại hay đổi màn thì hộp tự đóng. Hộp kéo thả được: giữ chuột trái ở chỗ bất kỳ trên hộp (trừ các nút, có dấu tay nắm ở mép trên) rồi kéo; hộp không ra khỏi màn hình, và các lần sau hiện lại ở chỗ đã kéo tới. Bấm Giải hoặc So sánh thì hộp của lượt trước đóng lại.
 
@@ -209,11 +216,12 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 | Khung kết quả hiện ở màn 23 (một thuật toán, rồi So sánh) (30/10) | Bàn giữ nguyên cỡ khi không bị che; khi So sánh chỉ thu vừa đủ |
 | Thắng ở màn 1; bấm F1, Esc; rơi ở màn 1 (30/10) | Khối thu vừa miệng lỗ và nhìn thấy trong lòng lỗ; hộp thắng ghi đúng số bước; hộp rơi ghi đúng lý do |
 | Lăn ra mép ở màn 1 (một đầu hụt, rồi hụt cả hai đầu), tách và ghép ở màn 8, đứng lên ô dễ vỡ, rồi bấm R (30/10) | Khối đổ nghiêng qua mép, không xuyên sàn; chỉ khối con hụt rơi; ô dễ vỡ được dựng lại |
+| Rà soát giao diện: Hủy khi khối tự lăn, bấm R khi cầu đang đổi, Giải/So sánh ngay sau khi rơi, chữ trong khung kết quả, Enter khi mở F1, thu phóng khi khung hiện (30/10) | 6 lỗi tái hiện được trước khi sửa, không còn sau khi sửa |
+| Bảng chú giải: G, nút "Chú giải", Esc, F1 khi bảng đang mở; Enter và phím lăn khi bảng đang mở (31/10) | Mở, đóng đúng; F1 thay bảng chú giải; Enter và phím lăn bị bỏ qua |
 
 ### 4.9. Hạn chế
 
 - Chấm đánh dấu màn đã thắng chỉ giữ trong một lần chạy chương trình, chưa lưu ra file.
-- Chưa có màn hướng dẫn chú giải các loại ô và phím; người chơi xem Bảng 4.1, dòng phím tắt cuối màn hình hoặc README.
 - Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
 - Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.
 
