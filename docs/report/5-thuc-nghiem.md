@@ -1,11 +1,13 @@
 ## 5. Thực nghiệm
 
-> Nháp của TV2 (V27), 28/10. Trạng thái từng mục:
+> Nháp của TV2 (V27), cập nhật 31/10. Trạng thái từng mục:
 > - **5.1 Thiết lập, 5.2 Bộ màn:** viết đủ theo code và tài liệu hiện có. Còn trống các ô ghi *(điền từ `run_info.json`)*: lấy từ lần chạy chính thức.
 > - **5.3 Kết quả, 5.5 Kết luận:** chỉ có khung. **Chưa có số liệu chính thức**, vì còn chờ:
->   - hàm chi phí của UCS (V13, mục 3.3): TV3 đã cài `bloxorz/costs.py` trên nhánh `feature/trong/V12-ucs`, nhưng chưa vào nhánh chính và chưa được dùng mặc định khi chạy;
->   - bộ nạp màn có `links` (V03), UCS (V12) và $h_P$ (V16) vào nhánh chính;
->   - nhóm chốt các quyết định về định dạng file kết quả.
+>   - TV3 xác nhận chi phí của bước làm khối tách đôi. Hiện bước này rơi về 1,0, trong khi Bảng 2.7 không có dòng nào cho nó; điều này ảnh hưởng tổng chi phí của 10 màn nhóm G5;
+>   - nhóm chốt các quyết định về định dạng file kết quả, và ghi vào `docs/04`;
+>   - công cụ kiểm tra chéo so tổng chi phí tương đối. Với chi phí V13 là số lẻ, nếu so tuyệt đối thì kiểm tra A* = UCS có thể báo sai ở lời giải dài.
+>
+>   Đã có trên nhánh chính (31/10): hàm chi phí V13 (`bloxorz/costs.py`, mục 2.8 và 3.3), bộ nạp `links` (V03), UCS (V12), $h_P$ (V16), bộ màn S1–S3 (V40). Lệnh đo dùng `--cost energy`. Công cụ `tools/check_heuristics.py` cho 0 vi phạm chấp nhận được và nhất quán với chi phí V13, trên 33 màn gốc và 14 màn tự sinh.
 >
 >   Số liệu chạy thử ngày 28/10 chỉ dùng để kiểm tra script, **không** đưa vào chương này.
 > - **5.4:** mỗi chủ thuật toán viết một đoạn (5.4.1 BFS, 5.4.2 DFS, 5.4.3 UCS, 5.4.4 A*), file riêng.
@@ -68,10 +70,10 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 | Số lần đo thời gian | 5, lấy trung vị |
 | Số lần đo bộ nhớ | 1, chạy riêng |
 | Giới hạn thời gian | 60 giây mỗi lần chạy |
-| Hàm chi phí | *(chờ V13, mục 3.3)* |
+| Hàm chi phí | V13 (`bloxorz/costs.py`, Bảng 2.7, mục 3.3); `run.py --cost energy`, kiểm khóa `cost` trong `run_info.json` |
 | Thời gian chạy toàn bộ | *(điền từ `started_utc`, `finished_utc`)* |
 
-**Hàm chi phí.** Cột `path_cost` của cả năm cấu hình tính theo hàm chi phí của UCS (mục 3.3), để so được chất lượng lời giải. Hàm này chưa chốt, nên chương này **chưa** đưa ra kết luận nào về tổng chi phí, về việc UCS chọn đường khác BFS hay không, hay về heuristic theo hàm chi phí cuối cùng.
+**Hàm chi phí.** Cột `path_cost` của cả năm cấu hình tính theo cùng một hàm chi phí V13 (Bảng 2.7, mục 3.3), để so được chất lượng lời giải. Chương này chỉ đưa ra kết luận về tổng chi phí, về việc UCS chọn đường khác BFS, và về heuristic **sau khi có số liệu chính thức**.
 
 Riêng **số bước và các số đếm của BFS và DFS không phụ thuộc hàm chi phí**, vì hai thuật toán này không dùng chi phí khi chọn nút. Ngược lại, số liệu của UCS và A* sẽ thay đổi khi đổi hàm chi phí.
 
