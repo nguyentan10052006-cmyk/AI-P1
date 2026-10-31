@@ -50,6 +50,8 @@ Các công cụ đọc chế độ chi phí (`cost`: `energy` là V13, `unit` l�
 
 Khi không xác định được chế độ, công cụ nêu lý do (thiếu file, file hỏng, thiếu khóa `cost`, giá trị lạ) và không đoán.
 
+**Giới hạn:** chế độ chi phí ghi cho cả lần chạy, trong `run_info.json`, không có trên từng dòng của `summary.csv` (schema 16 cột của 04 §5 không đổi). Vì vậy đừng ghép `summary.csv` của nhiều lần chạy thành một file: công cụ không phát hiện được hai chế độ lẫn trong cùng một file.
+
 ## Chạy chính thức
 
 ### 0. Điều kiện trước khi chạy

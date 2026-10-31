@@ -20,18 +20,17 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
 
-from experiments.check_results import cost_status, load
+from experiments.check_results import cost_status, load, same_cost
 
 EXACT = ("status", "steps", "path_cost", "expanded", "generated", "max_frontier", "visited")
 TIMING = ("search_ms", "total_ms", "peak_mem_kb")
-PATH_COST_EPS = 1e-9
 
 
 def _same(column: str, a: str, b: str) -> bool:
     if a == b:
         return True
-    if column == "path_cost" and a and b:   # 7 và 7.0 là một
-        return abs(float(a) - float(b)) < PATH_COST_EPS
+    if column == "path_cost" and a and b:   # 7 và 7.0 là một; chi phí V13 là số lẻ nên so tương đối như check_results
+        return same_cost(float(a), float(b))
     if a and b:
         try:
             return float(a) == float(b)
@@ -80,15 +79,14 @@ def main(argv=None) -> int:
         print(f"LỖI: {exc}", file=sys.stderr)
         return 2
     (mode_a, why_a), (mode_b, why_b) = cost_status(args.a), cost_status(args.b)
-    modes = mode_a, mode_b
     commits = sorted({r["commit"] for r in rows_a}), sorted({r["commit"] for r in rows_b})
     print(f"A: {args.a} ({len(rows_a)} dòng, commit {', '.join(commits[0])})")
     print(f"B: {args.b} ({len(rows_b)} dòng, commit {', '.join(commits[1])})")
     print(f"Chế độ chi phí: A {mode_a or 'không rõ (' + why_a + ')'}, B {mode_b or 'không rõ (' + why_b + ')'}")
-    if modes[0] and modes[1] and modes[0] != modes[1]:
+    if mode_a and mode_b and mode_a != mode_b:
         print("KHÁC CHẾ ĐỘ CHI PHÍ: hai lần chạy dùng hàm chi phí khác nhau nên không tương đương; không so.")
         return 1
-    if not (modes[0] and modes[1]):
+    if not (mode_a and mode_b):
         print("Lưu ý: không xác định được chế độ chi phí của cả hai lần chạy, nên không loại trừ được việc chúng khác "
               "hàm chi phí. Cột path_cost vẫn được so, nên khác hàm chi phí sẽ hiện thành lệch, không ra TRÙNG nhầm.")
     if commits[0] != commits[1]:

@@ -82,6 +82,14 @@ class CompareRunsTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("không xác định được chế độ chi phí", out)
 
+    def test_path_cost_compared_relatively(self):
+        """Tổng chi phí V13 lớn chỉ lệch ở chữ số cuối là trùng; lệch thật vẫn bị bắt."""
+        a, b = rows(), rows()
+        a[1]["path_cost"], b[1]["path_cost"] = "35287.0", "35287.00001"   # lệch tương đối 3e-10
+        self.assertEqual(compare(a, b)[0], [])
+        b[1]["path_cost"] = "35287.01"
+        self.assertEqual(compare(a, b)[0], ["original/01/dfs: path_cost '35287.0' ≠ '35287.01'"])
+
     def test_status_difference_fails(self):
         b = rows()
         b[1].update(status="timeout", steps="", path_cost="", expanded="")
