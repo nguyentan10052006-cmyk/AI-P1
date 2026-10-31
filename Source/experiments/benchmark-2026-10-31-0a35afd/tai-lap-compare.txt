@@ -1,0 +1,7 @@
+A: D:\Bloxorz-Solver\AI-P1-benchdata\benchmark-2026-10-31-0a35afd\summary.csv (235 dòng, commit 0a35afd)
+B: D:\Bloxorz-Solver\AI-P1-benchdata\tai-lap-2026-10-31-0a35afd\summary.csv (235 dòng, commit 0a35afd)
+Chế độ chi phí: A energy, B energy
+search_ms: B/A trung vị 1.03, nhỏ nhất 0.93, lớn nhất 1.19 (235 cặp)
+total_ms: B/A trung vị 1.03, nhỏ nhất 0.89, lớn nhất 1.21 (235 cặp)
+peak_mem_kb: B/A trung vị 1.00, nhỏ nhất 1.00, lớn nhất 1.00 (235 cặp)
+TRÙNG: mọi số đếm của 235 cặp giống hệt nhau.

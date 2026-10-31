@@ -1,16 +1,16 @@
 ## 5. Thực nghiệm
 
-> Nháp của TV2 (V27, V32), cập nhật 31/10 với số liệu đo ngày 31/10, commit `cd93624`. Trạng thái:
+> Nháp của TV2 (V27, V32), cập nhật 31/10 với số liệu đo ngày 31/10, commit `0a35afd`. Trạng thái:
 > - **Đã có số liệu:**
 >   - đo theo đúng phương pháp 04 §4 (5 lần đo thời gian, 1 lần đo bộ nhớ, timeout 60 giây) trên commit sạch, chế độ chi phí `energy` (V13);
 >   - K1–K8 đều PASS;
 >   - chạy lại lần thứ hai trên cùng commit, số đếm trùng hẳn ở 235/235 cặp;
->   - dữ liệu, hình và bảng ở `Source/experiments/benchmark-2026-10-31-cd93624/`.
-> - **Phần phụ thuộc quyết định của TV3:** bước làm khối tách đôi hiện có chi phí 1,0 trong `costs.py`, và Bảng 2.7 không có dòng cho bước này. Nếu TV3 đổi mức chi phí này, chỉ 10 màn nhóm G5 bị ảnh hưởng, ở hai loại số liệu:
+>   - dữ liệu, hình và bảng ở `Source/experiments/benchmark-2026-10-31-0a35afd/`.
+> - **Chi phí bước làm khối tách đôi: 1,62.** Trước commit `0a35afd`, bảng năng lượng trong `costs.py` không có cặp tư thế nằm → tách, nên bước này rơi về mức mặc định 1,0, rẻ hơn mọi bước khác. TV2 áp dụng mức 1,62 (bằng nằm → đứng, vì khối chỉ tách khi đứng lên công tắc tách) để hoàn thiện phép đo (PR #23). Đây là quyết định được áp dụng để hoàn thiện phép đo; **TV3 (phụ trách `costs.py`) chưa review hay phê duyệt**, và Bảng 2.7 (TV1) chưa có dòng cho bước này. Nếu nhóm chọn mức khác, chỉ 10 màn nhóm G5 bị ảnh hưởng, ở hai loại số liệu:
 >   - cột tổng chi phí của mọi thuật toán;
 >   - số đếm, thời gian, bộ nhớ của UCS và A*.
 >
->   Số liệu của G1–G4, S1–S3, và số bước, số đếm, thời gian, bộ nhớ của BFS và DFS ở mọi màn đều không phụ thuộc.
+>   Số liệu của G1–G4, S1–S3, và số bước, số đếm, bộ nhớ của BFS và DFS ở mọi màn đều không phụ thuộc. Lần đo trước trên commit `cd93624` (bước tách 1,0) được thay hẳn; khác biệt giữa hai lần ghi ở cuối mục 5.3.
 > - **Định dạng kết quả:** chương này chỉ dùng 16 cột của `summary.csv` đã chốt ở 04 §5. Các bổ sung về định dạng file kết quả (Q1–Q7) chưa được ghi vào `docs/04`, nhưng không ảnh hưởng số liệu trong chương.
 > - **5.4:** mỗi chủ thuật toán viết một đoạn (5.4.1 BFS, 5.4.2 DFS, 5.4.3 UCS, 5.4.4 A*), file riêng.
 
@@ -73,19 +73,19 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 | CPU, RAM | AMD64 Family 25 Model 117 (16 luồng), 15,3 GB |
 | Hệ điều hành | Windows (`platform`: Windows-10-10.0.26200-SP0) |
 | Python | CPython 3.11.9 |
-| Commit Git | `cd93624`, không có thay đổi chưa commit (`dirty_reasons` rỗng) |
+| Commit Git | `0a35afd`, không có thay đổi chưa commit (`dirty_reasons` rỗng) |
 | Số lần đo thời gian | 5, lấy trung vị |
 | Số lần đo bộ nhớ | 1, chạy riêng |
 | Giới hạn thời gian | 60 giây mỗi lần chạy |
-| Hàm chi phí | V13 (`bloxorz/costs.py`, Bảng 2.7, mục 3.3); `run.py --cost energy`, kiểm khóa `cost` trong `run_info.json` |
-| Thời gian chạy toàn bộ | 9 phút 14 giây (03:55:14 → 04:04:28 UTC, 31/10/2026) |
+| Hàm chi phí | V13 (`bloxorz/costs.py`, Bảng 2.7, mục 3.3), bước tách khối 1,62; `run.py --cost energy`, kiểm khóa `cost` trong `run_info.json` |
+| Thời gian chạy toàn bộ | 9 phút 34 giây (04:43:38 → 04:53:12 UTC, 31/10/2026) |
 | Cảnh báo, lần đo bộ nhớ thất bại | 0, 0 |
 
 **Hàm chi phí.** Cột `path_cost` của cả năm cấu hình tính theo cùng một hàm chi phí V13 (Bảng 2.7, mục 3.3), để so được chất lượng lời giải.
 
-**Kiểm tra chức năng của hàm chi phí** (kiểm tính đúng, không phải số liệu hiệu năng; chạy trên commit `02ea502`):
+**Kiểm tra chức năng của hàm chi phí** (kiểm tính đúng, không phải số liệu hiệu năng; chạy trên commit `0a35afd`):
 - Công cụ `tools/check_heuristics.py` (TV4) với chi phí V13: 0 vi phạm chấp nhận được và 0 vi phạm nhất quán của $h_M$ và $h_P$. Phạm vi kiểm: 340 414 cạnh của 33 màn gốc, 2 015 147 cạnh của 14 màn tự sinh. Tổng chi phí của A* bằng UCS ở mọi màn.
-- Duyệt mọi cạnh tới được của 33 màn gốc: mọi bước có chi phí ít nhất 1, đúng điều kiện ở mục 2.8.
+- Test `tests/test_costs_split.py` duyệt mọi cạnh tới được của 33 màn gốc. Mọi cặp tư thế đều có trong bảng năng lượng, không cạnh nào rơi về mức mặc định. Chi phí bằng bảng cộng phụ phí ô dễ vỡ, mọi bước có chi phí ít nhất 1 (đúng điều kiện ở mục 2.8), và không có cạnh đứng → tách. Test cũng kiểm: bước tách trên lời giải UCS của màn 08 tốn đúng 1,62; ở cả 10 màn G5, tổng chi phí của 5 cấu hình bằng chi phí phát lại.
 
 Riêng **số bước và các số đếm của BFS và DFS không phụ thuộc hàm chi phí**, vì hai thuật toán này không dùng chi phí khi chọn nút. Ngược lại, số liệu của UCS và A* sẽ thay đổi khi đổi hàm chi phí.
 
@@ -104,7 +104,7 @@ Các mục trên được kiểm tự động bằng `experiments/check_results.
 
 **Kết quả trên lần đo ngày 31/10:**
 - **K1–K8 đều PASS** (`check_results.txt`).
-- **Tái lập:** chạy lại lần hai trên cùng commit; `compare_runs.py` cho số đếm trùng hẳn ở 235/235 cặp. Thời gian tìm kiếm lần hai so với lần một có tỉ lệ trung vị 1,00 (thấp nhất 0,88, cao nhất 1,20); bộ nhớ đỉnh trùng hẳn.
+- **Tái lập:** chạy lại lần hai trên cùng commit; `compare_runs.py` cho số đếm trùng hẳn ở 235/235 cặp. Thời gian tìm kiếm lần hai so với lần một có tỉ lệ trung vị 1,03 (thấp nhất 0,93, cao nhất 1,19); bộ nhớ đỉnh trùng hẳn.
 - **Kiểm tra độc lập** (`kiem_tra_doc_lap.py`, không dùng công cụ sinh bảng):
   - phát lại 225 lời giải bằng engine: 0 lệch số bước hay tổng chi phí;
   - tính lại 75 ô trung vị của Bảng 5.5–5.7: 0 lệch;
@@ -162,9 +162,9 @@ Khi sinh, script `experiments/gen_levels.py` dùng BFS tính số bước tối 
 
 ### 5.3. Kết quả
 
-Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd93624`, chế độ chi phí `energy` (Bảng 5.2). Bảng sinh bằng `experiments/tables.py`, hình bằng `experiments/charts.py`, không chỉnh tay. Dữ liệu gốc và CSV của từng hình nằm ở `Source/experiments/benchmark-2026-10-31-cd93624/`. Bảng đầy đủ 235 cặp ở Phụ lục A (`phu-luc-a-ket-qua.md`).
+Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `0a35afd`, chế độ chi phí `energy` (Bảng 5.2). Bảng sinh bằng `experiments/tables.py`, hình bằng `experiments/charts.py`, không chỉnh tay. Dữ liệu gốc và CSV của từng hình nằm ở `Source/experiments/benchmark-2026-10-31-0a35afd/`. Bảng đầy đủ 235 cặp ở Phụ lục A (`phu-luc-a-ket-qua.md`).
 
-> Ở nhóm G5, cột tổng chi phí và mọi số liệu của UCS, A* phụ thuộc chi phí của bước làm khối tách đôi, hiện là 1,0 (xem khối trạng thái ở đầu chương).
+> Ở nhóm G5, cột tổng chi phí và mọi số liệu của UCS, A* phụ thuộc chi phí của bước làm khối tách đôi, nay là 1,62 (xem khối trạng thái ở đầu chương).
 
 **Bảng 5.5 (T3).** Trung vị số nút mở rộng theo nhóm màn gốc.
 
@@ -174,17 +174,17 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd9
 | G2 | 2 | 100 | 92 | 103 | 100 | 100 |
 | G3 | 15 | 325 | 240 | 328 | 310 | 311 |
 | G4 | 3 | 552 | 261 | 557 | 543 | 548 |
-| G5 | 10 | 2 851 | 658 | 3 317 | 2 934 | 3 106 |
+| G5 | 10 | 2 851 | 658 | 3 268 | 2 900 | 3 088 |
 
 **Bảng 5.6 (T3).** Trung vị thời gian tìm kiếm (ms) theo nhóm màn gốc.
 
 | Nhóm | Số màn | BFS | DFS | UCS | A* (h_P) | A* (h_M) |
 |---|---|---|---|---|---|---|
-| G1 | 3 | 1,29 | 0,99 | 1,55 | 1,61 | 1,60 |
-| G2 | 2 | 1,37 | 1,33 | 1,70 | 1,77 | 1,83 |
-| G3 | 15 | 4,52 | 3,53 | 5,85 | 5,57 | 5,93 |
-| G4 | 3 | 7,25 | 3,71 | 8,84 | 9,07 | 9,74 |
-| G5 | 10 | 86,01 | 18,79 | 120,66 | 111,34 | 119,93 |
+| G1 | 3 | 1,21 | 1,03 | 1,69 | 1,61 | 1,67 |
+| G2 | 2 | 1,56 | 1,41 | 1,77 | 1,85 | 1,92 |
+| G3 | 15 | 4,76 | 3,70 | 6,51 | 5,90 | 6,02 |
+| G4 | 3 | 8,18 | 3,91 | 9,93 | 10,26 | 10,06 |
+| G5 | 10 | 92,16 | 19,32 | 126,06 | 117,57 | 128,37 |
 
 **Bảng 5.7 (T3).** Trung vị bộ nhớ đỉnh (KB) theo nhóm màn gốc.
 
@@ -194,7 +194,7 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd9
 | G2 | 2 | 43,5 | 46,6 | 44,9 | 51,1 | 45,3 |
 | G3 | 15 | 151,0 | 116,4 | 134,1 | 134,9 | 129,9 |
 | G4 | 3 | 223,0 | 105,3 | 222,8 | 229,1 | 220,8 |
-| G5 | 10 | 1 160,2 | 459,5 | 1 418,9 | 1 356,0 | 1 379,1 |
+| G5 | 10 | 1 160,2 | 459,5 | 1 418,9 | 1 342,4 | 1 376,0 |
 
 **Bảng 5.8 (T4).** Chất lượng lời giải trên 33 màn gốc. "Tối ưu về số bước": bằng số bước của BFS. "Tối ưu về chi phí": bằng tổng chi phí của UCS.
 
@@ -214,7 +214,7 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd9
 | G2 | 103 | 100 | 100 |
 | G3 | 328 | 311 | 310 |
 | G4 | 557 | 548 | 543 |
-| G5 | 3 317 | 3 106 | 2 934 |
+| G5 | 3 268 | 3 088 | 2 900 |
 | $b^*$ | 1,080 | 1,080 | 1,080 |
 
 ![Hình 5.1](hinh/h5-1-so-nut-mo-rong.png)
@@ -235,11 +235,11 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd9
 
 ![Hình 5.5](hinh/h5-5-astar-so-voi-ucs.png)
 
-*Hình 5.5 (H5). Số nút của A* chia cho số nút của UCS. Cả hai heuristic bớt nút ở 31/33 màn và bằng UCS ở màn 11 và 18. Trung vị mức bớt theo màn là 5,8 % với $h_P$ và 3,6 % với $h_M$; lớn nhất 60,6 % ở màn 01.*
+*Hình 5.5 (H5). Số nút của A* chia cho số nút của UCS. Cả hai heuristic bớt nút ở 31/33 màn và bằng UCS ở màn 11 và 18. Trung vị mức bớt theo màn là 5,7 % với $h_P$ và 4,3 % với $h_M$; lớn nhất 60,6 % ở màn 01.*
 
 ![Hình 5.6](hinh/h5-6-theo-nhom.png)
 
-*Hình 5.6 (H6). Trung vị số nút mở rộng theo nhóm, thang log. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 6,0 lần với UCS, 5,4 lần với A* (h_P), 5,7 lần với A* (h_M), và 2,5 lần với DFS.*
+*Hình 5.6 (H6). Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A* (h_P), 5,6 lần với A* (h_M), và 2,5 lần với DFS.*
 
 ![Hình 5.7](hinh/h5-7-san-trong-s1.png)
 
@@ -253,35 +253,63 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `cd9
 
 | Màn | Thuật toán | Kết quả | Số bước | Nút mở rộng | Trạng thái đã thăm | Thời gian (ms) | Bộ nhớ (KB) |
 |---|---|---|---|---|---|---|---|
-| `s1_200` | BFS | solved | 266 | 119 589 | 119 598 | 2 088,48 | 44 736,48 |
-| `s1_200` | DFS | solved | 35 287 | 43 013 | 98 095 | 922,23 | 39 080,73 |
-| `s1_200` | UCS | solved | 266 | 119 599 | 119 600 | 2 833,67 | 50 718,93 |
-| `s1_200` | A* (h_P) | solved | 266 | 119 597 | 119 600 | 3 235,92 | 55 926,54 |
-| `s2_00` | BFS | solved | 6 | 95 | 145 | 1,45 | 61,27 |
-| `s2_10` | BFS | solved | 6 | 197 | 414 | 3,25 | 200,24 |
-| `s2_10` | A* (h_P) | solved | 6 | 30 | 89 | 0,82 | 62,39 |
-| `s3_50` | BFS | no_solution | | 7 400 | 7 400 | 115,70 | 3 004,41 |
-| `s3_50` | DFS | no_solution | | 7 400 | 7 400 | 119,43 | 3 003,11 |
-| `s3_50` | UCS | no_solution | | 7 400 | 7 400 | 154,90 | 3 081,45 |
+| `s1_200` | BFS | solved | 266 | 119 589 | 119 598 | 2 195,64 | 44 736,48 |
+| `s1_200` | DFS | solved | 35 287 | 43 013 | 98 095 | 914,64 | 39 080,73 |
+| `s1_200` | UCS | solved | 266 | 119 599 | 119 600 | 3 357,73 | 50 718,93 |
+| `s1_200` | A* (h_P) | solved | 266 | 119 597 | 119 600 | 3 439,23 | 55 926,54 |
+| `s2_00` | BFS | solved | 6 | 95 | 145 | 1,52 | 61,27 |
+| `s2_10` | BFS | solved | 6 | 197 | 414 | 3,41 | 200,24 |
+| `s2_10` | A* (h_P) | solved | 6 | 30 | 89 | 0,85 | 62,39 |
+| `s3_50` | BFS | no_solution | | 7 400 | 7 400 | 122,87 | 3 004,41 |
+| `s3_50` | DFS | no_solution | | 7 400 | 7 400 | 123,51 | 3 003,11 |
+| `s3_50` | UCS | no_solution | | 7 400 | 7 400 | 164,30 | 3 081,45 |
 | `s3_50` | A* (h_P) | no_solution | | 0 | 1 | 0,01 | 13,98 |
-| `s3_50` | A* (h_M) | no_solution | | 7 400 | 7 400 | 170,29 | 3 107,64 |
+| `s3_50` | A* (h_M) | no_solution | | 7 400 | 7 400 | 184,18 | 3 107,64 |
 
 **Timeout và không có lời giải.**
-- Không cặp nào hết giờ (60 giây). Cặp chạy lâu nhất là A* (h_M) trên `s1_200`: 3 296,07 ms thời gian tìm kiếm.
+- Không cặp nào hết giờ (60 giây). Cặp chạy lâu nhất là A* (h_P) trên `s1_200`: 3 439,23 ms thời gian tìm kiếm.
 - 10 cặp `no_solution` đều ở S3, đúng như thiết kế.
 - Không có dòng `invalid` hay lỗi (K1).
+
+**Trước và sau khi sửa chi phí bước tách.** Lần đo trước, trên commit `cd93624`, tính bước tách 1,0. Dữ liệu của lần đo đó vẫn giữ ở `Source/experiments/benchmark-2026-10-31-cd93624/`, kèm ghi chú đã bị thay thế. So hai `summary.csv` bằng `compare_runs.py` (`so-sanh-voi-cd93624.txt`):
+
+- 50 cặp khác nhau, đúng bằng 10 màn G5 × 5 cấu hình; 185 cặp còn lại trùng hẳn ở mọi số đếm, tổng chi phí và bộ nhớ.
+- Số bước không đổi ở mọi cặp.
+- BFS và DFS chỉ khác ở tổng chi phí, vì hai thuật toán không dùng chi phí khi chọn nút. Mỗi bước tách trên lời giải đắt thêm 0,62.
+- UCS và A* khác thêm ở số đếm, vì chi phí bước tách đổi thứ tự lấy nút ra khỏi hàng đợi.
+
+**Bảng 5.10.** Nhóm G5 trước (`cd93624`, bước tách 1,0) và sau (`0a35afd`, bước tách 1,62) khi sửa.
+
+| Màn | Tổng chi phí tối ưu (UCS) | Chênh | Nút mở rộng UCS | Nút A* (h_P) | Nút A* (h_M) |
+|---|---|---|---|---|---|
+| 08 | 11,98 → 12,60 | +0,62 | 594 → 594 | 492 → 492 | 507 → 508 |
+| 09 | 28,68 → 29,30 | +0,62 | 749 → 749 | 666 → 666 | 684 → 684 |
+| 10 | 66,82 → 67,44 | +0,62 | 3 611 → 3 505 | 3 153 → 3 086 | 3 391 → 3 356 |
+| 15 | 68,22 → 68,84 | +0,62 | 3 031 → 3 031 | 2 715 → 2 715 | 2 821 → 2 821 |
+| 16 | 33,88 → 38,22 | +4,34 | 160 → 168 | 149 → 160 | 155 → 160 |
+| 20 | 70,06 → 70,68 | +0,62 | 4 437 → 4 438 | 3 810 → 3 813 | 3 915 → 3 917 |
+| 23 | 99,96 → 100,58 | +0,62 | 3 804 → 3 755 | 3 682 → 3 682 | 3 737 → 3 711 |
+| 24 | 75,69 → 76,31 | +0,62 | 518 → 523 | 502 → 504 | 508 → 511 |
+| 26 | 124,26 → 125,50 | +1,24 | 4 910 → 4 910 | 4 704 → 4 704 | 4 778 → 4 778 |
+| 28 | 127,35 → 127,97 | +0,62 | 3 603 → 3 603 | 3 397 → 3 397 | 3 434 → 3 434 |
+
+Mức chênh tổng chi phí là bội của 0,62: lời giải tối ưu của màn 16 có 7 bước tách, của màn 26 có 2, các màn còn lại có 1. Các kết luận ở mục 5.5 không đổi; chỉ các con số của G5 và các tổng có chứa G5 đổi theo. Hai thay đổi lớn nhất:
+- trung vị G5 của UCS giảm từ 3 317 xuống 3 268 nút, của A* (h_P) từ 2 934 xuống 2 900 (Bảng 5.5);
+- ở màn 16, A* ($h_P$) và A* ($h_M$) nay cùng mở rộng 160 nút, nên số màn $h_P$ bằng $h_M$ tăng từ 10 lên 11.
+
+Thời gian ở mọi cặp đều đổi giữa hai lần đo, kể cả ở 185 cặp không bị ảnh hưởng, nên phần lệch thời gian không dùng để đánh giá việc sửa (xem phần hạn chế ở mục 5.5).
 
 ### 5.5. Kết luận thực nghiệm
 
 Năm câu hỏi ở mục 5.1, mỗi câu theo ba bước của 04 §7.3. Các kết luận chỉ dựa trên lần đo ở mục 5.3.
 
 **1. Ít nút, nhanh, ít bộ nhớ nhất.**
-- *Quan sát:* DFS có trung vị nhỏ nhất ở cả 5 nhóm về số nút (Bảng 5.5) và thời gian (Bảng 5.6). Theo từng màn, DFS mở rộng ít nút nhất ở 26/33 màn, nhanh nhất ở 26/33 màn, tốn ít bộ nhớ nhất ở 25/33 màn. Tổng thời gian tìm kiếm trên 33 màn: DFS 539,3 ms, BFS 858,7 ms, A* (h_P) 1 056,6 ms, UCS 1 112,0 ms, A* (h_M) 1 116,3 ms. BFS mở rộng ít nút hơn UCS ở 29/33 màn.
+- *Quan sát:* DFS có trung vị nhỏ nhất ở cả 5 nhóm về số nút (Bảng 5.5) và thời gian (Bảng 5.6). Theo từng màn, DFS mở rộng ít nút nhất ở 26/33 màn, nhanh nhất ở 26/33 màn, tốn ít bộ nhớ nhất ở 25/33 màn. Tổng thời gian tìm kiếm trên 33 màn: DFS 565,1 ms, BFS 898,2 ms, A* (h_P) 1 130,6 ms, UCS 1 163,2 ms, A* (h_M) 1 193,3 ms. BFS mở rộng ít nút hơn UCS ở 29/33 màn.
 - *Giải thích:* DFS dừng ngay khi nhánh đang đi gặp đích. BFS kiểm tra đích khi sinh nút. UCS và A* phải chờ tới khi lấy đích ra khỏi hàng đợi (mục 5.1), và với chi phí không đồng nhất, chúng duyệt theo đường đồng mức chi phí chứ không theo số bước. Thời gian đi theo số nút (Hình 5.2), còn mỗi nút của UCS và A* tốn thêm thao tác trên heap.
 - *Ý nghĩa:* chỉ cần biết màn có giải được hay không thì DFS rẻ nhất. Cần lời giải ngắn hay rẻ thì phải dùng BFS hoặc UCS và A* (câu 2).
 
 **2. Chất lượng lời giải.**
-- *Quan sát* (Bảng 5.8): BFS, UCS và cả hai A* đều cho số bước tối ưu ở 33/33 màn. UCS và A* tối ưu về chi phí ở 33/33 màn; BFS ở 31/33 màn. Hai màn còn lại là 17 (BFS 140,42, UCS 140,10) và 23 (BFS 100,96, UCS 99,96), cùng số bước. DFS chỉ tối ưu ở 3/33 màn; số bước trung bình bằng 288,3 % tối ưu, lớn nhất 15,83 lần ở màn 23 (Hình 5.4).
+- *Quan sát* (Bảng 5.8): BFS, UCS và cả hai A* đều cho số bước tối ưu ở 33/33 màn. UCS và A* tối ưu về chi phí ở 33/33 màn; BFS ở 31/33 màn. Hai màn còn lại là 17 (BFS 140,42, UCS 140,10) và 23 (BFS 101,58, UCS 100,58), cùng số bước. DFS chỉ tối ưu ở 3/33 màn; số bước trung bình bằng 288,3 % tối ưu, lớn nhất 15,83 lần ở màn 23 (Hình 5.4).
 - *Giải thích:* UCS và A* tối ưu theo tổng chi phí. Với hàm chi phí V13, đường ít bước nhất thường cũng là đường rẻ nhất, trừ màn 17 và 23, nơi có đường cùng số bước nhưng ít lần dựng khối hơn. DFS không so sánh độ dài giữa các nhánh (mục 3.2.5).
 - *Ý nghĩa:* với V13, UCS khác BFS ở rất ít màn trong bộ 33 màn gốc.
 
@@ -291,17 +319,17 @@ Năm câu hỏi ở mục 5.1, mỗi câu theo ba bước của 04 §7.3. Các k
 - *Ý nghĩa:* với bộ màn này, **thực nghiệm không đo được** mức tăng $2^k$; con số trên chỉ là phần không gian trạng thái mà tìm kiếm thực sự chạm tới. Đây là giới hạn của bố cục S2 (TV3, V40), không phải kết luận về mức tăng của không gian trạng thái.
 
 **4. Heuristic bớt được bao nhiêu nút so với UCS.**
-- *Quan sát* (Bảng 5.9, Hình 5.5): trên tổng 33 màn gốc, A* (h_P) mở rộng 32 763 nút, A* (h_M) 33 524, UCS 35 422, tức bớt 7,5 % và 5,4 %. Theo từng màn, trung vị mức bớt là 5,8 % (h_P) và 3,6 % (h_M). h_P mở rộng ít hơn h_M ở 23 màn, bằng nhau ở 10 màn, không màn nào nhiều hơn. Trung vị $b^*$ của cả ba là 1,080. Ở S3, A* (h_P) kết luận không có lời giải với 0 nút mở rộng; UCS và A* (h_M) duyệt hết 7 400 trạng thái của `s3_50`.
-- *Giải thích:* hai heuristic là cận dưới của **số bước** còn lại (mục 3.4), trong khi mỗi bước V13 tốn từ 1,0 đến 1,71. Khoảng cách tới chi phí thật vì vậy lớn, và mức bớt nhỏ. h_P nhận ra ngõ cụt, vì ô không nối được tới đích có h = ∞.
+- *Quan sát* (Bảng 5.9, Hình 5.5): trên tổng 33 màn gốc, A* (h_P) mở rộng 32 712 nút, A* (h_M) 33 474, UCS 35 281, tức bớt 7,3 % và 5,1 %. Theo từng màn, trung vị mức bớt là 5,7 % (h_P) và 4,3 % (h_M). h_P mở rộng ít hơn h_M ở 22 màn, bằng nhau ở 11 màn, không màn nào nhiều hơn. Trung vị $b^*$ của cả ba là 1,080. Ở S3, A* (h_P) kết luận không có lời giải với 0 nút mở rộng; UCS và A* (h_M) duyệt hết 7 400 trạng thái của `s3_50`.
+- *Giải thích:* hai heuristic là cận dưới của **số bước** còn lại (mục 3.4), trong khi mỗi bước V13 tốn từ 1,10 đến 1,71 trên các cạnh tới được của 33 màn gốc. Khoảng cách tới chi phí thật vì vậy lớn, và mức bớt nhỏ. h_P nhận ra ngõ cụt, vì ô không nối được tới đích có h = ∞.
 - *Ý nghĩa:* A* (h_P) luôn bằng hoặc tốt hơn A* (h_M) về số nút. Lợi ích lớn nhất của h_P là phát hiện màn không có lời giải.
 
 **5. Bàn lớn dần (S1) và màn không có lời giải (S3).**
-- *Quan sát:* ở S1, số nút BFS mở rộng xấp xỉ $3N^2$, đúng bậc của số trạng thái (khoảng 3 tư thế mỗi ô). Ở N = 200: BFS 2,09 giây, 43,7 MB; UCS 2,83 giây; A* (h_P) 3,24 giây, 54,6 MB. DFS 0,92 giây, nhưng lời giải dài 35 287 bước so với 266 bước tối ưu. Ở S3, BFS, DFS, UCS và A* (h_M) đều phải duyệt hết các trạng thái tới được (7 400 ở `s3_50`).
-- *Giải thích:* trên sân trống không có vật cản, mọi trạng thái đều tới được. Heuristic theo số bước gần như không cắt được nút nào khi chi phí mỗi bước lớn hơn 1: ở N = 200, A* (h_P) mở rộng 119 597 nút so với 119 599 của UCS. A* vì thế còn chậm hơn UCS, do phải tính thêm h.
+- *Quan sát:* ở S1, số nút BFS mở rộng xấp xỉ $3N^2$, đúng bậc của số trạng thái (khoảng 3 tư thế mỗi ô). Ở N = 200: BFS 2,20 giây, 43,7 MB; UCS 3,36 giây; A* (h_P) 3,44 giây, 54,6 MB. DFS 0,91 giây, nhưng lời giải dài 35 287 bước so với 266 bước tối ưu. Ở S3, BFS, DFS, UCS và A* (h_M) đều phải duyệt hết các trạng thái tới được (7 400 ở `s3_50`).
+- *Giải thích:* trên sân trống không có vật cản, mọi trạng thái đều tới được. Heuristic theo số bước gần như không cắt được nút nào khi chi phí mỗi bước lớn hơn 1: ở N = 200, A* (h_P) mở rộng 119 597 nút so với 119 599 của UCS. A* vì thế không nhanh hơn UCS, do phải tính thêm h: A* (h_P) 3,44 giây, A* (h_M) 3,34 giây, UCS 3,36 giây, chênh nhau trong phạm vi sai số đo (xem phần hạn chế).
 - *Ý nghĩa:* trên bàn lớn và trống, A* không có lợi thế so với UCS. Trên màn không có lời giải, A* (h_P) là lựa chọn duy nhất không phải vét cạn.
 
 **Hạn chế và sai số.**
-- Thời gian đo trên một máy, trung vị 5 lần. Hai lần đo cùng commit lệch tối đa 20 % ở từng cặp, nhưng trung vị tỉ lệ là 1,00. Bộ nhớ đo bằng `tracemalloc`, chỉ tính phần Python cấp phát.
+- Thời gian đo trên một máy, trung vị 5 lần. Hai lần đo cùng commit lệch tối đa 19 % ở từng cặp, trung vị tỉ lệ là 1,03. So lần đo trên `cd93624` với lần này: ở 185 cặp không phụ thuộc chi phí bước tách, số đếm và bộ nhớ trùng hẳn, nhưng thời gian lệch 0,94–1,18 lần (trung vị 1,05). Phần lệch này là nhiễu đo, không do đổi code. Bộ nhớ đo bằng `tracemalloc`, chỉ tính phần Python cấp phát.
 - 33 màn gốc nhỏ (bàn 10 × 15): nhiều cặp chỉ vài mili-giây, nên so sánh thời gian ở đó kém tin cậy hơn so sánh số nút.
-- Số liệu G5 phụ thuộc chi phí bước tách (đầu chương).
+- Số liệu G5 phụ thuộc chi phí bước tách. Mức 1,62 do TV2 áp dụng để hoàn thiện phép đo, chưa được TV3 review (đầu chương).
 - S2 không đo được mức tăng $2^k$ (câu 3).
