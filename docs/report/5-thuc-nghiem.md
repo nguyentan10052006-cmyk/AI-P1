@@ -223,15 +223,15 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit `0a3
 
 ![Hình 5.5](hinh/h5-5-astar-so-voi-ucs.png)
 
-*Hình 5.5. Số nút của A* chia cho số nút của UCS. Cả hai heuristic bớt nút ở 31/33 màn và bằng UCS ở màn 11 và 18. Trung vị mức bớt theo màn là 5,7 % với $h_P$ và 4,3 % với $h_M$; lớn nhất 60,6 % ở màn 01.*
+*Hình 5.5. Số nút của A\* chia cho số nút của UCS. Cả hai heuristic bớt nút ở 31/33 màn và bằng UCS ở màn 11 và 18. Trung vị mức bớt theo màn là 5,7 % với $h_P$ và 4,3 % với $h_M$; lớn nhất 60,6 % ở màn 01.*
 
 ![Hình 5.6](hinh/h5-6-theo-nhom.png)
 
-*Hình 5.6. Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A* (h_P), 5,6 lần với A* (h_M), và 2,5 lần với DFS.*
+*Hình 5.6. Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A\* (h_P), 5,6 lần với A\* (h_M), và 2,5 lần với DFS.*
 
 ![Hình 5.7](hinh/h5-7-san-trong-s1.png)
 
-*Hình 5.7. Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ $3N^2$ nút (2,59 $N^2$ ở N = 10, 2,99 $N^2$ ở N = 200). Đường của UCS và A* gần như trùng BFS; DFS thấp hơn.*
+*Hình 5.7. Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ $3N^2$ nút (2,59 $N^2$ ở N = 10, 2,99 $N^2$ ở N = 200). Đường của UCS và A\* gần như trùng BFS; DFS thấp hơn.*
 
 ![Hình 5.8](hinh/h5-8-cau-s2.png)
 
@@ -329,7 +329,7 @@ Năm câu hỏi ở mục 5.1, mỗi câu trả lời theo ba bước: quan sát
 | BFS | Số bước tối ưu ở 33/33 màn; nhanh nhất trong các thuật toán cho lời giải tối ưu (tổng 898 ms); chi phí mỗi nút thấp nhất (15,1 µs) | Bỏ qua chi phí: đắt hơn UCS ở màn 17 và 23; bộ nhớ tăng theo số trạng thái đã thăm (43,7 MB ở sân 200 × 200) | Cần lời giải ít bước nhất, ví dụ để gợi ý nước đi |
 | DFS | Ít nút nhất và nhanh nhất ở 26/33 màn (tổng 565 ms); ít bộ nhớ nhất ở 25/33 màn; luôn dừng nhờ tập đã thăm | Lời giải dài gấp 1,73 lần tối ưu (trung vị), 15,8 lần ở màn 23, khoảng 133 lần ở sân 200 × 200; biên lớn hơn BFS ở 32/33 màn; kết quả phụ thuộc thứ tự hành động | Chỉ cần biết màn có giải được hay không, hoặc cần một lời giải bất kỳ thật nhanh |
 | UCS | Tổng chi phí tối ưu ở 33/33 màn, có bảo đảm; không cần heuristic | Nhiều hơn BFS 5,4 % số nút, chậm hơn khoảng 30 %; duyệt hết các trạng thái rẻ hơn lời giải (S2: 828 trạng thái, BFS 414) | Các bước có chi phí khác nhau và chưa có heuristic tốt |
-| A* với $h_P$ | Tổng chi phí tối ưu ở 33/33 màn; ít nút hơn UCS ở 31/33 màn (bớt 7,3 %); kết luận màn không có lời giải mà không mở rộng nút nào | Heuristic đếm số bước nên yếu khi mỗi bước tốn hơn 1; trên sân trống không bớt được nút nào và chậm hơn UCS 2,4 % | Cần lời giải rẻ nhất; màn có tường, hố, hoặc có thể không có lời giải |
+| A* với $h_P$ | Tổng chi phí tối ưu ở 33/33 màn; ít nút hơn UCS ở 31/33 màn (bớt 7,3 %); kết luận màn không có lời giải mà không mở rộng nút nào | Heuristic đếm số bước nên yếu khi mỗi bước tốn hơn 1; trên sân trống gần như không bớt được nút nào (2 nút ở sân 200 × 200) và chậm hơn UCS 2,4 % | Cần lời giải rẻ nhất; màn có tường, hố, hoặc có thể không có lời giải |
 | A* với $h_M$ | Tổng chi phí tối ưu ở 33/33 màn; không cần tiền xử lý | Bớt ít nút hơn $h_P$ (5,1 % so với UCS); chậm hơn UCS 2,6 % vì phải tính khoảng cách tới đích và mọi công tắc tách; không nhận ra ngõ cụt | Làm mốc so sánh cho $h_P$ |
 
 **Hạn chế và sai số.**

@@ -1,12 +1,12 @@
 # Phụ lục B: phần của TV2 (gửi TV4 ghép vào `phu-luc-b-ai.md`)
 
-> TV2 soạn ngày 28/10, bổ sung ngày 31/10. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 34 prompt từ 19/10 20:32 tới 31/10 14:23; không tính thông báo hệ thống). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
+> TV2 soạn ngày 28/10, bổ sung ngày 31/10 và 01/11. Gồm ba phần: đoạn ghép vào B.1 và B.2 theo mẫu của TV4; các dòng dán vào tab prompt-ai; và nguồn để kiểm lại. Prompt trích **nguyên văn** từ lịch sử phiên Claude Code lưu trên máy TV2 (file `.jsonl` của phiên, 35 prompt từ 19/10 20:32 tới 01/11 12:02; không tính thông báo hệ thống). Giờ ghi theo giờ Việt Nam (+07). Không chép email, token hay thông tin đăng nhập nào.
 
 ## Đoạn ghép vào B.1 (bảng công cụ)
 
 | Công cụ | Ai dùng | Dùng cho |
 |---|---|---|
-| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.301–2.1.310, mô hình `claude-opus-5-5` | TV2 (19/10–31/10) | Xem B.2, phần TV2 |
+| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.301–2.1.310, mô hình `claude-opus-5-5` | TV2 (19/10–01/11) | Xem B.2, phần TV2 |
 
 ## Đoạn ghép vào B.2
 
@@ -32,6 +32,7 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
 | 31/10 | Rà cách nối hàm chi phí V13 sau PR #18 (đọc code, chạy `check_heuristics` với V13, duyệt mọi cạnh của 33 màn); phát hiện bước làm khối tách đôi có chi phí 1,0 (module của TV3); làm công cụ biết chế độ chi phí | PR #20; tài liệu bàn giao và bản vá đề xuất cho TV3 (không áp vào code của TV3) | 0 vi phạm heuristic; bản vá đề xuất qua 233 test. **Sự cố do Claude gây ra:** lần đo kỹ thuật đầu chạy trong worktree mà Claude đang sửa tạm `costs.py`, nên dữ liệu có thể bị nhiễm. Lần đo đó bị dừng, dữ liệu được đánh dấu loại bỏ, và đo lại trong worktree riêng |
 | 31/10 | Đo thực nghiệm trên commit sạch `cd93624` theo 04 §4; kiểm tra K1–K8, tái lập và kiểm tra độc lập; viết mục 5.3, 5.5, 5.4.2 và Phụ lục A | PR #21: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-cd93624/` | Đo lần hai trùng số đếm 235/235 cặp; phát lại 225 lời giải; tính lại 75 ô trung vị; mỗi con số trong chương đối chiếu với `summary.csv`. Rà lại chương trước khi merge và sửa 3 câu không khớp số liệu |
 | 31/10 (trưa, chiều) | Theo cho phép của TV2, đặt chi phí bước làm khối tách đôi bằng 1,62 (bằng nằm → đứng) trong `costs.py`, kèm test hồi quy. Đây là quyết định áp dụng để hoàn thiện phép đo; TV3 chưa review. Đo lại trên commit `0a35afd`; cập nhật chương 5, 5.4.2, Phụ lục A và hình; ghi khác biệt trước và sau khi sửa | PR #23 (`bloxorz/costs.py`, `tests/test_costs_split.py`, `tests/test_ucs.py`); PR #24: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-0a35afd/` | 3 test mới thất bại trên code cũ, qua trên code mới; cả bộ test qua (246 OK, 1 skip). K1–K8 PASS. So với lần đo `cd93624`: chỉ 50 cặp của 10 màn G5 khác, số bước không đổi. Đo lần hai trùng số đếm 235/235 cặp; kiểm tra độc lập 0 lệch. Rà lại chương và sửa thêm chú thích Hình 5.6 (ghi "thang log" trong khi hình dùng thang tuyến tính) |
+| 01/11 | Kiểm tra cuối trước khi nộp: đối chiếu `main` sau các PR #25–#29 của nhóm với dữ liệu đo `0a35afd` (Phụ lục A đã dịch, chương 5, 5.4.2, 3.2, 8 hình, bản LaTeX); chạy lại test và các bước kiểm tra. Tìm ra chú thích Hình 5.5–5.7 bị cắt trong bản dựng PDF (dấu * của "A*" đóng chữ nghiêng) và một câu ở Bảng 5.11 chưa khớp số liệu | #30: `docs/report/5-thuc-nghiem.md` | Phụ lục A: 235/235 dòng, 0 ô lệch với `summary.csv`; 8 hình trùng từng byte với hình của lần đo; cả bộ test qua (246 test, 1 skip); K1–K8 PASS; kiểm tra độc lập 0 lệch. Dựng thử chương 5 bằng pandoc 3.9: ba chú thích ra đủ |
 
 **Phần AI đề xuất và phần TV2 chọn.**
 - **Claude đề xuất,** TV2 đồng ý qua prompt tiếp theo:
@@ -44,7 +45,7 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
   - chờ PR #10 merge rồi mới làm tiếp V23;
   - tên nhánh `feature/Tien/M1`;
   - cho phép push các nhánh `feature/Tien/M1`, `feature/Tien/V23`, `feature/Tien/V23-fixes` và mở PR #10, #11, #13;
-  - cho phép push và mở PR #14, #16, #17, #20, #21, #22, #23, #24. #10, #11, #13, #14, #16, #17 do TV1 merge;
+  - cho phép push và mở PR #14, #16, #17, #20, #21, #22, #23, #24, #30. #10, #11, #13, #14, #16, #17 do TV1 merge;
   - ngày 31/10, cho phép tự review và tự merge **chỉ** PR #20 và #21, với điều kiện test đạt, không xung đột, không có số liệu giả; Claude thực hiện việc merge qua tài khoản GitHub của TV2;
   - ngày 31/10 (11:34), cho phép tự quyết chi phí bước tách bằng 1,62, chạy lại phần thực nghiệm bị ảnh hưởng, tự review và merge PR #22 và các thay đổi TV2. Kèm điều kiện: không đổi chi phí của các hành động khác; không sửa để số liệu khớp kết quả mong muốn; ghi rõ trong báo cáo rằng đây là quyết định áp dụng để hoàn thiện phép đo, không khẳng định TV3 đã review hay phê duyệt;
   - giữ nguyên các quyết định khác thuộc người khác: bố cục S2 (TV3), định dạng file kết quả Q1–Q7 (nhóm), dòng chi phí bước tách trong Bảng 2.7 (TV1). Báo cáo ghi rõ phần số liệu phụ thuộc các quyết định này;
@@ -114,6 +115,7 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 | 31/10 10:50 | `# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR #20/#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER` |
 | 31/10 11:34 | `# BỔ SUNG QUYỀN TỰ QUYẾT VÀ HOÀN TẤT TV2` |
 | 31/10 14:23 | `Tiếp tục ở trạng thái hiện tại` |
+| 01/11 12:02 | `# FINAL AUDIT — KIỂM TRA VÀ CHỐT TOÀN BỘ PHẦN VIỆC TV2 TRƯỚC KHI NỘP AI PROJECT 1` |
 
 ## Dòng dán vào tab prompt-ai (`docs/sheet/6-prompt-ai.csv`)
 
@@ -129,6 +131,7 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 2026-10-31,TV2,Claude Code (Anthropic),"Rà V13 sau PR #18; công cụ biết chế độ chi phí; tìm lỗi chi phí bước tách (TV3)","# PROMPT CLAUDE CODE — TIẾP TỤC TÍCH HỢP V13 VÀ HOÀN THÀNH THỰC NGHIỆM BLOXORZ SOLVER (TV2)","PR #20; tài liệu bàn giao cho TV3","check_heuristics với V13: 0 vi phạm; lần đo bị nhiễm do Claude sửa tạm code trong cùng worktree đã bị loại và đo lại"
 2026-10-31,TV2,Claude Code (Anthropic),"Đo thực nghiệm cd93624; chương 5.3, 5.5, 5.4.2, Phụ lục A","# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR #20/#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER","PR #21: docs/report/, Source/experiments/benchmark-2026-10-31-cd93624/","K1–K8 PASS; lần đo hai trùng số đếm 235/235; kiểm tra độc lập 0 lệch"
 2026-10-31,TV2,Claude Code (Anthropic),"Chi phí bước tách 1,62 (quyết định để hoàn thiện phép đo, TV3 chưa review); đo lại 0a35afd; cập nhật chương 5, Phụ lục A","# BỔ SUNG QUYỀN TỰ QUYẾT VÀ HOÀN TẤT TV2","PR #23: bloxorz/costs.py, tests/test_costs_split.py; PR #24: docs/report/, Source/experiments/benchmark-2026-10-31-0a35afd/","Test mới thất bại trên code cũ; cả bộ test qua; K1–K8 PASS; chỉ 50 cặp G5 khác lần đo cd93624; lần đo hai trùng số đếm 235/235"
+2026-11-01,TV2,Claude Code (Anthropic),"Kiểm tra cuối trước khi nộp; sửa chú thích Hình 5.5–5.7 bị cắt trong PDF và một câu ở Bảng 5.11","# FINAL AUDIT — KIỂM TRA VÀ CHỐT TOÀN BỘ PHẦN VIỆC TV2 TRƯỚC KHI NỘP AI PROJECT 1","#30: docs/report/5-thuc-nghiem.md","Phụ lục A 235/235 dòng khớp summary.csv; 8 hình trùng byte; cả bộ test qua; K1–K8 PASS; dựng thử bằng pandoc"
 ```
 
 ## Nguồn để kiểm lại
