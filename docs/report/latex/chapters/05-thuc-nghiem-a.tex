@@ -31,7 +31,7 @@ Chương này so sánh năm cấu hình thuật toán trên cùng một bộ mà
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3611}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1111}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Khóa}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thuật toán}
@@ -65,9 +65,9 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2778}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1944}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5278}}@{}}
-\caption{\textbf{Bảng 5.1.} Các chỉ số đo (quy ước đếm ở mục 3.1.3).}\tabularnewline
+\caption{\captionlabel{Bảng 5.1.} Các chỉ số đo (quy ước đếm ở mục 3.1.3).}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Chỉ số}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Cột trong \texttt{summary.\allowbreak{}csv}}
@@ -77,7 +77,7 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Chỉ số}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Cột trong \texttt{summary.\allowbreak{}csv}}
@@ -141,9 +141,9 @@ Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}soluti
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4722}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5278}}@{}}
-\caption{\textbf{Bảng 5.2.} Thiết lập của lần đo chính thức.}\tabularnewline
+\caption{\captionlabel{Bảng 5.2.} Thiết lập của lần đo chính thức.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Hạng mục}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Giá trị}
@@ -151,7 +151,7 @@ Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}soluti
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Hạng mục}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Giá trị}
@@ -268,9 +268,9 @@ python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>  
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3056}}@{}}
-\caption{\textbf{Bảng 5.3.} Năm nhóm màn gốc. ``Số bước tối ưu'' là số bước của lời giải ít bước nhất theo dữ liệu tham khảo; BFS của nhóm khớp ở cả 33 màn (test T24 và bước kiểm tra K2 của lần đo).}\tabularnewline
+\caption{\captionlabel{Bảng 5.3.} Năm nhóm màn gốc. ``Số bước tối ưu'' là số bước của lời giải ít bước nhất theo dữ liệu tham khảo; BFS của nhóm khớp ở cả 33 màn (test T24 và bước kiểm tra K2 của lần đo).}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Mô tả}
@@ -284,7 +284,7 @@ python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>  
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Mô tả}
@@ -322,9 +322,9 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1806}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}@{}}
-\caption{\textbf{Bảng 5.4.} Ba nhóm màn tự sinh.}\tabularnewline
+\caption{\captionlabel{Bảng 5.4.} Ba nhóm màn tự sinh.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Cách dựng}
@@ -340,7 +340,7 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Cách dựng}
@@ -379,13 +379,13 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit \tex
 Ở nhóm G5, cột tổng chi phí và số liệu của UCS, A* phụ thuộc chi phí của bước tách khối (1,62; lý do ở mục 3.3.3).
 
 \begin{longtable}[]{@{}lllllll@{}}
-\caption{\textbf{Bảng 5.5.} Trung vị số nút mở rộng theo nhóm màn gốc.}\tabularnewline
+\caption{\captionlabel{Bảng 5.5.} Trung vị số nút mở rộng theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -398,13 +398,13 @@ G5 & 10 & 2 851 & 658 & 3 268 & 2 900 & 3 088 \\
 \end{longtable}
 
 \begin{longtable}[]{@{}lllllll@{}}
-\caption{\textbf{Bảng 5.6.} Trung vị thời gian tìm kiếm (ms) theo nhóm màn gốc.}\tabularnewline
+\caption{\captionlabel{Bảng 5.6.} Trung vị thời gian tìm kiếm (ms) theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -417,13 +417,13 @@ G5 & 10 & 92,16 & 19,32 & 126,06 & 117,57 & 128,37 \\
 \end{longtable}
 
 \begin{longtable}[]{@{}lllllll@{}}
-\caption{\textbf{Bảng 5.7.} Trung vị bộ nhớ đỉnh (KB) theo nhóm màn gốc.}\tabularnewline
+\caption{\captionlabel{Bảng 5.7.} Trung vị bộ nhớ đỉnh (KB) theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{Số màn} & \textbf{BFS} & \textbf{DFS} & \textbf{UCS} & \textbf{A* (\(h_P\))} & \textbf{A* (\(h_M\))} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -441,9 +441,9 @@ G5 & 10 & 1 160,2 & 459,5 & 1 418,9 & 1 342,4 & 1 376,0 \\
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1667}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1667}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2778}}@{}}
-\caption{\textbf{Bảng 5.8.} Chất lượng lời giải trên 33 màn gốc. ``Tối ưu về số bước'': bằng số bước của BFS. ``Tối ưu về chi phí'': bằng tổng chi phí của UCS.}\tabularnewline
+\caption{\captionlabel{Bảng 5.8.} Chất lượng lời giải trên 33 màn gốc. ``Tối ưu về số bước'': bằng số bước của BFS. ``Tối ưu về chi phí'': bằng tổng chi phí của UCS.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thuật toán}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Giải được}
@@ -457,7 +457,7 @@ G5 & 10 & 1 160,2 & 459,5 & 1 418,9 & 1 342,4 & 1 376,0 \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thuật toán}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Giải được}
@@ -480,13 +480,13 @@ A* (\(h_M\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
 \end{longtable}
 
 \begin{longtable}[]{@{}llll@{}}
-\caption{\textbf{Bảng 5.9.} Trung vị số nút mở rộng của UCS và A* theo nhóm, và trung vị hệ số phân nhánh hiệu dụng \(b^*\) trên 33 màn gốc.}\tabularnewline
+\caption{\captionlabel{Bảng 5.9.} Trung vị số nút mở rộng của UCS và A* theo nhóm, và trung vị hệ số phân nhánh hiệu dụng \(b^*\) trên 33 màn gốc.}\tabularnewline
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
+\rowcolor{tablehead}\textbf{Nhóm} & \textbf{UCS} & \textbf{A* (\(h_M\))} & \textbf{A* (\(h_P\))} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -502,49 +502,49 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.1}]{hinh/h5-1-so-nut-mo-rong.png}
-\caption{Hình 5.1. Số nút mở rộng trên từng màn gốc, thang log. DFS mở rộng ít nút nhất ở 26/33 màn. DFS mở rộng nhiều hơn BFS ở 6 màn: 01, 02, 04, 16, 23, 28.}
+\caption{\captionlabel{Hình 5.1.} Số nút mở rộng trên từng màn gốc, thang log. DFS mở rộng ít nút nhất ở 26/33 màn. DFS mở rộng nhiều hơn BFS ở 6 màn: 01, 02, 04, 16, 23, 28.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.2}]{hinh/h5-2-thoi-gian.png}
-\caption{Hình 5.2. Thời gian tìm kiếm trên từng màn gốc. Thời gian đi theo số nút mở rộng: tương quan hạng Spearman giữa hai cột trên 165 cặp (màn, thuật toán) là 0,978.}
+\caption{\captionlabel{Hình 5.2.} Thời gian tìm kiếm trên từng màn gốc. Thời gian đi theo số nút mở rộng: tương quan hạng Spearman giữa hai cột trên 165 cặp (màn, thuật toán) là 0,978.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.3}]{hinh/h5-3-bo-nho.png}
-\caption{Hình 5.3. Bộ nhớ đỉnh trên từng màn gốc. Bộ nhớ đi theo số trạng thái đã thăm: tương quan hạng Spearman 0,997.}
+\caption{\captionlabel{Hình 5.3.} Bộ nhớ đỉnh trên từng màn gốc. Bộ nhớ đi theo số trạng thái đã thăm: tương quan hạng Spearman 0,997.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.4}]{hinh/h5-4-dfs-so-voi-toi-uu.png}
-\caption{Hình 5.4. Số bước của DFS chia cho số bước tối ưu. Trung vị theo màn là 1,73; lớn nhất 15,83 ở màn 23. DFS ra đúng số bước tối ưu ở 3 màn: 04, 21, 27.}
+\caption{\captionlabel{Hình 5.4.} Số bước của DFS chia cho số bước tối ưu. Trung vị theo màn là 1,73; lớn nhất 15,83 ở màn 23. DFS ra đúng số bước tối ưu ở 3 màn: 04, 21, 27.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.5}]{hinh/h5-5-astar-so-voi-ucs.png}
-\caption{Hình 5.5. Số nút của A}
+\caption{\captionlabel{Hình 5.5.} Số nút của A}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.6}]{hinh/h5-6-theo-nhom.png}
-\caption{Hình 5.6. Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A}
+\caption{\captionlabel{Hình 5.6.} Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.7}]{hinh/h5-7-san-trong-s1.png}
-\caption{Hình 5.7. Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ \(3N^2\) nút (2,59 \(N^2\) ở N = 10, 2,99 \(N^2\) ở N = 200). Đường của UCS và A}
+\caption{\captionlabel{Hình 5.7.} Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ \(3N^2\) nút (2,59 \(N^2\) ở N = 10, 2,99 \(N^2\) ở N = 200). Đường của UCS và A}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.8}]{hinh/h5-8-cau-s2.png}
-\caption{Hình 5.8. Số trạng thái đã thăm theo số công tắc k (S2); đường nét đứt là số trạng thái BFS thăm ở k = 0, nhân \(2^k\). Số trạng thái thực tế đi ngang từ k = 6 và còn xa đường \(2^k\).}
+\caption{\captionlabel{Hình 5.8.} Số trạng thái đã thăm theo số công tắc k (S2); đường nét đứt là số trạng thái BFS thăm ở k = 0, nhân \(2^k\). Số trạng thái thực tế đi ngang từ k = 6 và còn xa đường \(2^k\).}
 \end{figure}
 
 \textbf{Bộ màn tự sinh.} Số liệu chọn lọc từ \texttt{summary.\allowbreak{}csv}:
@@ -561,7 +561,7 @@ G5 & 3 268 & 3 088 & 2 900 \\
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thuật toán}
@@ -642,9 +642,9 @@ G5 & 3 268 & 3 088 & 2 900 \\
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2037}}@{}}
-\caption{\textbf{Bảng 5.10.} Nhóm G5 trước (\texttt{cd93624}, bước tách 1,0) và sau (\texttt{0a35afd}, bước tách 1,62) khi sửa.}\tabularnewline
+\caption{\captionlabel{Bảng 5.10.} Nhóm G5 trước (\texttt{cd93624}, bước tách 1,0) và sau (\texttt{0a35afd}, bước tách 1,62) khi sửa.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Tổng chi phí tối ưu (UCS)}
@@ -660,7 +660,7 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Tổng chi phí tối ưu (UCS)}

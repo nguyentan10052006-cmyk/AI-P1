@@ -48,18 +48,17 @@ LANDSCAPE = {"A-ket-qua"}
 
 MAIN = r"""%!TEX program = xelatex
 % File sinh bởi build.py. Sửa nội dung ở docs/report/*.md, thông tin bìa ở info.tex.
-\documentclass[12pt,a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 \newcommand{\reportpdftitle}{CSC14003 Project 1 – Bloxorz Solver – Nhóm 9}
 \newcommand{\reportpdfauthor}{Võ Quốc Trung, Bùi Quang Tiến, Nguyễn Bảo Trọng, Trịnh Vỹ Triết, Trần Nguyên Tân}
-\newcommand{\headerleft}{Project 1 – Bloxorz Solver}
-\newcommand{\headerright}{CSC14003 · Nhóm 9}
+\newcommand{\headerleft}{Bloxorz Solver · CSC14003 · Nhóm 9}
 \input{preamble}
 \graphicspath{{../}}   % hình nằm ở docs/report/hinh
 \input{info}
 \begin{document}
 \input{cover}
 \newpage
-{\hypersetup{linkcolor=darkneutral}\tableofcontents}
+\tableofcontents
 %BODY%
 \end{document}
 """
@@ -133,6 +132,20 @@ def add_row_rules(tex: str) -> str:
     return "\n".join(out)
 
 
+def style_tables_and_captions(tex: str) -> str:
+    """Bọc số "Bảng 5.5." / "Hình 5.1." đầu chú thích bằng \\captionlabel, và tô nền hàng tiêu đề bảng
+    (hàng ngay sau \\toprule, cả ở trang đầu lẫn trang tiếp của longtable)."""
+    tex = re.sub(r"\\caption\{\\textbf\{((?:Bảng|Hình) [0-9A-Z.]+\.)\} ", r"\\caption{\\captionlabel{\1} ", tex)
+    tex = re.sub(r"\\caption\{((?:Bảng|Hình) [0-9A-Z]+(?:\.[0-9]+)+\.) ", r"\\caption{\\captionlabel{\1} ", tex)
+    out, after_top = [], False
+    for line in tex.split("\n"):
+        if after_top:
+            line = "\\rowcolor{tablehead}" + line
+        after_top = line.strip() == "\\toprule\\noalign{}"
+        out.append(line)
+    return "\n".join(out)
+
+
 def convert() -> None:
     pandoc = find_pandoc()
     OUT.mkdir(exist_ok=True)
@@ -141,6 +154,7 @@ def convert() -> None:
     body = []
     for name, spec, shift in PARTS:
         tex = add_row_rules(to_latex(pandoc, read_part(spec), shift, 130 if name in LANDSCAPE else 72))
+        tex = style_tables_and_captions(tex)
         (OUT / f"{name}.tex").write_text(tex, encoding="utf-8")
         if name == APPENDIX_FROM:
             body.append("\\appendix")

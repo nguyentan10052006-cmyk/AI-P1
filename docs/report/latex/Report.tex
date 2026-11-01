@@ -1,17 +1,16 @@
 %!TEX program = xelatex
 % File sinh bởi build.py. Sửa nội dung ở docs/report/*.md, thông tin bìa ở info.tex.
-\documentclass[12pt,a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 \newcommand{\reportpdftitle}{CSC14003 Project 1 – Bloxorz Solver – Nhóm 9}
 \newcommand{\reportpdfauthor}{Võ Quốc Trung, Bùi Quang Tiến, Nguyễn Bảo Trọng, Trịnh Vỹ Triết, Trần Nguyên Tân}
-\newcommand{\headerleft}{Project 1 – Bloxorz Solver}
-\newcommand{\headerright}{CSC14003 · Nhóm 9}
+\newcommand{\headerleft}{Bloxorz Solver · CSC14003 · Nhóm 9}
 \input{preamble}
 \graphicspath{{../}}   % hình nằm ở docs/report/hinh
 \input{info}
 \begin{document}
 \input{cover}
 \newpage
-{\hypersetup{linkcolor=darkneutral}\tableofcontents}
+\tableofcontents
 \input{chapters/00-tom-tat}
 \input{chapters/01-phan-cong}
 \input{chapters/02-mo-hinh-hoa}

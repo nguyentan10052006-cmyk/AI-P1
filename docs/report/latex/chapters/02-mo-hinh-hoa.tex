@@ -15,9 +15,9 @@ Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}@{}}
-\caption{\textbf{Bảng 2.1.} Cách xử lý từng loại ô.}\tabularnewline
+\caption{\captionlabel{Bảng 2.1.} Cách xử lý từng loại ô.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Loại ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ký hiệu}
@@ -31,7 +31,7 @@ Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Loại ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ký hiệu}
@@ -108,13 +108,13 @@ Mỗi công tắc mềm hoặc nặng nối với một hoặc nhiều ô cầu,
 Công tắc tách có trường \texttt{targets} gồm hai ô. Khi khối nguyên đứng lên công tắc, khối tách thành hai khối con đặt tại hai ô đó (mục 2.6). Định dạng file màn cho phép công tắc tách nối thêm cầu; khi đó cầu đổi trạng thái trước, rồi khối mới tách. Không màn gốc nào dùng trường hợp này.
 
 \begin{longtable}[]{@{}llllll@{}}
-\caption{\textbf{Bảng 2.2.} Số công tắc trong 33 màn gốc, theo loại và kiểu tác động.}\tabularnewline
+\caption{\captionlabel{Bảng 2.2.} Số công tắc trong 33 màn gốc, theo loại và kiểu tác động.}\tabularnewline
 \toprule\noalign{}
-\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
+\rowcolor{tablehead}\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
+\rowcolor{tablehead}\textbf{Loại công tắc} & \textbf{\texttt{toggle}} & \textbf{\texttt{open}} & \textbf{\texttt{close}} & \textbf{Nhiều kiểu (\texttt{links})} & \textbf{Tổng} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -204,9 +204,9 @@ Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợ
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1806}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1528}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1944}}@{}}
-\caption{\textbf{Bảng 2.3.} Số trạng thái tới được ở một số màn.}\tabularnewline
+\caption{\captionlabel{Bảng 2.3.} Số trạng thái tới được ở một số màn.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
@@ -222,7 +222,7 @@ Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợ
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Màn}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Nhóm}
@@ -273,9 +273,9 @@ Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế v
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}@{}}
-\caption{\textbf{Bảng 2.4.} Bảng chuyển của khối nguyên, với ô neo hiện tại là (r, c).}\tabularnewline
+\caption{\captionlabel{Bảng 2.4.} Bảng chuyển của khối nguyên, với ô neo hiện tại là (r, c).}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Tư thế hiện tại}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{U}
@@ -289,7 +289,7 @@ Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế v
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Tư thế hiện tại}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{U}
@@ -333,13 +333,13 @@ Bảng này là hằng \texttt{BLOCK\_\allowbreak{}MOVES} trong \texttt{Source/\
 Ngoài trạng thái mới, \texttt{step()} trả về danh sách sự kiện theo thứ tự xảy ra (công tắc, ô vỡ, tách, ghép, rơi, thắng). Giao diện chỉ đọc các sự kiện này để vẽ hiệu ứng, không tự tính lại luật (chương 4). Hàm \texttt{Problem.\allowbreak{}result()} của bài toán tìm kiếm gọi đúng hàm \texttt{step()} này.
 
 \begin{longtable}[]{@{}llll@{}}
-\caption{\textbf{Bảng 2.5.} Lời giải BFS của màn 1: \texttt{R D D R R D R}, 7 bước.}\tabularnewline
+\caption{\captionlabel{Bảng 2.5.} Lời giải BFS của màn 1: \texttt{R D D R R D R}, 7 bước.}\tabularnewline
 \toprule\noalign{}
-\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
+\rowcolor{tablehead}\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
+\rowcolor{tablehead}\textbf{Bước} & \textbf{Lệnh} & \textbf{Tư thế} & \textbf{Ô khối chiếm} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -367,9 +367,9 @@ Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con kh�
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2222}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2500}}@{}}
-\caption{\textbf{Bảng 2.6.} Lời giải BFS của màn 8, có tách và ghép, 10 bước. Công tắc tách ở (4, 4), hai ô đáp là (1, 10) và (7, 10).}\tabularnewline
+\caption{\captionlabel{Bảng 2.6.} Lời giải BFS của màn 8, có tách và ghép, 10 bước. Công tắc tách ở (4, 4), hai ô đáp là (1, 10) và (7, 10).}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Bước}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Lệnh}
@@ -383,7 +383,7 @@ Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con kh�
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Bước}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Lệnh}
@@ -426,13 +426,13 @@ Trạng thái đích là trạng thái khối nguyên đứng có ô neo trùng 
 Chi phí của một bước do \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost(s, a, s')} trả về. Khi không truyền hàm chi phí, mỗi bước tốn 1. Giao diện và script thực nghiệm dùng hàm chi phí không đồng nhất trong \texttt{Source/\allowbreak{}bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 2.7), xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đi lên ô dễ vỡ. Định nghĩa đầy đủ và lý do của từng mức được trình bày ở mục 3.3.2 và 3.3.3.
 
 \begin{longtable}[]{@{}ll@{}}
-\caption{\textbf{Bảng 2.7.} Chi phí một bước.}\tabularnewline
+\caption{\captionlabel{Bảng 2.7.} Chi phí một bước.}\tabularnewline
 \toprule\noalign{}
-\textbf{Bước} & \textbf{Chi phí} \\
+\rowcolor{tablehead}\textbf{Bước} & \textbf{Chi phí} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\textbf{Bước} & \textbf{Chi phí} \\
+\rowcolor{tablehead}\textbf{Bước} & \textbf{Chi phí} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -468,9 +468,9 @@ Bốn thuật toán đều là tìm kiếm trên đồ thị (graph search): ghi
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2222}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3889}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3889}}@{}}
-\caption{\textbf{Bảng 2.8.} Mô hình bài toán tìm kiếm và nơi cài đặt.}\tabularnewline
+\caption{\captionlabel{Bảng 2.8.} Mô hình bài toán tìm kiếm và nơi cài đặt.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thành phần}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Định nghĩa}
@@ -480,7 +480,7 @@ Bốn thuật toán đều là tìm kiếm trên đồ thị (graph search): ghi
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Thành phần}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Định nghĩa}

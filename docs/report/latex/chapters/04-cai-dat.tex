@@ -39,7 +39,7 @@ Chương trình chia thành ba lớp, phụ thuộc theo một chiều:
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4306}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3056}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Package}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Được dùng}
@@ -70,7 +70,7 @@ Các file của \texttt{gui/\allowbreak{}} chia việc như sau:
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3056}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6944}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{File}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Việc}
@@ -123,7 +123,7 @@ Các ảnh trong chương được chụp ngày 31/10, trước khi thêm trang 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.1}]{hinh/h4-1-man23-du-loai-o.png}
-\caption{Hình 4.1. Màn 23 lúc bắt đầu: đủ 9 loại ô trên cùng một bàn, phân biệt được bằng màu và hình.}
+\caption{\captionlabel{Hình 4.1.} Màn 23 lúc bắt đầu: đủ 9 loại ô trên cùng một bàn, phân biệt được bằng màu và hình.}
 \end{figure}
 
 Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như bảng phím tắt: mỗi mục có một ô mẫu, tên và cách ô hoạt động theo luật. Ô mẫu vẽ bằng đúng màu và ký hiệu của bàn (lấy từ \texttt{board\_\allowbreak{}view.\allowbreak{}COLORS}), nên đổi màu ô trên bàn thì chú giải đổi theo. Khi bảng đang mở, phím lăn và Enter bị bỏ qua; G hoặc Esc đóng bảng.
@@ -131,7 +131,7 @@ Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như b�
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.11}]{hinh/h4-11-chu-giai.png}
-\caption{Hình 4.11. Bảng chú giải các loại ô (phím G) trên màn 23: cột trái là ô và khối, cột phải là cầu và ba loại công tắc.}
+\caption{\captionlabel{Hình 4.11.} Bảng chú giải các loại ô (phím G) trên màn 23: cột trái là ô và khối, cột phải là cầu và ba loại công tắc.}
 \end{figure}
 
 
@@ -139,9 +139,9 @@ Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như b�
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3472}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4028}}@{}}
-\caption{\textbf{Bảng 4.1.} Cách vẽ từng loại ô.}\tabularnewline
+\caption{\captionlabel{Bảng 4.1.} Cách vẽ từng loại ô.}\tabularnewline
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ký hiệu trong file màn}
@@ -151,7 +151,7 @@ Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như b�
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ô}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Ký hiệu trong file màn}
@@ -186,7 +186,7 @@ Khối 1×1×2 màu trắng có viền xanh sáng để nổi trên sàn xám, v
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.2}]{hinh/h4-2-ba-tu-the.png}
-\caption{Hình 4.2. Ba tư thế của khối ở màn 1: đứng chiếm một ô, nằm ngang (sau phím →) và nằm dọc (sau phím ↓) chiếm hai ô.}
+\caption{\captionlabel{Hình 4.2.} Ba tư thế của khối ở màn 1: đứng chiếm một ô, nằm ngang (sau phím →) và nằm dọc (sau phím ↓) chiếm hai ô.}
 \end{figure}
 
 Khi công tắc tác động, cầu bị điều khiển đổi màu dần giữa màu gỗ và màu sẫm, kèm một dòng thông báo cho biết loại công tắc và hiệu ứng (Hình 4.3). Thông báo lấy từ sự kiện \texttt{switch} của engine, không do giao diện tự suy ra.
@@ -194,7 +194,7 @@ Khi công tắc tác động, cầu bị điều khiển đổi màu dần giữ
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.3}]{hinh/h4-3-cong-tac-va-cau.png}
-\caption{Hình 4.3. Màn 2, bước 2: khối nằm vừa chạm công tắc mềm nên cặp cầu bên trái mở; cặp cầu bên phải vẫn đóng cho tới khi khối đứng lên công tắc nặng (dấu X đỏ).}
+\caption{\captionlabel{Hình 4.3.} Màn 2, bước 2: khối nằm vừa chạm công tắc mềm nên cặp cầu bên trái mở; cặp cầu bên phải vẫn đóng cho tới khi khối đứng lên công tắc nặng (dấu X đỏ).}
 \end{figure}
 
 Khi khối đứng lên công tắc tách, hai khối con bay theo đường vòng cung từ chỗ khối cũ tới hai ô định sẵn (Hình 4.4). Khối con đang điều khiển màu trắng, viền xanh rõ; khối còn lại màu xám, viền mờ; phím Space đổi khối. Engine luôn sắp hai khối con theo thứ tự ô, nên sau mỗi bước, giao diện tìm lại khối vừa đi theo ô mới của nó để giữ đúng khối người chơi đang điều khiển. Hai khối con kề nhau thì tự ghép lại, có thông báo.
@@ -202,7 +202,7 @@ Khi khối đứng lên công tắc tách, hai khối con bay theo đường vò
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.4}]{hinh/h4-4-tach-khoi.png}
-\caption{Hình 4.4. Màn 8 sau khi tách: khối con sáng màu là khối đang điều khiển (ghi ``KHỐI CON 1/2'' cạnh số bước).}
+\caption{\captionlabel{Hình 4.4.} Màn 8 sau khi tách: khối con sáng màu là khối đang điều khiển (ghi ``KHỐI CON 1/2'' cạnh số bước).}
 \end{figure}
 
 Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đứng thẳng trên ô dễ vỡ. Giao diện hiện lý do rơi; với ô dễ vỡ, ô cam rơi cùng khối (Hình 4.5) và được dựng lại khi bấm R. Khối nằm mà chỉ một đầu hụt thì đổ nghiêng qua mép ô còn đỡ rồi mới rơi, không xuyên qua sàn; khi đã tách, chỉ khối con bị hụt rơi. Khối mờ dần khi rơi xuống dưới bàn. Việc chọn kiểu đổ chỉ dựa vào hình (ô nào còn tấm đỡ); quyết định có rơi hay không vẫn do \texttt{rules.\allowbreak{}step()}.
@@ -210,7 +210,7 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.5}]{hinh/h4-5-o-de-vo.png}
-\caption{Hình 4.5. Màn 4, bước 18: khối đứng thẳng lên ô dễ vỡ, ô cam vỡ và đang rơi cùng khối (giữa phía dưới); hộp kết thúc (được kéo lên mép trên) nêu đúng lý do thua.}
+\caption{\captionlabel{Hình 4.5.} Màn 4, bước 18: khối đứng thẳng lên ô dễ vỡ, ô cam vỡ và đang rơi cùng khối (giữa phía dưới); hộp kết thúc (được kéo lên mép trên) nêu đúng lý do thua.}
 \end{figure}
 
 \subsection{4.5. Chơi tay}
@@ -223,7 +223,7 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Phím}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Tác dụng}
@@ -277,7 +277,7 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.6}]{hinh/h4-6-giai-bfs-thang.png}
-\caption{Hình 4.6. Màn 23 sau khi bấm Giải bằng BFS: khối đã tự lăn tới đích sau 75 bước, đúng số bước tối ưu; khung kết quả hiện các chỉ số của lần tìm, bàn thu nhỏ vào phần màn hình còn trống nên không bị che.}
+\caption{\captionlabel{Hình 4.6.} Màn 23 sau khi bấm Giải bằng BFS: khối đã tự lăn tới đích sau 75 bước, đúng số bước tối ưu; khung kết quả hiện các chỉ số của lần tìm, bàn thu nhỏ vào phần màn hình còn trống nên không bị che.}
 \end{figure}
 
 \textbf{So sánh} chạy lần lượt năm thuật toán trên màn đang mở: BFS, DFS, UCS, A* với \(h_P\) và A* với \(h_M\), mỗi thuật toán một tiến trình. Chạy lần lượt chứ không song song để thời gian và bộ nhớ của các thuật toán không ảnh hưởng nhau. Bảng được điền dần khi từng thuật toán xong (Hình 4.7, 4.8); dòng đang chạy ghi số giây đã chạy; thuật toán nào lỗi thì ô ghi ``Lỗi'' và nội dung lỗi ghi dưới bảng. Cột ``Giây'' và ``MB'' ghi số không kèm đơn vị cho bảng gọn.
@@ -285,13 +285,13 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.7}]{hinh/h4-7-so-sanh-dang-chay.png}
-\caption{Hình 4.7. So sánh đang chạy trên màn 23: bốn thuật toán đã xong, A}
+\caption{\captionlabel{Hình 4.7.} So sánh đang chạy trên màn 23: bốn thuật toán đã xong, A}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.8}]{hinh/h4-8-so-sanh-xong.png}
-\caption{Hình 4.8. Kết quả So sánh trên màn 23: BFS, UCS và A}
+\caption{\captionlabel{Hình 4.8.} Kết quả So sánh trên màn 23: BFS, UCS và A}
 \end{figure}
 
 Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (mục 3.3.2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 101,58, còn UCS và A* đi 75 bước khác tốn 100,58.
@@ -301,7 +301,7 @@ Thời gian và bộ nhớ trên giao diện chỉ để tham khảo, vì tiến
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.9}]{hinh/h4-9-chon-man.png}
-\caption{Hình 4.9. Lưới chọn màn: màn đang mở tô màu xanh; bấm một mã màn để chuyển thẳng tới màn đó, thuật toán đang chạy (nếu có) bị hủy. Bấm ra ngoài lưới, Esc hoặc Ctrl+K để đóng. Màn đã thắng trong lần chạy này có chấm xanh ở góc nút.}
+\caption{\captionlabel{Hình 4.9.} Lưới chọn màn: màn đang mở tô màu xanh; bấm một mã màn để chuyển thẳng tới màn đó, thuật toán đang chạy (nếu có) bị hủy. Bấm ra ngoài lưới, Esc hoặc Ctrl+K để đóng. Màn đã thắng trong lần chạy này có chấm xanh ở góc nút.}
 \end{figure}
 
 \subsection{4.7. Camera và bố cục màn hình}
@@ -325,7 +325,7 @@ Camera chuyển góc mượt bằng nội suy mỗi khung hình. Khi nghiêng ng
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 4.10}]{hinh/h4-10-goc-camera.png}
-\caption{Hình 4.10. Màn 23 ở ba góc nhìn: nghiêng trái 40° (cao 52°), nghiêng phải 20° hạ thấp còn 30°, và nhìn từ đỉnh. Ở cả ba góc, phím ↑ vẫn đẩy khối về phía trên màn hình.}
+\caption{\captionlabel{Hình 4.10.} Màn 23 ở ba góc nhìn: nghiêng trái 40° (cao 52°), nghiêng phải 20° hạ thấp còn 30°, và nhìn từ đỉnh. Ở cả ba góc, phím ↑ vẫn đẩy khối về phía trên màn hình.}
 \end{figure}
 
 \textbf{Bố cục khi khung kết quả hiện.} Khung kết quả nằm ở cột bên trái, gọn theo nội dung: rộng vừa các chỉ số khi giải bằng một thuật toán, rộng vừa bảng khi So sánh (vị trí cột tính theo bề rộng chữ thật). Bàn chỉ bị dời hoặc thu khi thật sự bị khung che: giao diện chiếu các góc ô qua camera để biết bàn chiếm đoạn nào trên màn hình. Nếu bàn đã nằm ngoài khung thì giữ nguyên; nếu chạm khung thì ưu tiên dời ngang (bằng độ lệch ống kính, góc nhìn không đổi), chỉ khi dời không đủ mới lùi camera, và chỉ lùi vừa đủ để bàn nằm gọn giữa khung và cột nút (Hình 4.6, 4.8). Đổi góc camera trong lúc khung đang hiện thì bàn được đo và căn lại. Phím H ẩn khung; kết quả lần giải mới luôn hiện lại khung.
@@ -342,7 +342,7 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
+\rowcolor{tablehead}\begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Kiểm tra}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Kết quả}
