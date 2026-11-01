@@ -6,4 +6,5 @@ Trò chơi được mô hình hóa thành bài toán tìm kiếm có trạng th�
 
 Thực nghiệm chạy năm cấu hình trên 33 màn của trò chơi gốc (chia năm nhóm độ khó) và 14 màn tự sinh. Cả bốn thuật toán giải được 33/33 màn gốc. BFS cho số bước tối ưu; UCS và A* cho tổng chi phí tối ưu ở mọi màn; DFS mở rộng ít nút nhất nhưng lời giải dài gấp 1,73 lần tối ưu theo trung vị. A* với $h_P$ mở rộng ít hơn UCS 7,3 % số nút và phát hiện màn không có lời giải mà không mở rộng nút nào.
 
-Video demo: xem link trên trang bìa.
+- **Mã nguồn (GitHub):** [https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver](https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver)
+- **Video demo (YouTube):** [https://youtu.be/UM20h791R6E](https://youtu.be/UM20h791R6E) (và trên trang bìa).

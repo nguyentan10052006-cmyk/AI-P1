@@ -20,7 +20,7 @@ Theo đề bài [1] (mục 3.6), điểm cá nhân bằng điểm nhóm nhân v�
 
 ### 1.3. Tiến độ và cách làm việc
 
-Nhóm làm việc trên một repository GitHub chung. Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (khoảng 250 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
+Nhóm làm việc trên một repository GitHub chung: [https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver](https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver). Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (hơn 200 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
 
 **Bảng 1.2.** Các mốc tiến độ.
 

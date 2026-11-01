@@ -9,6 +9,7 @@ Bloxorz {[}2{]} đặt một khối 1×1×2 trên một bàn ô vuông. Khối b
 Mỗi loại ô xử lý khối theo một cách riêng (Bảng 2.1).
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2315}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
@@ -60,10 +61,10 @@ Cầu đang đóng & \texttt{b} & rơi & rơi & rơi \\
 \rowrule
 Cầu đang mở & \texttt{B} & được & được & được \\
 \rowrule
-Công tắc mềm & \texttt{o} & kích hoạt & kích hoạt & kích hoạt \\
-\rowrule
-Công tắc nặng & \texttt{x} & kích hoạt & không kích hoạt & không kích hoạt \\
-\rowrule
+Công tắc mềm & \texttt{o} & kích hoạt & kích hoạt & kích hoạt \\*
+\rowrulenb
+Công tắc nặng & \texttt{x} & kích hoạt & không kích hoạt & không kích hoạt \\*
+\rowrulenb
 Công tắc tách & \texttt{@} & tách khối & không có tác dụng & không có tác dụng \\
 \end{longtable}
 
@@ -107,6 +108,7 @@ Mỗi công tắc mềm hoặc nặng nối với một hoặc nhiều ô cầu,
 
 Công tắc tách có trường \texttt{targets} gồm hai ô. Khi khối nguyên đứng lên công tắc, khối tách thành hai khối con đặt tại hai ô đó (mục 2.6). Định dạng file màn cho phép công tắc tách nối thêm cầu; khi đó cầu đổi trạng thái trước, rồi khối mới tách. Không màn gốc nào dùng trường hợp này.
 
+\Needspace{12\baselineskip}
 \begin{longtable}[]{@{}llllll@{}}
 \caption{\captionlabel{Bảng 2.2.} Số công tắc trong 33 màn gốc, theo loại và kiểu tác động.}\tabularnewline
 \toprule\noalign{}
@@ -197,6 +199,7 @@ Trạng thái không lưu ba thông tin sau, vì chúng không cần thiết:
 
 Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợp có thể có. Duyệt hết các trạng thái tới được từ trạng thái đầu (không đi tiếp từ trạng thái đích), 33 màn gốc có tổng cộng 70 062 trạng thái (Bảng 2.3).
 
+\Needspace{17\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
@@ -243,8 +246,8 @@ Không gian trạng thái thực tế nhỏ hơn nhiều so với số tổ hợ
 2 & G3 & 4 & 380 & 0 & 4 \\
 8 & G5 & 0 & 710 & 573 & 1 \\
 20 & G5 & 6 & 10 856 & 9 814 & 8 \\
-23 & G5 & 8 & 22 847 & 21 712 & 16 \\
-29 & G3 & 17 & 1 817 & 0 & 21 \\
+23 & G5 & 8 & 22 847 & 21 712 & 16 \\*
+29 & G3 & 17 & 1 817 & 0 & 21 \\*
 32 & G3 & 8 & 840 & 0 & 8 \\
 \end{longtable}
 
@@ -267,6 +270,7 @@ Hàm \texttt{Problem.\allowbreak{}actions(state)} trả về mọi hành động
 Hàm chuyển của khối nguyên cho bởi Bảng 2.4: với mỗi tư thế và mỗi hướng lăn là tư thế mới và vị trí ô neo mới.
 
 
+\Needspace{14\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1528}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2118}}
@@ -332,6 +336,7 @@ Bảng này là hằng \texttt{BLOCK\_\allowbreak{}MOVES} trong \texttt{Source/\
 
 Ngoài trạng thái mới, \texttt{step()} trả về danh sách sự kiện theo thứ tự xảy ra (công tắc, ô vỡ, tách, ghép, rơi, thắng). Giao diện chỉ đọc các sự kiện này để vẽ hiệu ứng, không tự tính lại luật (chương 4). Hàm \texttt{Problem.\allowbreak{}result()} của bài toán tìm kiếm gọi đúng hàm \texttt{step()} này.
 
+\Needspace{16\baselineskip}
 \begin{longtable}[]{@{}llll@{}}
 \caption{\captionlabel{Bảng 2.5.} Lời giải BFS của màn 1: \texttt{R D D R R D R}, 7 bước.}\tabularnewline
 \toprule\noalign{}
@@ -349,8 +354,8 @@ Ngoài trạng thái mới, \texttt{step()} trả về danh sách sự kiện th
 2 & D & nằm ngang & (4, 4), (4, 5) \\
 3 & D & nằm ngang & (5, 4), (5, 5) \\
 4 & R & đứng & (5, 6) \\
-5 & R & nằm ngang & (5, 7), (5, 8) \\
-6 & D & nằm ngang & (6, 7), (6, 8) \\
+5 & R & nằm ngang & (5, 7), (5, 8) \\*
+6 & D & nằm ngang & (6, 7), (6, 8) \\*
 7 & R & đứng trên đích & (6, 9) \\
 \end{longtable}
 
@@ -361,6 +366,7 @@ Chỉ khối nguyên đứng trên công tắc tách mới bị tách. Khi đó 
 Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con không làm vỡ ô dễ vỡ; đi vào ô đích cũng không thắng. Khi hai khối con kề cạnh nhau (chung một cạnh), chúng tự ghép thành khối nằm. Nếu cùng hàng thì thành khối nằm ngang với ô neo bên trái; nếu cùng cột thì thành khối nằm dọc với ô neo bên trên. Hai khối con kề chéo thì không ghép.
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1944}}
@@ -408,10 +414,10 @@ Sau khi tách, mỗi bước chỉ một khối con đi một ô. Khối con kh�
 \rowrule
 7 & U2 & nằm dọc & (5, 10), (6, 10) & hai khối con kề cạnh, ghép thành khối nằm dọc \\
 \rowrule
-8 & U & đứng & (4, 10) & \\
-\rowrule
-9 & R & nằm ngang & (4, 11), (4, 12) & \\
-\rowrule
+8 & U & đứng & (4, 10) & \\*
+\rowrulenb
+9 & R & nằm ngang & (4, 11), (4, 12) & \\*
+\rowrulenb
 10 & R & đứng trên đích & (4, 13) & thắng \\
 \end{longtable}
 
@@ -425,6 +431,7 @@ Trạng thái đích là trạng thái khối nguyên đứng có ô neo trùng 
 
 Chi phí của một bước do \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost(s, a, s')} trả về. Khi không truyền hàm chi phí, mỗi bước tốn 1. Giao diện và script thực nghiệm dùng hàm chi phí không đồng nhất trong \texttt{Source/\allowbreak{}bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 2.7), xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đi lên ô dễ vỡ. Định nghĩa đầy đủ và lý do của từng mức được trình bày ở mục 3.3.2 và 3.3.3.
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}ll@{}}
 \caption{\captionlabel{Bảng 2.7.} Chi phí một bước.}\tabularnewline
 \toprule\noalign{}
@@ -441,7 +448,7 @@ Chi phí của một bước do \texttt{Problem.\allowbreak{}step\_\allowbreak{}
 Nằm → đứng & 1,62 \\
 Nằm → nằm (lăn quanh trục dài) & 1,21 \\
 Khối con 1×1×1 lăn một ô (kể cả bước hai khối con ghép lại) & 1,10 \\
-Nằm → đứng lên công tắc tách, rồi tách thành hai khối con & 1,62 \\
+Nằm → đứng lên công tắc tách, rồi tách thành hai khối con & 1,62 \\*
 Thêm khi có phần khối nằm trên ô dễ vỡ & + 0,50 \\
 \end{longtable}
 
@@ -501,9 +508,9 @@ Hàm chuyển & Bảng 2.4 và thứ tự xử lý ở mục 2.5; \texttt{None} 
 \rowrule
 Kiểm tra đích & khối nguyên đứng trên ô đích & \texttt{Problem.\allowbreak{}is\_\allowbreak{}goal()} \\
 \rowrule
-Chi phí bước & Bảng 2.7, mọi bước ≥ 1 & \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost()}, \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} \\
-\rowrule
-Heuristic & \(h_M\) và \(h_P\) (mục 3.4) & \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py} \\
-\rowrule
+Chi phí bước & Bảng 2.7, mọi bước ≥ 1 & \texttt{Problem.\allowbreak{}step\_\allowbreak{}cost()}, \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} \\*
+\rowrulenb
+Heuristic & \(h_M\) và \(h_P\) (mục 3.4) & \texttt{solvers/\allowbreak{}heuristics.\allowbreak{}py} \\*
+\rowrulenb
 Tránh lặp & tập đã thăm (BFS, DFS); bảng \texttt{best\_\allowbreak{}g} (UCS, A*) & \texttt{solvers/\allowbreak{}*.\allowbreak{}py} \\
 \end{longtable}

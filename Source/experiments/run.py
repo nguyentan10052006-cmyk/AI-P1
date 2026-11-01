@@ -70,7 +70,7 @@ DEFAULT_OUT = SOURCE_DIR / "experiments"
 DEFAULT_ALGORITHMS = ("bfs", "dfs", "ucs", "astar", "astar_m")
 # Hàm chi phí (docs/04 §2: path_cost của cả 4 thuật toán tính bằng hàm chi phí của UCS).
 # "energy" là bloxorz.costs.compute_step_cost (V13); "unit" là 1 mỗi bước, như trước khi nối V13.
-# Dòng lệnh mặc định "energy" (hàm chi phí chính thức, như GUI và web); run_experiment() mặc định "unit"
+# Dòng lệnh mặc định "energy" (hàm chi phí chính thức, như GUI); run_experiment() mặc định "unit"
 # cho các test dùng solver giả.
 COSTS = ("energy", "unit")
 

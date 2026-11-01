@@ -15,7 +15,7 @@ Thư mục này chứa nội dung báo cáo, mỗi phần một file, viết b�
 | 9 | 6. Kết luận | [6-ket-luan.md](6-ket-luan.md) |
 | 10 | Tài liệu tham khảo | [tai-lieu-tham-khao.md](tai-lieu-tham-khao.md) |
 | 11 | Phụ lục A. Kết quả thực nghiệm đầy đủ | [phu-luc-a-ket-qua.md](phu-luc-a-ket-qua.md) |
-| 12 | Phụ lục B. Sử dụng công cụ AI | [phu-luc-b-ai.md](phu-luc-b-ai.md) (đã gộp phần của TV1, TV2, TV4, TV5 từ các file `phu-luc-b-tv*.md`) |
+| 12 | Phụ lục B. Sử dụng công cụ AI | [phu-luc-b-ai.md](phu-luc-b-ai.md) (đã gộp đủ phần của cả năm thành viên TV1–TV5 từ các file `phu-luc-b-tv*.md`) |
 
 Quy ước khi sửa:
 

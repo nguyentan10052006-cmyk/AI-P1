@@ -17,6 +17,7 @@ c(s, a, s') = c_{\text{lăn}}\big(o(s), o(s')\big) + \begin{cases} 0{,}5 & \text
 trong đó \(o(s)\) là tư thế của khối ở trạng thái \(s\), và \(\text{cells}(s')\) là các ô khối chiếm sau bước đi. Bảng 3.3.1 cho \(c_{\text{lăn}}\).
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2917}}
@@ -111,6 +112,7 @@ Công cần để lật khối là công nâng trọng tâm từ độ cao lúc 
 \textbf{Hàm chi phí làm UCS chọn đường khác BFS ở đâu.} Trên 33 màn gốc, UCS và BFS luôn có cùng số bước, nhưng có tổng chi phí khác nhau ở 2 màn (Bảng 3.3.2). Ở màn 17, đường của UCS dựng khối đứng ít hơn một lần, thay bằng hai lần lăn khối nằm: bớt một bước ``nằm → đứng'' (1,62) và một bước ``đứng → nằm'' (1,12), thêm hai bước ``nằm → nằm'' (2 × 1,21), tức rẻ hơn 0,32. Ở màn 23, đường của UCS đè lên ô dễ vỡ 21 lần thay vì 23 lần, nên rẻ hơn 2 × 0,5 = 1,00. Test \texttt{test\_\allowbreak{}branching\_\allowbreak{}decisions\_\allowbreak{}on\_\allowbreak{}levels\_\allowbreak{}17\_\allowbreak{}and\_\allowbreak{}23} kiểm tra hai trường hợp này.
 
 
+\Needspace{12\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
@@ -213,6 +215,7 @@ Gọi \(S\) là tập trạng thái tới được, \(b \le 8\) là số hành �
   \textbf{Đếm chỉ số theo quy ước chung} (mục 3.1.3): \texttt{generated} đếm mọi con hợp lệ trước khi xét \texttt{best\_\allowbreak{}g}; \texttt{visited} là số khóa của \texttt{best\_\allowbreak{}g}, tính cả trạng thái đầu.
 \end{enumerate}
 
+\Needspace{18\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.0833}}
@@ -274,8 +277,8 @@ Gọi \(S\) là tập trạng thái tới được, \(b \le 8\) là số hành �
 8 & G5 & 10 & 12,60 & 594 & 412 & 3 343 & 135 & 656 \\
 17 & G3 & 106 & 140,10 & 988 & 977 & 2 429 & 47 & 992 \\
 20 & G5 & 56 & 70,68 & 4 438 & 3 983 & 23 550 & 366 & 4 800 \\
-23 & G5 & 75 & 100,58 & 3 755 & 3 692 & 20 060 & 190 & 3 831 \\
-29 & G3 & 104 & 140,24 & 1 811 & 1 809 & 4 007 & 48 & 1 816 \\
+23 & G5 & 75 & 100,58 & 3 755 & 3 692 & 20 060 & 190 & 3 831 \\*
+29 & G3 & 104 & 140,24 & 1 811 & 1 809 & 4 007 & 48 & 1 816 \\*
 32 & G3 & 129 & 168,57 & 626 & 626 & 1 308 & 18 & 632 \\
 \end{longtable}
 
