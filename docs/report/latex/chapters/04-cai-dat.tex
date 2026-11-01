@@ -2,15 +2,13 @@
 
 \subsection{4.1. Công nghệ}
 
-Toàn bộ chương trình viết bằng \textbf{Python 3.11} {[}9{]}. Giao diện 3D dùng \textbf{Ursina 7.0.0} {[}10{]}, một engine game chạy trên \textbf{Panda3D 1.10.16} {[}11{]}. Nhóm chọn Ursina vì ba lý do:
+Toàn bộ chương trình viết bằng \textbf{Python 3.11} {[}9{]}. Giao diện 3D dùng \textbf{Ursina 7.0.0} {[}10{]}, một engine game chạy trên \textbf{Panda3D 1.10.16} {[}11{]}. Nhóm chọn Ursina vì hai lý do:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
   Cùng ngôn ngữ với engine và thuật toán, nên giao diện gọi thẳng hàm luật chơi của nhóm, không phải viết lại luật hay dựng thêm một lớp giao tiếp.
-\item
-  Bản demo đầu tiên dùng giao diện web (Three.js {[}14{]}, phông chữ Baloo 2 và Nunito {[}15{]}) gọi engine qua server HTTP. Cách đó đẹp hơn nhưng phải giữ thêm server, API và mã JavaScript; khi chuyển sang Ursina, nhóm không dùng phần này nữa.
 \item
   Ursina đủ để dựng bàn 3D có hoạt ảnh lăn, tách, ghép và rơi. Một nhóm khóa trước cùng môn đã dùng Ursina cho đề tài này; nhóm tham khảo danh sách lỗi hay gặp của họ, không dùng lại code {[}8{]}.
 \end{enumerate}
@@ -34,6 +32,7 @@ Chương trình chia thành ba lớp, phụ thuộc theo một chiều:
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2639}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4306}}
@@ -66,6 +65,7 @@ Các file của \texttt{gui/\allowbreak{}} chia việc như sau:
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3056}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6944}}@{}}
@@ -91,10 +91,10 @@ Các file của \texttt{gui/\allowbreak{}} chia việc như sau:
 \rowrule
 \texttt{popup.\allowbreak{}py} & Hộp kết thúc màn (thắng, rơi) với các nút hành động tiếp theo; kéo thả được \\
 \rowrule
-\texttt{theme.\allowbreak{}py} & Font Be Vietnam Pro (thư mục \texttt{fonts/\allowbreak{}}) và thẻ kiểu kính mờ dùng chung \\
-\rowrule
-\texttt{meshes.\allowbreak{}py} & Mesh hộp vát cạnh cho ô và khối, tạo một lần rồi dùng lại \\
-\rowrule
+\texttt{theme.\allowbreak{}py} & Font Be Vietnam Pro (thư mục \texttt{fonts/\allowbreak{}}) và thẻ kiểu kính mờ dùng chung \\*
+\rowrulenb
+\texttt{meshes.\allowbreak{}py} & Mesh hộp vát cạnh cho ô và khối, tạo một lần rồi dùng lại \\*
+\rowrulenb
 \texttt{anim.\allowbreak{}py} & Hoạt ảnh hẹn giờ dừng được, an toàn khi đổi màn (lỗi của Ursina 7, mục 4.5) \\
 \end{longtable}
 }
@@ -135,6 +135,7 @@ Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như b�
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3472}}
@@ -174,10 +175,10 @@ Công tắc mềm & \texttt{o} & Sàn có đĩa tròn trắng \\
 \rowrule
 Công tắc nặng & \texttt{x} & Sàn có hình X đỏ \\
 \rowrule
-Công tắc tách & \texttt{@} & Sàn có hình ``( )'' xanh \\
-\rowrule
-Cầu mở & \texttt{B} (hoặc \texttt{b} sau khi mở) & Khối hộp màu gỗ \\
-\rowrule
+Công tắc tách & \texttt{@} & Sàn có hình ``( )'' xanh \\*
+\rowrulenb
+Cầu mở & \texttt{B} (hoặc \texttt{b} sau khi mở) & Khối hộp màu gỗ \\*
+\rowrulenb
 Cầu đóng & \texttt{b} (hoặc \texttt{B} sau khi đóng) & Khối hộp sẫm, gần trong suốt, nhìn rõ chỗ có cầu \\
 \end{longtable}
 
@@ -219,6 +220,7 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
@@ -250,10 +252,10 @@ Ctrl+K & Mở hoặc đóng lưới chọn màn \\
 \rowrule
 Enter & Nút chính của hộp kết thúc màn \\
 \rowrule
-G & Bảng chú giải các loại ô (Hình 4.11) \\
-\rowrule
-F1 & Bảng tất cả phím tắt \\
-\rowrule
+G & Bảng chú giải các loại ô (Hình 4.11) \\*
+\rowrulenb
+F1 & Bảng tất cả phím tắt \\*
+\rowrulenb
 Esc & Đóng hộp kết thúc màn, lưới chọn màn, bảng phím tắt hoặc bảng chú giải \\
 \end{longtable}
 }
@@ -338,6 +340,7 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}

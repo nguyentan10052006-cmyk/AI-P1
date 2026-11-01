@@ -26,10 +26,6 @@
 
 [13] The Be Vietnam Pro Project Authors, *Be Vietnam Pro* (phông chữ của giao diện), giấy phép SIL Open Font License 1.1. [Trực tuyến]. Địa chỉ: https://github.com/bettergui/BeVietnamPro
 
-[14] three.js authors, *three.js* r160, kèm `OrbitControls.js` và `RoundedBoxGeometry.js`, giấy phép MIT. [Trực tuyến]. Địa chỉ: https://threejs.org
-
-[15] The Baloo 2 Project Authors, *Baloo 2*, và The Nunito Project Authors, *Nunito* (phông chữ), giấy phép SIL Open Font License 1.1. [Trực tuyến]. Địa chỉ: https://github.com/EkType/Baloo2, https://github.com/googlefonts/nunito
-
 **Ghi chú về nguồn 8.** Bài của một nhóm khóa trước cùng môn, không có giấy phép. Nhóm chỉ lấy ý tưởng (bài học về thực nghiệm, nút So sánh, các lỗi hay gặp với Ursina, sân trống lớn và màn không lời giải), không dùng code, asset hay dữ liệu màn.
 
-**Ghi chú về nguồn 3 đến 6.** Dữ liệu 33 màn gốc được chuyển tự động từ nguồn [3] (giấy phép GPL-3.0); ba nguồn [4], [5], [6] chỉ dùng để đối chiếu từng ô của các màn (mục 5.2). **Nguồn 14 và 15** chỉ dùng trong bản demo giao diện web đầu tiên (thư mục `Source/web/`), không dùng trong giao diện Ursina.
+**Ghi chú về nguồn 3 đến 6.** Dữ liệu 33 màn gốc được chuyển tự động từ nguồn [3] (giấy phép GPL-3.0); ba nguồn [4], [5], [6] chỉ dùng để đối chiếu từng ô của các màn (mục 5.2).

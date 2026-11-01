@@ -25,6 +25,7 @@ Chương này so sánh năm cấu hình thuật toán trên cùng một bộ mà
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{11\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1250}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4028}}
@@ -61,6 +62,7 @@ Thời điểm kiểm tra đích làm thay đổi số nút mở rộng: BFS và
 \textbf{Chỉ số.} Bốn chỉ số đề bắt buộc (thời gian tìm kiếm, bộ nhớ đỉnh, số nút mở rộng, độ dài lời giải), cộng năm chỉ số để giải thích kết quả.
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2778}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1944}}
@@ -104,8 +106,8 @@ Bộ nhớ đỉnh & \texttt{peak\_\allowbreak{}mem\_\allowbreak{}kb} & Đỉnh 
 \rowrule
 Thời gian tìm kiếm & \texttt{search\_\allowbreak{}ms} & Thời gian chạy \texttt{search()}, trung vị 5 lần \\
 \rowrule
-Tổng thời gian & \texttt{total\_\allowbreak{}ms} & Từ lúc đọc file màn tới khi có lời giải: nạp màn, dựng bài toán, \texttt{prepare()}, \texttt{search()}; trung vị 5 lần \\
-\rowrule
+Tổng thời gian & \texttt{total\_\allowbreak{}ms} & Từ lúc đọc file màn tới khi có lời giải: nạp màn, dựng bài toán, \texttt{prepare()}, \texttt{search()}; trung vị 5 lần \\*
+\rowrulenb
 Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}solution}, \texttt{timeout}, \texttt{invalid} \\
 \end{longtable}
 
@@ -138,6 +140,7 @@ Kết quả & \texttt{status} & \texttt{solved}, \texttt{no\_\allowbreak{}soluti
 \end{itemize}
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4722}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5278}}@{}}
@@ -176,8 +179,8 @@ Giới hạn thời gian & 60 giây mỗi lần chạy \\
 \rowrule
 Hàm chi phí & \texttt{bloxorz/\allowbreak{}costs.\allowbreak{}py} (Bảng 3.3.1), bước tách khối 1,62; \texttt{run.\allowbreak{}py -\allowbreak{}-\allowbreak{}cost energy}, ghi ở khóa \texttt{cost} trong \texttt{run\_\allowbreak{}info.\allowbreak{}json} \\
 \rowrule
-Thời gian chạy toàn bộ & 9 phút 34 giây (04:43:38 → 04:53:12 UTC, 31/10/2026) \\
-\rowrule
+Thời gian chạy toàn bộ & 9 phút 34 giây (04:43:38 → 04:53:12 UTC, 31/10/2026) \\*
+\rowrulenb
 Cảnh báo, lần đo bộ nhớ thất bại & 0, 0 \\
 \end{longtable}
 
@@ -262,6 +265,7 @@ python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>  
 Đề gợi ý bốn nhóm: không có ô đặc biệt, có ô dễ vỡ, có công tắc, và kết hợp. Nhóm tách thêm các màn có công tắc tách thành nhóm riêng (G5), vì khi khối bị tách, trạng thái gồm hai khối con và không gian trạng thái khác hẳn.
 
 
+\Needspace{19\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0833}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2639}}
@@ -315,6 +319,7 @@ Sáu màn 17, 23, 25, 29, 30, 31 có công tắc nối nhiều ô cầu với ki
 \textbf{14 màn tự sinh.} 33 màn gốc nhỏ, thời gian giải chỉ vài mili-giây nên dễ nhiễu, và khó thấy khác biệt giữa các thuật toán. Ba nhóm màn sinh bằng script cho số liệu ở quy mô lớn hơn, mỗi nhóm trả lời một câu hỏi ở mục 5.1.
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1840}}
@@ -378,6 +383,7 @@ Mọi số liệu trong mục này lấy từ lần đo ngày 31/10, commit \tex
 
 Ở nhóm G5, cột tổng chi phí và số liệu của UCS, A* phụ thuộc chi phí của bước tách khối (1,62; lý do ở mục 3.3.3).
 
+\Needspace{14\baselineskip}
 \begin{longtable}[]{@{}lllllll@{}}
 \caption{\captionlabel{Bảng 5.5.} Trung vị số nút mở rộng theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
@@ -397,6 +403,7 @@ G4 & 3 & 552 & 261 & 557 & 543 & 548 \\
 G5 & 10 & 2 851 & 658 & 3 268 & 2 900 & 3 088 \\
 \end{longtable}
 
+\Needspace{14\baselineskip}
 \begin{longtable}[]{@{}lllllll@{}}
 \caption{\captionlabel{Bảng 5.6.} Trung vị thời gian tìm kiếm (ms) theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
@@ -416,6 +423,7 @@ G4 & 3 & 8,18 & 3,91 & 9,93 & 10,26 & 10,06 \\
 G5 & 10 & 92,16 & 19,32 & 126,06 & 117,57 & 128,37 \\
 \end{longtable}
 
+\Needspace{14\baselineskip}
 \begin{longtable}[]{@{}lllllll@{}}
 \caption{\captionlabel{Bảng 5.7.} Trung vị bộ nhớ đỉnh (KB) theo nhóm màn gốc.}\tabularnewline
 \toprule\noalign{}
@@ -435,6 +443,7 @@ G4 & 3 & 223,0 & 105,3 & 222,8 & 229,1 & 220,8 \\
 G5 & 10 & 1 160,2 & 459,5 & 1 418,9 & 1 342,4 & 1 376,0 \\
 \end{longtable}
 
+\Needspace{15\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1389}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0972}}
@@ -479,6 +488,7 @@ A* (\(h_P\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
 A* (\(h_M\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
 \end{longtable}
 
+\Needspace{15\baselineskip}
 \begin{longtable}[]{@{}llll@{}}
 \caption{\captionlabel{Bảng 5.9.} Trung vị số nút mở rộng của UCS và A* theo nhóm, và trung vị hệ số phân nhánh hiệu dụng \(b^*\) trên 33 màn gốc.}\tabularnewline
 \toprule\noalign{}
@@ -494,8 +504,8 @@ A* (\(h_M\)) & 33/33 & 33/33 & 33/33 & 100,0 \% \\
 G1 & 90 & 84 & 84 \\
 G2 & 103 & 100 & 100 \\
 G3 & 328 & 311 & 310 \\
-G4 & 557 & 548 & 543 \\
-G5 & 3 268 & 3 088 & 2 900 \\
+G4 & 557 & 548 & 543 \\*
+G5 & 3 268 & 3 088 & 2 900 \\*
 \(b^*\) & 1,080 & 1,080 & 1,080 \\
 \end{longtable}
 
@@ -526,19 +536,19 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.5}]{hinh/h5-5-astar-so-voi-ucs.png}
-\caption{\captionlabel{Hình 5.5.} Số nút của A}
+\caption{\captionlabel{Hình 5.5.} Số nút của A* chia cho số nút của UCS. Cả hai heuristic bớt nút ở 31/33 màn và bằng UCS ở màn 11 và 18. Trung vị mức bớt theo màn là 5,7 \% với \(h_P\) và 4,3 \% với \(h_M\); lớn nhất 60,6 \% ở màn 01.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.6}]{hinh/h5-6-theo-nhom.png}
-\caption{\captionlabel{Hình 5.6.} Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A}
+\caption{\captionlabel{Hình 5.6.} Trung vị số nút mở rộng theo nhóm, thang tuyến tính. Nhóm G5 (công tắc tách) lớn nhất ở mọi thuật toán: so với G4, gấp 5,2 lần với BFS, 5,9 lần với UCS, 5,3 lần với A* (\(h_P\)), 5,6 lần với A* (\(h_M\)), và 2,5 lần với DFS.}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={Hình 5.7}]{hinh/h5-7-san-trong-s1.png}
-\caption{\captionlabel{Hình 5.7.} Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ \(3N^2\) nút (2,59 \(N^2\) ở N = 10, 2,99 \(N^2\) ở N = 200). Đường của UCS và A}
+\caption{\captionlabel{Hình 5.7.} Số nút mở rộng theo kích thước sân N (S1). BFS mở rộng xấp xỉ \(3N^2\) nút (2,59 \(N^2\) ở N = 10, 2,99 \(N^2\) ở N = 200). Đường của UCS và A* gần như trùng BFS; DFS thấp hơn.}
 \end{figure}
 
 \begin{figure}
@@ -551,6 +561,7 @@ G5 & 3 268 & 3 088 & 2 900 \\
 
 
 {\def\LTcaptype{none} % do not increment counter
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1111}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1194}}
@@ -600,10 +611,10 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \rowrule
 \texttt{s3\_\allowbreak{}50} & DFS & no\_solution & & 7 400 & 7 400 & 123,51 & 3 003,11 \\
 \rowrule
-\texttt{s3\_\allowbreak{}50} & UCS & no\_solution & & 7 400 & 7 400 & 164,30 & 3 081,45 \\
-\rowrule
-\texttt{s3\_\allowbreak{}50} & A* (\(h_P\)) & no\_solution & & 0 & 1 & 0,01 & 13,98 \\
-\rowrule
+\texttt{s3\_\allowbreak{}50} & UCS & no\_solution & & 7 400 & 7 400 & 164,30 & 3 081,45 \\*
+\rowrulenb
+\texttt{s3\_\allowbreak{}50} & A* (\(h_P\)) & no\_solution & & 0 & 1 & 0,01 & 13,98 \\*
+\rowrulenb
 \texttt{s3\_\allowbreak{}50} & A* (\(h_M\)) & no\_solution & & 7 400 & 7 400 & 184,18 & 3 107,64 \\
 \end{longtable}
 }
@@ -635,6 +646,7 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \end{itemize}
 
 
+\Needspace{22\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2222}}
@@ -691,10 +703,10 @@ G5 & 3 268 & 3 088 & 2 900 \\
 \rowrule
 23 & 99,96 → 100,58 & +0,62 & 3 804 → 3 755 & 3 682 → 3 682 & 3 737 → 3 711 \\
 \rowrule
-24 & 75,69 → 76,31 & +0,62 & 518 → 523 & 502 → 504 & 508 → 511 \\
-\rowrule
-26 & 124,26 → 125,50 & +1,24 & 4 910 → 4 910 & 4 704 → 4 704 & 4 778 → 4 778 \\
-\rowrule
+24 & 75,69 → 76,31 & +0,62 & 518 → 523 & 502 → 504 & 508 → 511 \\*
+\rowrulenb
+26 & 124,26 → 125,50 & +1,24 & 4 910 → 4 910 & 4 704 → 4 704 & 4 778 → 4 778 \\*
+\rowrulenb
 28 & 127,35 → 127,97 & +0,62 & 3 603 → 3 603 & 3 397 → 3 397 & 3 434 → 3 434 \\
 \end{longtable}
 

@@ -5,6 +5,7 @@
 Nhóm 9 có năm thành viên. Nhóm chia việc theo hướng mỗi người một thuật toán: bốn thành viên mỗi người phụ trách một thuật toán tìm kiếm (BFS, DFS, UCS, A*) cùng một phần dùng chung của engine, màn chơi hoặc thực nghiệm; thành viên thứ năm làm giao diện 3D. Phần dùng chung được chia thành các nhóm việc, mỗi nhóm việc có một người chủ chịu trách nhiệm và một người đọc chéo. Các mã TV1 đến TV5 được dùng trong toàn báo cáo (Bảng 1.1).
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1458}}
@@ -69,9 +70,10 @@ Theo đề bài {[}1{]} (mục 3.6), điểm cá nhân bằng điểm nhóm nhâ
 
 \subsection{1.3. Tiến độ và cách làm việc}
 
-Nhóm làm việc trên một repository GitHub chung. Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (khoảng 250 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
+Nhóm làm việc trên một repository GitHub chung: \href{https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver}{\url{https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver}}. Mỗi việc làm trên một nhánh riêng, rồi gộp vào nhánh chính qua pull request; trước khi gộp, toàn bộ test (hơn 200 test, chạy được cả khi máy chưa cài Ursina) phải qua. Tiến độ được theo dõi trên một bảng tính Google Sheets chung. Dự án chia thành ba mốc kiểm tra trước ngày nộp (Bảng 1.2).
 
 
+\Needspace{16\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1528}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1389}}
@@ -115,6 +117,7 @@ Nộp & 31/10 & Lần đo chính thức, báo cáo hoàn chỉnh, video, kiểm 
 Bảng 1.3 đến 1.7 liệt kê việc của từng thành viên, kèm mốc và hạn.
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
@@ -161,14 +164,15 @@ V09 & BFS giải đủ 33 màn & M2 & 25/10 \\
 \rowrule
 V26 & Chương 2 Mô hình hóa bài toán và mục 3.1 BFS & M3 & 27/10 \\
 \rowrule
-V31 & Nhận xét kết quả BFS (mục 5.4.1) & M3 & 28/10 \\
-\rowrule
-V37 & Kiểm thử cài đặt theo README trong môi trường mới & Nộp & 29/10 \\
-\rowrule
+V31 & Nhận xét kết quả BFS (mục 5.4.1) & M3 & 28/10 \\*
+\rowrulenb
+V37 & Kiểm thử cài đặt theo README trong môi trường mới & Nộp & 29/10 \\*
+\rowrulenb
 V38 & Đóng gói file nộp & Nộp & 30/10 \\
 \end{longtable}
 
 
+\Needspace{17\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
@@ -211,14 +215,15 @@ V11 & DFS giải đủ 33 màn & M2 & 25/10 \\
 \rowrule
 V24 & Chạy thử 4 thuật toán × 33 màn, thêm A* với \(h_M\) và bộ màn tự sinh & M2 & 25/10 \\
 \rowrule
-V25 & Chạy chính thức; bảng và biểu đồ & M3 & 27/10 \\
-\rowrule
-V27 & Mục 3.2 DFS và chương 5 Thực nghiệm (5.1--5.3, 5.5) & M3 & 28/10 \\
-\rowrule
+V25 & Chạy chính thức; bảng và biểu đồ & M3 & 27/10 \\*
+\rowrulenb
+V27 & Mục 3.2 DFS và chương 5 Thực nghiệm (5.1--5.3, 5.5) & M3 & 28/10 \\*
+\rowrulenb
 V32 & Nhận xét kết quả DFS (mục 5.4.2) & M3 & 28/10 \\
 \end{longtable}
 
 
+\Needspace{19\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
@@ -263,14 +268,15 @@ V40 & Bộ màn tự sinh S1--S3, dùng BFS kiểm tra & M2 & 24/10 \\
 \rowrule
 V14 & UCS giải đủ 33 màn & M2 & 25/10 \\
 \rowrule
-V28 & Mục 3.3 UCS và hàm chi phí & M3 & 27/10 \\
-\rowrule
-V33 & Nhận xét kết quả UCS (mục 5.4.3) & M3 & 28/10 \\
-\rowrule
+V28 & Mục 3.3 UCS và hàm chi phí & M3 & 27/10 \\*
+\rowrulenb
+V33 & Nhận xét kết quả UCS (mục 5.4.3) & M3 & 28/10 \\*
+\rowrulenb
 V36 & Kịch bản, quay, phụ đề, đăng YouTube công khai & Nộp & 29/10 \\
 \end{longtable}
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
@@ -311,14 +317,15 @@ V16 & Heuristic \(h_M\) và \(h_P\) chấp nhận được với hàm chi phí (
 \rowrule
 V17 & A* giải đủ 33 màn & M2 & 25/10 \\
 \rowrule
-V29 & Mục 3.4 A*, heuristic và chứng minh & M3 & 27/10 \\
-\rowrule
-V34 & Nhận xét kết quả A* (mục 5.4.4) & M3 & 28/10 \\
-\rowrule
+V29 & Mục 3.4 A*, heuristic và chứng minh & M3 & 27/10 \\*
+\rowrulenb
+V34 & Nhận xét kết quả A* (mục 5.4.4) & M3 & 28/10 \\*
+\rowrulenb
 V35 & Ghép báo cáo; chương 1, chương 6; tài liệu tham khảo; phụ lục AI; xuất PDF & Nộp & 30/10 \\
 \end{longtable}
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.0694}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.7639}}
@@ -357,9 +364,9 @@ V19 & Chơi tay bằng engine thật (lăn, rơi, thắng) & M1 & 21/10 \\
 \rowrule
 V20 & Hiển thị ô đặc biệt, cầu, tách khối; Space đổi khối & M2 & 24/10 \\
 \rowrule
-V21 & New Game, Restart, chọn 33 màn, nút Giải cho từng thuật toán, nút So sánh và nút Hủy, khối tự lăn, hiện kết quả & M2 & 25/10 \\
-\rowrule
-V22 & main.py, README, requirements.txt & M3 & 27/10 \\
-\rowrule
+V21 & New Game, Restart, chọn 33 màn, nút Giải cho từng thuật toán, nút So sánh và nút Hủy, khối tự lăn, hiện kết quả & M2 & 25/10 \\*
+\rowrulenb
+V22 & main.py, README, requirements.txt & M3 & 27/10 \\*
+\rowrulenb
 V30 & Chương 4 Cài đặt và giao diện & M3 & 27/10 \\
 \end{longtable}

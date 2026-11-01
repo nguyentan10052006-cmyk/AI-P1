@@ -1,6 +1,6 @@
 ## Phụ lục B. Sử dụng công cụ AI
 
-Đề yêu cầu nêu rõ công cụ AI đã dùng, prompt và kết quả của AI được dùng vào đâu [1, mục 3.6]. Mỗi thành viên tự ghi phần của mình; prompt được trích **nguyên văn** từ lịch sử phiên làm việc lưu trên máy của từng người. Phụ lục gồm bảng công cụ (B.1), việc dùng AI của từng thành viên kèm ví dụ prompt (B.2) và các nguyên tắc nhóm áp dụng (B.3).
+Đề yêu cầu nêu rõ công cụ AI đã dùng, prompt và kết quả của AI được dùng vào đâu [1, mục 3.6]. Mỗi thành viên tự ghi phần của mình; prompt được trích **nguyên văn** từ lịch sử phiên làm việc lưu trên máy của từng người, riêng TV4 lấy từ bảng theo dõi việc dùng AI của nhóm. Số test ghi trong các bảng (ví dụ "246 test qua") là số test của repository tại thời điểm chạy; trước khi nộp, nhóm gỡ phần code thử nghiệm ban đầu không thuộc bài nộp cùng 29 test đi kèm, nên bản nộp có 217 test, đều qua. Phụ lục gồm bảng công cụ (B.1), việc dùng AI của từng thành viên kèm ví dụ prompt (B.2) và các nguyên tắc nhóm áp dụng (B.3).
 
 ### B.1. Công cụ
 
@@ -8,10 +8,10 @@
 
 | Công cụ | Ai dùng | Dùng cho |
 |---|---|---|
-| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.300–2.1.312, mô hình `claude-opus-5-5` | TV1 (15/10–31/10) | Xem B.2, phần TV1 |
+| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.300–2.1.314, mô hình `claude-opus-5-5` | TV1 (15/10–01/11) | Xem B.2, phần TV1 |
 | Claude Code trên web (claude.ai/code, Anthropic) | TV1 (19/10) | Bản cân bằng lại phân công ngày 19/10 (commit `84c5a4e`) |
-| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.301–2.1.310, mô hình `claude-opus-5-5` | TV2 (19/10–31/10) | Xem B.2, phần TV2 |
-| [TV3 điền: công cụ AI đã dùng, hoặc ghi "không dùng"]{.dien} | TV3 | |
+| Claude Code (Anthropic), tiện ích VS Code, bản 2.1.301–2.1.310, mô hình `claude-opus-5-5` | TV2 (19/10–01/11) | Xem B.2, phần TV2 |
+| Antigravity (Google DeepMind), tiện ích IDE, mô hình Gemini (Gemini 3.8 Flash / Pro) | TV3 (21/10–31/10) | Xem B.2, phần TV3 |
 | Claude Code (Anthropic) | TV4 (20/10–26/10) | Xem B.2, phần TV4 |
 | Claude Code (Anthropic), giao diện dòng lệnh, bản 2.1.303–2.1.310, mô hình `claude-opus-5-5` | TV5 (19/10–29/10) | Xem B.2, phần TV5 |
 
@@ -34,7 +34,7 @@ TV1 làm các việc sau:
 
 | Ngày | Việc | Kết quả dùng vào đâu | Kiểm tra lại |
 |---|---|---|---|
-| 15–18/10 | Tạo repository; slide cho buổi họp đầu tiên; code luyện tập (engine, giao diện web demo, 18 màn tự thiết kế) | Repository nhóm; bản demo đầu, vào nhánh chính qua PR #1 | Chạy thử demo; toàn bộ test của bản luyện tập |
+| 15–18/10 | Tạo repository; slide cho buổi họp đầu tiên; bản engine đầu tiên (bảng lăn, rơi, thắng) | Repository nhóm; `bloxorz/`, vào nhánh chính qua PR #1 | Toàn bộ test của engine |
 | 18–19/10 | Soạn bộ tài liệu nhóm `docs/01`–`06` và 7 file CSV cho Google Sheet; đối chiếu dữ liệu 33 màn gốc từ bốn nguồn và tính cột "Bước tối ưu"; cân bằng lại phân công | `docs/`, Google Sheet "AI-P1" | Đối chiếu từng ô với bốn nguồn [3]–[6]; cột "Bước tối ưu" tính bằng BFS |
 | 20/10 | BFS (V08): cài đặt, quy ước đếm chỉ số, mã giả | `solvers/bfs.py`, `tests/test_bfs.py`; PR #3 | Đếm `expanded`, `generated`, `max_frontier`, `visited` trên mê cung nhỏ, so với kết quả tính tay |
 | 21/10 | Test engine lõi T01–T06 (V02): bảng chuyển 12 trường hợp, rơi, thắng, phát lại lời giải | `tests/test_rules.py`; PR #5 | Toàn bộ test qua |
@@ -43,6 +43,7 @@ TV1 làm các việc sau:
 | 25/10 | Test T24: BFS trên đủ 33 màn gốc (V09); khung báo cáo LaTeX; nháp chương 2 và mục 3.1 | `tests/test_bfs.py`; PR #12; bản nháp riêng | BFS khớp số bước tối ưu ở 33/33 màn, lời giải phát lại tới đích |
 | 30/10 | Đánh giá bài của nhóm theo thang điểm của đề; cập nhật chương 2 và mục 3.1 theo code mới nhất; viết mục 5.4.1 và phần này; thử cài theo README trong môi trường ảo mới (V37) | `docs/report/2-mo-hinh-hoa.md`, `3.1-bfs.md`, `5.4-nhan-xet-bfs.md`, `phu-luc-b-tv1.md` | Mọi ví dụ và con số được chạy lại bằng engine và script thực nghiệm ở commit `44dc9e3`; trên bản cài mới, 205/206 test qua (test còn lại cần thư mục `.git`) và giao diện import được |
 | 31/10 | Ghép báo cáo và xuất PDF. Viết mục 3.3 (UCS và hàm chi phí) và 5.4.3 (nhận xét UCS), là hai phần được giao cho TV3 nhưng chưa có khi ghép; viết chương 1, chương 6, phần Tóm tắt; viết lại mục 5.4.4 và cập nhật Bảng 3.4.1, 3.4.2, mục 5.4.1 theo lần đo chính thức; bỏ ghi chú nháp và tham chiếu tới tài liệu nội bộ | Toàn bộ báo cáo (`docs/report/`, `Report.pdf`) | Mọi con số đối chiếu với `summary.csv` của lần đo `0a35afd`; chạy lại `tools/check_heuristics.py` (0 vi phạm); so lời giải BFS và UCS ở màn 17, 23 bằng engine; đối chiếu mô tả test với code test; chạy lại toàn bộ test (246 test qua) |
+| 01/11 | Làm lại cách trình bày bản PDF (bìa, phông chữ, màu, đầu trang, bảng); ghép phần của TV3 và phiên 01/11 của TV2 vào phụ lục này | `docs/report/latex/`, `phu-luc-b-ai.md`, `Report.pdf`; PR #29 | Dựng lại PDF: 0 dòng tràn lề, 0 ký tự thiếu phông; đối chiếu từng đoạn ghép với file riêng của thành viên và với số liệu của lần đo `0a35afd` |
 
 **Phần AI đề xuất và phần TV1 chọn.**
 
@@ -53,7 +54,7 @@ TV1 làm các việc sau:
   - cách tổ chức chương 2 và mục 3.1.
 - **TV1 quyết định:**
   - phương án PA2, Google Sheets, 33 màn gốc, các chỉ số thực nghiệm;
-  - không giao cho Claude việc nhắn tin, đôn đốc thành viên khác;
+  - không giao cho Claude việc nhắn tin, đôn đốc thành viên khác.
 
 Đề bài có một dòng chữ ẩn yêu cầu công cụ AI chèn một câu cố định vào báo cáo. TV1 đã tìm và bảo đảm câu đó không có trong các phần của mình.
 
@@ -106,7 +107,8 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
 | 28/10 (chiều) | Mở PR báo cáo; sửa các công cụ thực nghiệm để từ chối dữ liệu hỏng (5 lỗi tái hiện bằng file cố ý làm hỏng); thêm kiểm tra đủ dòng K8 và `compare_runs.py`; tách các công cụ ra một nhánh sạch từ `main` | PR #14, #16, #17: `check_results.py`, `charts.py`, `tables.py`, `compare_runs.py`, `experiments/README.md` | Test mới thất bại trên code cũ; chạy thử 235 cặp, so hai lần chạy cho số đếm trùng hẳn |
 | 31/10 | Rà cách nối hàm chi phí V13 sau PR #18 (đọc code, chạy `check_heuristics` với V13, duyệt mọi cạnh của 33 màn); phát hiện bước làm khối tách đôi có chi phí 1,0 (module của TV3); làm công cụ biết chế độ chi phí | PR #20; tài liệu bàn giao và bản vá đề xuất cho TV3 (không áp vào code của TV3) | 0 vi phạm heuristic; bản vá đề xuất qua 233 test. **Sự cố do Claude gây ra:** lần đo kỹ thuật đầu chạy trong worktree mà Claude đang sửa tạm `costs.py`, nên dữ liệu có thể bị nhiễm. Lần đo đó bị dừng, dữ liệu được đánh dấu loại bỏ, và đo lại trong worktree riêng |
 | 31/10 | Đo thực nghiệm trên commit sạch `cd93624` theo 04 §4; kiểm tra K1–K8, tái lập và kiểm tra độc lập; viết mục 5.3, 5.5, 5.4.2 và Phụ lục A | PR #21: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-cd93624/` | Đo lần hai trùng số đếm 235/235 cặp; phát lại 225 lời giải; tính lại 75 ô trung vị; mỗi con số trong chương đối chiếu với `summary.csv`. Rà lại chương trước khi merge và sửa 3 câu không khớp số liệu |
-| 31/10 (trưa, chiều) | Theo cho phép của TV2, đặt chi phí bước làm khối tách đôi bằng 1,62 (bằng nằm → đứng) trong `costs.py`, kèm test hồi quy. Đây là quyết định áp dụng để hoàn thiện phép đo; TV3 chưa review. Đo lại trên commit `0a35afd`; cập nhật chương 5, 5.4.2, Phụ lục A và hình; ghi khác biệt trước và sau khi sửa | PR #23 (`bloxorz/costs.py`, `tests/test_costs_split.py`, `tests/test_ucs.py`); PR #24: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-0a35afd/` | 3 test mới thất bại trên code cũ, qua trên code mới; cả bộ test qua (246 OK, 1 skip). K1–K8 PASS. So với lần đo `cd93624`: chỉ 50 cặp của 10 màn G5 khác, số bước không đổi. Đo lần hai trùng số đếm 235/235 cặp; kiểm tra độc lập 0 lệch. Rà lại chương và sửa thêm chú thích Hình 5.6 (ghi "thang log" trong khi hình dùng thang tuyến tính) |
+| 31/10 (trưa, chiều) | Theo cho phép của TV2, đặt chi phí bước làm khối tách đôi bằng 1,62 (bằng nằm → đứng) trong `costs.py`, kèm test hồi quy. Đây là quyết định áp dụng để hoàn thiện phép đo; TV3 chưa review. Đo lại trên commit `0a35afd`; cập nhật chương 5, 5.4.2, Phụ lục A và hình; ghi khác biệt trước và sau khi sửa | PR #23 (`bloxorz/costs.py`, `tests/test_costs_split.py`, `tests/test_ucs.py`); PR #24: chương 5, Phụ lục A, `Source/experiments/benchmark-2026-10-31-0a35afd/` | 3 test mới thất bại trên code cũ, qua trên code mới; cả bộ test qua (246 test, 1 bỏ qua). K1–K8 PASS. So với lần đo `cd93624`: chỉ 50 cặp của 10 màn G5 khác, số bước không đổi. Đo lần hai trùng số đếm 235/235 cặp; kiểm tra độc lập 0 lệch. Rà lại chương và sửa thêm chú thích Hình 5.6 (ghi "thang log" trong khi hình dùng thang tuyến tính) |
+| 01/11 | Kiểm tra cuối trước khi nộp: đối chiếu `main` sau các PR #25–#29 của nhóm với dữ liệu đo `0a35afd` (Phụ lục A đã dịch, chương 5, 5.4.2, 3.2, 8 hình, bản LaTeX); chạy lại test và các bước kiểm tra. Tìm ra chú thích Hình 5.5–5.7 bị cắt trong bản dựng PDF (dấu * của "A*" đóng chữ nghiêng) và một câu ở Bảng 5.11 chưa khớp số liệu | PR #30: `docs/report/5-thuc-nghiem.md` | Phụ lục A: 235/235 dòng, 0 ô lệch với `summary.csv`; 8 hình trùng từng byte với hình của lần đo; cả bộ test qua (246 test, 1 bỏ qua); K1–K8 PASS; kiểm tra độc lập 0 lệch. Dựng thử chương 5 bằng pandoc 3.9: ba chú thích ra đủ |
 
 **Phần AI đề xuất và phần TV2 chọn.**
 - **Claude đề xuất,** TV2 đồng ý qua prompt tiếp theo:
@@ -119,13 +121,11 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
   - chờ PR #10 merge rồi mới làm tiếp V23;
   - tên nhánh `feature/Tien/M1`;
   - cho phép push các nhánh `feature/Tien/M1`, `feature/Tien/V23`, `feature/Tien/V23-fixes` và mở PR #10, #11, #13;
-  - cho phép push và mở PR #14, #16, #17, #20, #21, #22, #23, #24. #10, #11, #13, #14, #16, #17 do TV1 merge;
+  - cho phép push và mở PR #14, #16, #17, #20, #21, #22, #23, #24, #30. #10, #11, #13, #14, #16, #17 do TV1 merge;
   - ngày 31/10, cho phép tự review và tự merge **chỉ** PR #20 và #21, với điều kiện test đạt, không xung đột, không có số liệu giả; Claude thực hiện việc merge qua tài khoản GitHub của TV2;
   - ngày 31/10 (11:34), cho phép tự quyết chi phí bước tách bằng 1,62, chạy lại phần thực nghiệm bị ảnh hưởng, tự review và merge PR #22 và các thay đổi TV2. Kèm điều kiện: không đổi chi phí của các hành động khác; không sửa để số liệu khớp kết quả mong muốn; ghi rõ trong báo cáo rằng đây là quyết định áp dụng để hoàn thiện phép đo, không khẳng định TV3 đã review hay phê duyệt;
   - giữ nguyên các quyết định khác thuộc người khác: bố cục S2 (TV3), định dạng file kết quả Q1–Q7 (nhóm), dòng chi phí bước tách trong Bảng 2.7 (TV1). Báo cáo ghi rõ phần số liệu phụ thuộc các quyết định này;
   - không giao cho Claude các việc thuộc người khác, ngoài mức chi phí bước tách nói trên: phần còn lại của hàm chi phí V13, định dạng file kết quả chung, xác nhận bộ màn S1–S3.
-
-*(TV2 bổ sung trước khi nộp: các lần tự chạy lại test hoặc tự đọc code ngoài phiên Claude Code, nếu có.)*
 
 **Ví dụ prompt của TV2 (trích nguyên văn).**
 
@@ -189,10 +189,166 @@ Prompt giao việc có giới hạn quyền, 28/10 12:28 (đoạn mở đầu):
 | 31/10 10:50 | `# FINAL PROMPT — HOÀN THIỆN TV2, TÍCH HỢP PR #20/#21, CHẠY BENCHMARK VÀ TỔNG KẾT DỰ ÁN BLOXORZ SOLVER` |
 | 31/10 11:34 | `# BỔ SUNG QUYỀN TỰ QUYẾT VÀ HOÀN TẤT TV2` |
 | 31/10 14:23 | `Tiếp tục ở trạng thái hiện tại` |
+| 01/11 12:02 | `# FINAL AUDIT — KIỂM TRA VÀ CHỐT TOÀN BỘ PHẦN VIỆC TV2 TRƯỚC KHI NỘP AI PROJECT 1` |
 
 #### TV3 (Nguyễn Bảo Trọng)
 
-[TV3 điền: đã dùng công cụ AI nào cho bộ nạp màn, ô đặc biệt, UCS, hàm chi phí và bộ màn tự sinh; dùng vào đâu; kiểm tra lại thế nào; kèm một vài prompt trích nguyên văn. Nếu không dùng AI thì ghi rõ.]{.dien}
+Dùng Antigravity (Google DeepMind), mô hình Gemini (Gemini 3.8 Flash / Pro), chạy trong môi trường IDE gắn với repository. Antigravity đọc tài liệu đặc tả và code của nhóm, đề xuất giải pháp, hỗ trợ viết code và thiết kế hàm chi phí, viết test, chạy kiểm thử và thao tác Git theo từng yêu cầu của TV3. Phần lớn code UCS, hàm chi phí, bộ nạp màn và bộ sinh màn của TV3 được viết với sự hỗ trợ của Antigravity, theo các ràng buộc TV3 đặt ra.
+
+TV3 làm các việc sau:
+- viết prompt; chia mục tiêu lớn thành kế hoạch chi tiết và danh sách kiểm tra (checklist) trước khi cho phép Antigravity viết code (V03, V05, V12, V13, V14, V40, V36);
+- quản lý nhánh Git: khi Antigravity đề xuất gộp chung các việc vào một nhánh `feature/TV3/M1`, TV3 yêu cầu dừng lại ("chỉ phân tích và trả lời, chưa thực hiện bất cứ điều gì"), phân tích sự độc lập giữa tầng engine (V03) và tầng solver (V12), rồi tách thành hai nhánh riêng `feature/TV3/V03-level-loader` và `feature/trong/V12-ucs` (tên đã chuẩn hóa), để mỗi nhánh ứng với đúng một việc trên Google Sheet và TV1, TV2, TV5 tích hợp được bộ nạp màn sớm, không phụ thuộc tiến độ của UCS;
+- quyết định lưu trường `passcode` của `Level` dạng chuỗi 6 chữ số để giữ các số 0 ở đầu (màn 5, 9, 15, 16, 24);
+- giám sát và quyết định nguyên lý vật lý của hàm chi phí không đồng nhất V13: mô hình hóa theo công cơ học nâng trọng tâm khối hộp $1 \times 1 \times 2$ khi đổi tư thế ($\Delta h$), cộng phụ phí rủi ro 0,50 khi có phần khối nằm trên ô dễ vỡ;
+- đặt bất biến (invariant) cho hàm chi phí: yêu cầu Antigravity bảo đảm mọi bước có chi phí $c(s, a, s') \ge 1$, để heuristic $h(n)$ do TV4 thiết kế cho A* vẫn chấp nhận được (admissible);
+- giữ tương thích ngược: `Problem.step_cost` mặc định trả về 1 khi không truyền `cost_fn`, nên test và phép đếm số bước của BFS (TV1) và DFS (TV2) không bị ảnh hưởng;
+- kiểm soát phạm vi và yêu cầu phân tích tổng thể đồ án: ngày 23/10, yêu cầu Antigravity không tự ý sửa code ("chỉ thảo luận, không làm thêm bất cứ gì hết"), đọc lại toàn bộ đề bài (`AI - Project 1.pdf`), phân tích kiến trúc nhiều tầng (giao diện, engine, solver), làm rõ cơ chế tương tác giữa giao diện và các thuật toán khi chạy, và mục đích học thuật của bốn thuật toán;
+- phát hiện các điểm thiếu sót trong quá trình làm việc: nhắc Antigravity bổ sung việc rà soát ô đặc biệt (V05), đính chính trạng thái hoàn thành của V12 và V13, yêu cầu thiết kế bộ test riêng;
+- đặt quy trình kiểm thử trước khi gộp code: kiểm thử đơn vị → gộp vào nhánh tích hợp `integration/M2` → kiểm tra chéo heuristic với TV4 → gộp vào `main`;
+- trực tiếp yêu cầu kiểm thử toàn diện 5 tầng (cả bộ 246 test qua) và kiểm tra tính tái lập của dữ liệu thực nghiệm trước khi chốt mã nguồn.
+
+Mọi lần chạy test và kiểm tra dưới đây được chạy trong phiên làm việc trên máy của TV3.
+
+| Ngày | Việc | Kết quả dùng vào đâu | Kiểm tra lại |
+|---|---|---|---|
+| 21/10 (chiều) | Bộ nạp màn đọc `links` (công tắc nối nhiều cầu, hiệu ứng `toggle`, `open`, `close`) cho 6 màn 17, 23, 25, 29, 30, 31; thêm `passcode` vào `Level`; cập nhật `_apply_switch` trong `rules.py` và `serialize.py`; viết test T14 và test kiểm tra file màn (V03); tách nhánh Git | `bloxorz/level.py`, `rules.py`, `serialize.py`, `tests/test_rules.py`; nhánh `feature/TV3/V03-level-loader`, commit `ad4b30e` | `test_original_levels.py` qua 15/15 (nạp đủ 33 màn gốc), `test_rules.py` qua 27/27, cả bộ 130 test qua; T14 xác nhận cầu đổi đúng trạng thái qua các lần bấm |
+| 21/10 (tối) | Lập kế hoạch kèm checklist cho UCS trên `GridMaze` (V12): hàng đợi ưu tiên `heapq` với bộ `(g, order, state)`, xóa trễ (lazy deletion) qua `best_g`, kiểm tra đích khi lấy nút ra khỏi frontier, quy ước đếm bốn chỉ số thực nghiệm | Bản kế hoạch `ke_hoach_v12_ucs.md` (artifact của Antigravity, không nộp) | Đối chiếu với mục 3.4.2 của [7] và quy ước đếm ở `docs/04` §3; xác minh tính tối ưu trên mê cung có trọng số `weighted` (chọn đường vòng 10 bước chi phí 10 thay vì đường thẳng 6 bước chi phí 46) |
+| 22/10 | Đổi tên nhánh thành `feature/trong/V12-ucs`; cài UCS trong `solvers/ucs.py`, kế thừa lớp `Solver`, theo checklist ngày 21/10 (V12) | `solvers/ucs.py`; nhánh `feature/trong/V12-ucs`, commit `e8c472c` | `tests/test_solvers.py` qua cả 4 mê cung mẫu (`open`, `walls`, `weighted`, `no_solution`), chi phí khớp kết quả tính tay; cả bộ 111 test qua |
+| 23/10 | Phân tích đề bài và repository, không sửa code: luồng tương tác giữa giao diện Ursina, engine và solver, cách chạy solver nền không chặn (`runner.py`), vai trò của bốn thuật toán; phát hiện dòng chữ ẩn trong đề yêu cầu công cụ AI chèn một câu cố định. Rà soát và hoàn thiện xử lý ô đặc biệt (V05): ô dễ vỡ, công tắc mềm và nặng, cầu `toggle`, `open`, `close`, cầu đóng dưới chân khối | Tài liệu phân tích riêng của TV3 (không nộp); `bloxorz/rules.py`, `tests/test_rules.py`, `tests/test_spec.py` | Code và tài liệu của TV3 không chứa câu mà dòng chữ ẩn yêu cầu; test T07–T16 qua; màn 2, 4, 5, 7, 11, 13 giải đúng số bước tham khảo; `test_spec.py` qua 26/26 |
+| 28/10 (chiều) | Thiết kế và cài hàm chi phí không đồng nhất V13 theo độ nâng trọng tâm; nối vào `Problem.step_cost` | `bloxorz/costs.py`, `bloxorz/problem.py`, `tests/test_costs.py`; commit `828eaed` | `test_costs.py` qua 7/7; mọi bước có chi phí ≥ 1; chi phí mặc định 1 giữ nguyên kết quả các test cũ của TV1, TV2 |
+| 28/10 (chiều, tối) | UCS trên 33 màn gốc (V14), tìm ra lời giải rẻ hơn BFS ở màn 17, 23; script sinh 14 màn S1–S3 để kiểm tra khả năng mở rộng (V40) | `tests/test_ucs.py`, `experiments/gen_levels.py`, `tests/test_gen_levels.py`, `levels/gen/`; commit `cc3fa6a` | `test_ucs.py` qua 7/7: với chi phí 1, số bước khớp số bước tối ưu của BFS; với chi phí V13, màn 17 (106 bước) BFS 140,42, UCS 140,10; màn 23 (75 bước) BFS 100,96, UCS 99,96 (khi bước tách còn tính 1,0, trước PR #23). Sinh đủ 14 file JSON; BFS xác nhận S1, S2 giải được, S3 vô nghiệm |
+| 28/10 (tối) | Gộp các việc của TV3 vào nhánh tích hợp `integration/M2` để kiểm thử chung với code của TV4, TV5 | Commit `04d8a9a` trên `integration/M2` | Cả bộ 203 test qua trên `integration/M2`, không xung đột |
+| 31/10 | Lấy code `main` mới nhất (commit `a205b99`) và kiểm thử 5 tầng; sửa lỗi mã hóa cp1258 khi `charts.py` in ra console trên Windows; soạn kịch bản và trang giới thiệu cho video demo (V36) | `experiments/charts.py` (commit `8b72e74`); kịch bản và trang giới thiệu dùng cho video demo | Cả bộ 246 test qua; `check_heuristics.py` 0 vi phạm trên 340 414 cạnh; K1–K8 PASS; lần đo lại trùng hoàn toàn số đếm; sinh thử bảng và 8 biểu đồ; giao diện Ursina khởi tạo được ở chế độ không cửa sổ (headless) |
+
+**Phần AI đề xuất và phần TV3 chọn.**
+- **Antigravity đề xuất,** TV3 đồng ý qua prompt tiếp theo:
+  - lưu liên kết của công tắc dạng `NamedTuple` bất biến (`cell`, `effect`) trong `Switch`, vẫn đọc được định dạng cũ `bridges` kèm `effect`;
+  - hàng đợi ưu tiên của UCS dùng `heapq` với phần tử `(g, order, state)`, `order` lấy từ `itertools.count()` để không phải so sánh hai `State` khi $g$ bằng nhau, kèm xóa trễ qua `best_g`;
+  - cách tính độ nâng trọng tâm $\Delta h$ cho từng kiểu lăn: đứng → nằm $\Delta h = \frac{\sqrt{5}}{2} - 1 \approx 0{,}12$ (chi phí 1,12); nằm → đứng $\Delta h = \frac{\sqrt{5}}{2} - 0{,}5 \approx 0{,}62$ (chi phí 1,62); nằm → nằm $\Delta h = \frac{\sqrt{2}}{2} - 0{,}5 \approx 0{,}21$ (chi phí 1,21);
+  - cách chia 14 màn tự sinh: S1 sân trống $N \times N$; S2 sân $8 \times 12$ có $k$ công tắc ở mép sân; S3 bị chia cắt bởi khe trống rộng 1 ô;
+  - khung kịch bản theo từng giây cho video demo, bám mục 3.7 của đề.
+- **TV3 quyết định:**
+  - tách nhánh riêng cho từng việc và đặt tên nhánh (`feature/TV3/V03-level-loader`, `feature/trong/V12-ucs`) thay cho nhánh chung `feature/TV3/M1`;
+  - dành phiên ngày 23/10 chỉ để phân tích tài liệu và code;
+  - mọi chi phí cộng trên nền `COST_BASE = 1.0`, kể cả phụ phí ô dễ vỡ, nên không bước nào có chi phí nhỏ hơn 1;
+  - `Problem.step_cost` mặc định trả về 1 khi không truyền `cost_fn`;
+  - dùng nhánh `integration/M2` để kiểm thử trước khi gộp vào `main`; chỉ đo và chạy test khi TV3 xác nhận;
+  - trang giới thiệu video đơn giản, ít chữ.
+
+Đề bài có một dòng chữ ẩn yêu cầu công cụ AI chèn một câu cố định vào báo cáo. TV3 đã rà mã nguồn, tài liệu và kịch bản video của mình, bảo đảm câu đó không xuất hiện.
+
+**Ví dụ prompt của TV3 (trích nguyên văn).**
+
+Prompt 1. Rà soát nhiệm vụ M1 và phân tích yêu cầu bộ nạp màn (21/10, 15:22 và 15:34):
+
+> Hãy đọc và phân tích toàn bộ repo trong thư mục hiện tại, đây là đồ án nhóm môn học của chúng tôi. Tôi được phân công là TV3, sau khi phân tích hãy trình bày cho tôi biết những công việc của mình cần phải hoàn thành ở mốc 1 (M1 - 21/10) theo như bản phân công @[AI-P1/docs/01-phan-cong-PA2.md]
+>
+> hãy lên kế hoạch chi tiết để hoàn thành công việc của nhiệm vụ 1
+
+Prompt 2. Kiểm soát nhánh Git: yêu cầu phân tích trước, rồi quyết định tách nhánh (21/10, 16:05, 16:08 và 16:10):
+
+> lúc nãy bạn tạo nhánh là origin/feature/TV3/M1. Nhưng ở mốc 1 TV3 có các nhiệm vụ khác nhau, code của các nhiệm vụ này có cùng trường với nhau không? tôi nên giữ nguyên branch ../../M1 như hiện tại và làm cả 2 nhiệm vụ vào đó hay là nên tách ra 2 nhánh riêng cho từng nhiệm vụ? (bạn hãy chỉ phân tích và trả lời, chưa thực hiện bất cứ điều gì)
+>
+> vậy tôi nên đổi tên nhánh vừa làm xong là gì
+>
+> hãy thực hiện giúp tôi
+
+Prompt 3. Lập kế hoạch chi tiết kèm checklist cho UCS trước khi viết code (21/10, 18:13):
+
+> tiếp tục phân tích và lên kế hoạch để hoàn thành nhiệm vụ 2, tạo một tab kế hoạch chi tiết bao gồm check list để tôi kiểm soát (chỉ plan chứ chưa thực hiện)
+
+Prompt 4. Chuẩn hóa tên nhánh và triển khai UCS theo checklist (22/10, 13:45 và 14:23):
+
+> sửa đổi một chút ở tên nhánh: "feature/TV3/V12-ucs" thành "feature/trong/V12-ucs". Tiến hành thực hiện
+>
+> thử lại
+
+Prompt 5. Giới hạn ở mức thảo luận, yêu cầu phân tích tổng thể đồ án từ đề bài (23/10, 11:49):
+
+> tôi muốn hiểu một cách tổng quát và chi tiết hơn về đồ án đang làm của nhóm, hãy cùng tôi phân tích và thảo luận để hiểu rõ hơn (chỉ thảo luận, không làm thêm bất cứ gì hết). Hãy phân tích lại toàn bộ dự án, đặt biệt là phân tích kỹ file @[AI-P1/docs/AI - Project 1.pdf] để hiểu rõ nhất về yêu cầu đồ án, tiếp theo là phần tích lại toàn bộ repo để hiểu được những gì nhóm đang triển khai. Sau đó trình bày chi tiết cho tôi trong một file .md
+
+Prompt 6. Làm rõ cơ chế tương tác giữa giao diện, hệ thống và thuật toán (23/10, 12:17 và 12:19):
+
+> bạn hãy trình bày rõ hơn về cách hoạt động của dự án, tương tác giữa giao diện người chơi và hệ thống, những thuật toán được cài đặt tương tác như thế nào với người chơi, những thuật toán đó phục vụ cho việc gì?
+>
+> trình bày lại vào file md
+
+Prompt 7. Rà soát nhiệm vụ M2, phát hiện thiếu V05 và đính chính tiến độ (28/10, 18:00, 18:05 và 18:10):
+
+> hãy pull code mới nhất về và phân tích lại toàn bộ repo để nắm rõ ngữ cảnh đồ án. Trong đồ án này tôi được phân công là TV3. Sau đó dựa vào file phân công, liệt kê ra các task mà tôi (TV3) cần phải hoàn thành, trong đó tôi đã hoàn thành được 2 task của TV3 là V13, V03.
+>
+> bạn có liệt kê thiếu V05 không?
+>
+> lúc nãy tôi đã bị nhầm, task tôi đã hoàn thành là v03 và v12 chứ không phải là v03 và v13
+
+Prompt 8. Lập kế hoạch chi tiết cho V13 và V05, tức hàm chi phí và ô đặc biệt (28/10, 18:15 và 18:22):
+
+> lên kế hoạch chi tiết để thực hiện V13, V05
+>
+> tiến hành thực hiện
+
+Prompt 9. Lập kế hoạch cho V14 và V40, tức UCS trên 33 màn và bộ màn tự sinh S1–S3 (28/10, 18:30 và 18:35):
+
+> tiếp tục lên kế hoạch chi tiết để thực hiện V14 và V40
+>
+> tiến hành thực hiện kế hoạch trên
+
+Prompt 10. Tích hợp vào nhánh trung gian `integration/M2` (28/10, 19:39):
+
+> nhóm tôi sử dụng nhánh "Integration M2" để test toàn bộ code trước khi merge vào nhánh main. Hãy PR toàn bộ code của tôi (TV3) vào nhánh này
+
+Prompt 11. Kiểm thử 5 tầng, chỉ chạy sau khi TV3 xác nhận (31/10, 19:53 và 20:06):
+
+> hãy pull hết code mới nhất trên github của nhóm về và lên kế hoạch kiểm thử chi tiết (pull và planning, chỉ thực hiện kiểm thử sau khi có xác nhận của tôi)
+>
+> tiến hành
+
+Prompt 12. Xây dựng kịch bản video demo theo yêu cầu chấm điểm của đề (31/10, 21:16):
+
+> đọc kỹ lại phần yêu cầu quay video up youtube trong file mô tả đồ án gốc @[AI-P1/docs/AI - Project 1.pdf] , sau đó lên cho tôi một plan để thực hiện yêu cầu này sao cho đúng với những gì được yêu cầu trong file và có thể được trọn điểm
+
+Prompt 13. Tối giản trang giới thiệu video và chuyển sang file Markdown (31/10, 21:45, 21:48 và 21:52):
+
+> làm lại trang intro trên, yêu cầu: đơn giản, ít chữ, phần các thành viên chỉ cần để tên và mssv, không cần giới thiệu rườm rà, xóa luôn các chú thích ở phía đáy slide
+>
+> làm lại trong một file .md
+>
+> viết hết phần kế hoạch kịch bản lúc nãy của bạn vào một file .md và đặt nó ở ngoài thư mục "AI-P1"
+
+**Danh sách các đợt chính** (nguyên văn):
+
+| Ngày, giờ | Prompt |
+|---|---|
+| 21/10 15:22 | `Hãy đọc và phân tích toàn bộ repo trong thư mục hiện tại, đây là đồ án nhóm môn học của chúng tôi. Tôi được phân công là TV3, sau khi phân tích hãy trình bày cho tôi biết những công việc của mình cần phải hoàn thành ở mốc 1 (M1 - 21/10) theo như bản phân công @[AI-P1/docs/01-phan-cong-PA2.md]` |
+| 21/10 15:34 | `hãy lên kế hoạch chi tiết để hoàn thành công việc của nhiệm vụ 1` |
+| 21/10 15:42 | `hãy tiến hành thực hiện` |
+| 21/10 15:55 | `bạn đã push lên github và tạo pull request chưa?` |
+| 21/10 16:05 | `lúc nãy bạn tạo nhánh là origin/feature/TV3/M1. Nhưng ở mốc 1 TV3 có các nhiệm vụ khác nhau, code của các nhiệm vụ này có cùng trường với nhau không? tôi nên giữ nguyên branch ../../M1 như hiện tại và làm cả 2 nhiệm vụ vào đó hay là nên tách ra 2 nhánh riêng cho từng nhiệm vụ? (bạn hãy chỉ phân tích và trả lời, chưa thực hiện bất cứ điều gì)` |
+| 21/10 16:08 | `vậy tôi nên đổi tên nhánh vừa làm xong là gì` |
+| 21/10 16:10 | `hãy thực hiện giúp tôi` |
+| 21/10 18:13 | `tiếp tục phân tích và lên kế hoạch để hoàn thành nhiệm vụ 2, tạo một tab kế hoạch chi tiết bao gồm check list để tôi kiểm soát (chỉ plan chứ chưa thực hiện)` |
+| 22/10 13:45 | `sửa đổi một chút ở tên nhánh: "feature/TV3/V12-ucs" thành "feature/trong/V12-ucs". Tiến hành thực hiện` |
+| 22/10 14:23 | `thử lại` |
+| 23/10 11:49 | `tôi muốn hiểu một cách tổng quát và chi tiết hơn về đồ án đang làm của nhóm, hãy cùng tôi phân tích và thảo luận để hiểu rõ hơn (chỉ thảo luận, không làm thêm bất cứ gì hết). Hãy phân tích lại toàn bộ dự án, đặt biệt là phân tích kỹ file @[AI-P1/docs/AI - Project 1.pdf] để hiểu rõ nhất về yêu cầu đồ án, tiếp theo là phần tích lại toàn bộ repo để hiểu được những gì nhóm đang triển khai. Sau đó trình bày chi tiết cho tôi trong một file .md` |
+| 23/10 12:17 | `bạn hãy trình bày rõ hơn về cách hoạt động của dự án, tương tác giữa giao diện người chơi và hệ thống, những thuật toán được cài đặt tương tác như thế nào với người chơi, những thuật toán đó phục vụ cho việc gì?` |
+| 23/10 12:19 | `trình bày lại vào file md` |
+| 28/10 18:00 | `hãy pull code mới nhất về và phân tích lại toàn bộ repo để nắm rõ ngữ cảnh đồ án. Trong đồ án này tôi được phân công là TV3. Sau đó dựa vào file phân công, liệt kê ra các task mà tôi (TV3) cần phải hoàn thành, trong đó tôi đã hoàn thành được 2 task của TV3 là V13, V03.` |
+| 28/10 18:05 | `bạn có liệt kê thiếu V05 không?` |
+| 28/10 18:10 | `lúc nãy tôi đã bị nhầm, task tôi đã hoàn thành là v03 và v12 chứ không phải là v03 và v13` |
+| 28/10 18:15 | `lên kế hoạch chi tiết để thực hiện V13, V05` |
+| 28/10 18:22 | `tiến hành thực hiện` |
+| 28/10 18:30 | `tiếp tục lên kế hoạch chi tiết để thực hiện V14 và V40` |
+| 28/10 18:35 | `tiến hành thực hiện kế hoạch trên` |
+| 28/10 19:39 | `nhóm tôi sử dụng nhánh "Integration M2" để test toàn bộ code trước khi merge vào nhánh main. Hãy PR toàn bộ code của tôi (TV3) vào nhánh này` |
+| 31/10 19:53 | `hãy pull hết code mới nhất trên github của nhóm về và lên kế hoạch kiểm thử chi tiết (pull và planning, chỉ thực hiện kiểm thử sau khi có xác nhận của tôi)` |
+| 31/10 20:06 | `tiến hành` |
+| 31/10 20:30 | `hướng dẫn tôi chạy game` |
+| 31/10 21:16 | `đọc kỹ lại phần yêu cầu quay video up youtube trong file mô tả đồ án gốc @[AI-P1/docs/AI - Project 1.pdf] , sau đó lên cho tôi một plan để thực hiện yêu cầu này sao cho đúng với những gì được yêu cầu trong file và có thể được trọn điểm` |
+| 31/10 21:32 | `pull code mới nhất về, vừa có thêm một số update phần gui` |
+| 31/10 21:41 | `tạo cho tôi một slide giới thiệu như bạn đề cập ở phần1 trong kịch bản video` |
+| 31/10 21:45 | `làm lại trang intro trên, yêu cầu: đơn giản, ít chữ, phần các thành viên chỉ cần để tên và mssv, không cần giới thiệu rườm rà, xóa luôn các chú thích ở phía đáy slide` |
+| 31/10 21:48 | `làm lại trong một file .md` |
+| 31/10 21:52 | `viết hết phần kế hoạch kịch bản lúc nãy của bạn vào một file .md và đặt nó ở ngoài thư mục "AI-P1"` |
 
 #### TV4 (Trịnh Vỹ Triết)
 
@@ -200,10 +356,19 @@ Dùng Claude Code để viết code và nháp báo cáo cho các việc sau; m�
 
 | Ngày | Việc | Kết quả dùng vào đâu | Kiểm tra lại |
 |---|---|---|---|
-| 20/10 | Hai biến thể A* (`astar`, `astar_m`); vẽ mê cung mẫu | `solvers/astar.py`, `tools/draw_mazes.py`, `docs/gridmaze/` | Toàn bộ test; xem ảnh SVG |
-| 20/10 | A* trên mê cung (V15), module chạy nền không chặn (V39) | `solvers/astar.py`, `solvers/heuristics.py`, `solvers/runner.py` | Test trên mê cung có đáp án; test runner với tiến trình con thật |
-| 23/10 | $h_P$ cho Bloxorz (V16), A* trên 33 màn (V17) | `solvers/heuristics.py`, `tools/check_heuristics.py` | 0 vi phạm trên 340 414 cạnh; cùng chi phí với UCS ở 33/33 màn |
-| 26/10 | Nháp chương 3.4, mục 5.4 (A*), khung chương 1, 6, tài liệu tham khảo | `docs/report/` | TV4 đọc lại từng bước chứng minh; số liệu lấy từ công cụ đo |
+| 20/10 | Hai biến thể A* (`astar`, `astar_m`); vẽ mê cung mẫu | `solvers/astar.py`, `tools/draw_mazes.py`, `docs/gridmaze/` | Chạy toàn bộ test; xem lại ảnh SVG trên trình duyệt |
+| 20/10 | A* trên mê cung (V15), module chạy nền không chặn (V39) | `solvers/astar.py`, `solvers/heuristics.py`, `solvers/runner.py` | Test trên 4 mê cung mẫu có đáp án; 0 vi phạm tính nhất quán trên 27 176 cạnh; test runner với tiến trình con thật |
+| 23/10 | $h_P$ cho Bloxorz (V16), A* trên 33 màn (V17) | `solvers/heuristics.py`, `tools/check_heuristics.py` | 0 vi phạm tính chấp nhận được và tính nhất quán trên 340 414 cạnh của 33 màn; cùng chi phí với UCS ở 33/33 màn; đọc lại chứng minh |
+| 26/10 | Nháp chương 3.4, mục 5.4 (A*), khung chương 1, 6, tài liệu tham khảo và phụ lục B; tạo nhánh tích hợp `integration/M2` | `docs/report/` | TV4 đọc lại từng bước chứng minh; số liệu lấy từ công cụ đo; rà để bảo đảm câu mà dòng chữ ẩn của đề yêu cầu chèn không có trong phần của TV4 |
+
+**Prompt của TV4** (theo bảng theo dõi việc dùng AI của nhóm; bảng ghi prompt ở dạng tóm tắt hoặc nguyên văn):
+
+| Ngày | Prompt |
+|---|---|
+| 20/10 | Giữ tên astar_m, GUI so sánh được h_M và h_P; visualize các màn GridMaze và đặt vào codebase cho cả nhóm xem |
+| 20/10 | Làm phần công việc của TV4 cho M1 |
+| 23/10 | Làm các phần mốc 2 của TV4, làm trên nhánh feature/triet/structure |
+| 26/10 | Pull commit mới về nhánh, tạo nhánh tích hợp để test trước khi merge vào main, rồi implement các task M3 của TV4 |
 
 #### TV5 (Võ Quốc Trung)
 
@@ -239,8 +404,6 @@ Mọi lần chạy test và kiểm tra dưới đây do Claude chạy trong phi�
   - camera chỉ nhìn từ trên xuống, không xoay 360°; thêm một nấc nghiêng mỗi bên và các nấc hạ thấp góc nhìn;
   - bỏ bóng đổ; màn đang mở phải có màu khác trong lưới chọn màn;
   - tên nhánh, thời điểm push, commit dưới tên TV5; không giao cho Claude việc của thành viên khác (bộ nạp màn, solver, runner).
-
-*(TV5 bổ sung trước khi nộp: các lần tự chạy lại hoặc tự sửa code ngoài phiên Claude Code, nếu có.)*
 
 **Ví dụ prompt của TV5 (trích nguyên văn).**
 

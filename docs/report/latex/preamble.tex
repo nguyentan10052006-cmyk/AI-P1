@@ -12,6 +12,7 @@
 \setdefaultlanguage{vietnamese}
 \usepackage{amsmath,amssymb}
 \usepackage{etoolbox}
+\usepackage{needspace}    % giữ tiêu đề mục con đi cùng nội dung của nó
 \usepackage{float}        % [H]: hình nằm đúng chỗ khai báo
 \usepackage{graphicx}
 \usepackage{booktabs,array,longtable,calc}
@@ -97,6 +98,7 @@
 \linespread{1.14}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.5em}
+\clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000  % không để một dòng lẻ ở đầu hay cuối trang
 \setlength{\emergencystretch}{3em}   % bớt dòng tràn lề khi có nhiều tên hàm không ngắt được
 \setlist[itemize]{leftmargin=1.4em,itemsep=0.15em,topsep=0.2em}
 \setlist[itemize,1]{label={\textcolor{spark}{\small$\blacksquare$}}}
@@ -122,8 +124,12 @@
 \titleformat{\subsubsection}{\sffamily\bfseries\normalsize\color{ink}}{}{0pt}{}
 \titlespacing*{\subsubsection}{0pt}{1.0em}{0.3em}
 \pretocmd{\section}{\clearpage\phantomsection}{}{}
+% Mục con không bắt đầu sát cuối trang: còn dưới 5 dòng thì sang trang sau
+\pretocmd{\subsection}{\Needspace{5\baselineskip}}{}{}
+\pretocmd{\subsubsection}{\Needspace{5\baselineskip}}{}{}
 
 % Mục lục: chương in đậm màu chính, mục con có dấu chấm dẫn
+\makeatletter\renewcommand{\@pnumwidth}{2em}\makeatother  % đủ chỗ cho số trang ba chữ số
 \titlecontents{section}[0pt]{\addvspace{0.75em}\sffamily\bfseries\color{brand}}{}{}
   {\hfill\contentspage}
 \titlecontents{subsection}[1.1em]{\addvspace{0.1em}}{}{}
@@ -168,6 +174,8 @@
 \newcommand{\tablefont}{\small}
 \AtBeginEnvironment{longtable}{\tablefont\renewcommand{\arraystretch}{1.18}\arrayrulecolor{brand}}
 \newcommand{\rowrule}{\arrayrulecolor{brand!18}\specialrule{0.4pt}{0pt}{0pt}\arrayrulecolor{brand}}
+% Như \rowrule nhưng không có khoảng trắng dọc, nên không thể ngắt trang tại đường kẻ (hai hàng cuối bảng dài)
+\newcommand{\rowrulenb}{\noalign{\nobreak{\color{brand!18}\hrule height 0.4pt}\nobreak}}
 \newcounter{none}   % bảng không có chú thích (pandoc dùng \LTcaptype{none})
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
@@ -183,7 +191,8 @@
 
 % --- Hộp ghi chú (> trong Markdown): nền màu nhấn nhạt, bo góc, không viền -------
 \newtcolorbox{notebox}[1][]{enhanced,breakable,colback=notebg,colframe=notebg,
-  boxrule=0pt,arc=5pt,left=11pt,right=11pt,top=7pt,bottom=7pt,#1}
+  boxrule=0pt,arc=5pt,left=11pt,right=11pt,top=7pt,bottom=7pt,
+  before upper={\setlength{\parskip}{0.5em}},#1}   % giữ khoảng cách đoạn: tách các prompt trong một hộp
 \renewenvironment{quote}{\begin{notebox}}{\end{notebox}}
 
 % Chỗ còn phải điền: [chữ]{.dien} trong Markdown (filter.lua) thành chữ đỏ nghiêng

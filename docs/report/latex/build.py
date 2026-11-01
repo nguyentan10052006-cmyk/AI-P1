@@ -9,6 +9,7 @@ Trên WSL, script tự tìm xelatex.exe của MiKTeX bên Windows.
 from __future__ import annotations
 
 import glob
+import math
 import os
 import re
 import shutil
@@ -146,6 +147,75 @@ def style_tables_and_captions(tex: str) -> str:
     return "\n".join(out)
 
 
+SMALL_TABLE = 12                # bảng tối đa 12 hàng, mỗi ô một dòng, thì không tách qua trang
+ROW_PT, LINE_PT = 19.4, 13.6    # đo trên PDF: hàng một dòng; mỗi dòng thêm trong ô
+BODY_PT = 15.4                  # một dòng chữ thân bài
+
+
+def _text_len(tex: str) -> float:
+    """Độ dài hiển thị của một ô bảng tính bằng ký tự thường (bỏ môi trường, lệnh, ngoặc);
+    chữ code rộng hơn chữ thường khoảng 13 %."""
+    code = sum(len(m) for m in re.findall(r"\\texttt\{([^}]*)\}", tex))
+    tex = re.sub(r"\\(?:begin|end)\{[^}]*\}(?:\[[^\]]*\])?", "", tex)
+    tex = re.sub(r"\\[a-zA-Z]+\*?|[{}\\$]", "", tex)
+    return len(" ".join(tex.split())) + 0.13 * code
+
+
+def _row_lines(cells: list[str], fracs: list[float], cpl: float) -> int:
+    """Số dòng chữ của hàng: ô dài nhất so với độ rộng cột của nó."""
+    widths = fracs if len(fracs) == len(cells) else [1 / len(cells)] * len(cells)
+    return max(max(1, math.ceil(_text_len(c) / (w * cpl))) for c, w in zip(cells, widths))
+
+
+def keep_tables_together(tex: str, landscape: bool = False) -> str:
+    """Bảng nhỏ (tối đa 12 hàng mỗi ô một dòng, hoặc tối đa 5 hàng mỗi ô tối đa ba dòng, nên ước tính được
+    chiều cao) không bị tách qua trang:
+    \\Needspace trước bảng đẩy cả bảng sang trang sau khi không đủ chỗ, như hình [H]. Bảng khác chỉ bắt đầu
+    khi trang còn ít nhất 8 dòng, và không để lẻ ở trang sau một, hai hàng thấp (như hàng "Tổng").
+    Dùng \\Needspace (đo và ngắt ngay) chứ không dùng \\needspace: ngắt muộn sau khi longtable đã bắt đầu
+    sẽ lặp hàng tiêu đề bảng lên đầu trang mới."""
+    lines, out, i = tex.split("\n"), [], 0
+    while i < len(lines):
+        if not lines[i].startswith("\\begin{longtable}"):
+            out.append(lines[i])
+            i += 1
+            continue
+        j = next(k for k in range(i, len(lines)) if lines[k].startswith("\\end{longtable}"))
+        block = lines[i:j + 1]
+        text = "\n".join(block)
+        fracs = [float(x) for x in re.findall(r"\\real\{([0-9.]+)\}", text)]
+        head = text.split("\\endfirsthead")[0].split("\\toprule")[-1].split("\\midrule")[0]
+        cols = len(head.split("&"))
+        # số ký tự trên một dòng rộng bằng cả bảng: (bề rộng dòng − đệm ô) / bề rộng trung bình một ký tự
+        cpl = ((700 if landscape else 459) - 12 * cols) / (3.7 if landscape else 4.6)
+        caption = re.search(r"\\caption\{(.*)\}\\tabularnewline", text)
+        start = next(k for k, line in enumerate(block) if line.strip().startswith("\\endlastfoot")) + 1
+        rows = [k for k in range(start, len(block)) if block[k].rstrip().endswith("\\\\")]
+        heights = [ROW_PT + LINE_PT * (_row_lines(block[k].rstrip()[:-2].split(" & "), fracs, cpl) - 1)
+                   for k in rows]
+        pt = 16 + ROW_PT + LINE_PT * (_row_lines(head.split("&"), fracs, cpl) - 1) + sum(heights)
+        if caption:
+            pt += 24 + 16 * math.ceil(_text_len(caption.group(1)) / 90)
+        need = math.ceil(pt / BODY_PT) + 1
+        prev = next((x for x in reversed(out) if x.strip() and not x.lstrip().startswith(("{\\def", "%"))), "")
+        if not prev.startswith(("\\section", "\\subsection", "\\subsubsection")):
+            tallest = max(heights, default=0)
+            small = (len(rows) <= SMALL_TABLE and tallest <= ROW_PT) or (len(rows) <= 5 and tallest <= ROW_PT + 2 * LINE_PT)
+            out.append(f"\\Needspace{{{need if small else min(need, 8)}\\baselineskip}}")
+        protect = []                               # chỗ ngắt cấm dùng, tính từ cuối bảng
+        if len(rows) >= 6 and heights[-1] <= ROW_PT + LINE_PT:
+            protect.append(rows[-2])               # hàng cuối không đứng một mình ở trang sau
+            if heights[-2] <= ROW_PT:
+                protect.append(rows[-3])           # hai hàng cuối cũng vậy
+        for k in protect:
+            block[k] = block[k].rstrip()[:-2] + "\\\\*"
+            if block[k + 1].strip() == "\\rowrule":
+                block[k + 1] = "\\rowrulenb"
+        out.extend(block)
+        i = j + 1
+    return "\n".join(out)
+
+
 def convert() -> None:
     pandoc = find_pandoc()
     OUT.mkdir(exist_ok=True)
@@ -154,13 +224,15 @@ def convert() -> None:
     body = []
     for name, spec, shift in PARTS:
         tex = add_row_rules(to_latex(pandoc, read_part(spec), shift, 130 if name in LANDSCAPE else 72))
-        tex = style_tables_and_captions(tex)
+        tex = keep_tables_together(style_tables_and_captions(tex), name in LANDSCAPE)
         (OUT / f"{name}.tex").write_text(tex, encoding="utf-8")
         if name == APPENDIX_FROM:
             body.append("\\appendix")
         if name in LANDSCAPE:
             body.append(f"\\begin{{landscape}}\\renewcommand{{\\tablefont}}{{\\footnotesize}}"
                         f"\\input{{chapters/{name}}}\\end{{landscape}}")
+        elif name == "90-tai-lieu":  # tài liệu tham khảo in cỡ chữ nhỏ
+            body.append(f"{{\\small\\input{{chapters/{name}}}\\par}}")
         else:
             body.append(f"\\input{{chapters/{name}}}")
     (HERE / "Report.tex").write_text(MAIN.replace("%BODY%", "\n".join(body)), encoding="utf-8")

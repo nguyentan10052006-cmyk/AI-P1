@@ -65,6 +65,7 @@ Năm câu hỏi ở mục 5.1, mỗi câu trả lời theo ba bước: quan sát
 \textbf{Tóm tắt điểm mạnh và điểm yếu.} Bảng 5.11 gom các nhận xét ở mục 5.4 và các câu trả lời trên thành một bảng, kèm số liệu làm căn cứ.
 
 
+\Needspace{8\baselineskip}
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1667}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2778}}
@@ -103,7 +104,7 @@ DFS & Ít nút nhất và nhanh nhất ở 26/33 màn (tổng 565 ms); ít bộ 
 \rowrule
 UCS & Tổng chi phí tối ưu ở 33/33 màn, có bảo đảm; không cần heuristic & Nhiều hơn BFS 5,4 \% số nút, chậm hơn khoảng 30 \%; duyệt hết các trạng thái rẻ hơn lời giải (S2: 828 trạng thái, BFS 414) & Các bước có chi phí khác nhau và chưa có heuristic tốt \\
 \rowrule
-A* với \(h_P\) & Tổng chi phí tối ưu ở 33/33 màn; ít nút hơn UCS ở 31/33 màn (bớt 7,3 \%); kết luận màn không có lời giải mà không mở rộng nút nào & Heuristic đếm số bước nên yếu khi mỗi bước tốn hơn 1; trên sân trống không bớt được nút nào và chậm hơn UCS 2,4 \% & Cần lời giải rẻ nhất; màn có tường, hố, hoặc có thể không có lời giải \\
+A* với \(h_P\) & Tổng chi phí tối ưu ở 33/33 màn; ít nút hơn UCS ở 31/33 màn (bớt 7,3 \%); kết luận màn không có lời giải mà không mở rộng nút nào & Heuristic đếm số bước nên yếu khi mỗi bước tốn hơn 1; trên sân trống gần như không bớt được nút nào (2 nút ở sân 200 × 200) và chậm hơn UCS 2,4 \% & Cần lời giải rẻ nhất; màn có tường, hố, hoặc có thể không có lời giải \\
 \rowrule
 A* với \(h_M\) & Tổng chi phí tối ưu ở 33/33 màn; không cần tiền xử lý & Bớt ít nút hơn \(h_P\) (5,1 \% so với UCS); chậm hơn UCS 2,6 \% vì phải tính khoảng cách tới đích và mọi công tắc tách; không nhận ra ngõ cụt & Làm mốc so sánh cho \(h_P\) \\
 \end{longtable}
