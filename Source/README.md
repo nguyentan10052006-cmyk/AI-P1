@@ -2,6 +2,9 @@
 
 Đồ án CSC14003 Cơ sở Trí tuệ Nhân tạo, Project 1. Trò chơi Bloxorz có giao diện 3D viết bằng Ursina, chơi trên 33 màn gốc của game, với đủ các ô đặc biệt (ô dễ vỡ, cầu, ba loại công tắc, tách và ghép khối) và bốn thuật toán tìm kiếm: BFS, DFS, UCS, A*.
 
+**Mã nguồn (GitHub):** https://github.com/nguyentan10052006-cmyk/Bloxorz-Solver  
+**Video demo (YouTube):** https://youtu.be/UM20h791R6E
+
 ## Cài đặt
 
 Yêu cầu **Python 3.11** (đã thử với 3.11.9). Ursina chạy trên Panda3D; Panda3D thường ra bản cho Python mới chậm hơn, nên dùng đúng 3.11 để tránh lỗi cài đặt.
@@ -105,7 +108,7 @@ UCS và A* dùng hàm chi phí không đồng nhất trong `bloxorz/costs.py` (c
 | Khối con 1×1×1 lăn | 1.10 |
 | Thêm khi có phần khối nằm trên ô dễ vỡ | +0.50 |
 
-Đây là hàm chi phí chính thức của nhóm. Nút Giải, nút So sánh, script thực nghiệm, công cụ kiểm tra heuristic và bản demo web đều dùng hàm này (`COST_FN` trong `gui/app.py`, `--cost` trong `experiments/run.py` và `tools/check_heuristics.py`, `cost_fn` trong `server/api.py`; `--cost unit` để đối chiếu với chi phí 1 mỗi bước), nên cột chi phí của BFS và DFS cũng tính theo cùng hàm để so chất lượng lời giải (docs/04 §2). BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất; trên 33 màn gốc, hai tiêu chí này cho đường khác nhau ở màn 17 và 23.
+Đây là hàm chi phí chính thức của nhóm. Nút Giải, nút So sánh, script thực nghiệm và công cụ kiểm tra heuristic đều dùng hàm này (`COST_FN` trong `gui/app.py`, `--cost` trong `experiments/run.py` và `tools/check_heuristics.py`; `--cost unit` để đối chiếu với chi phí 1 mỗi bước), nên cột chi phí của BFS và DFS cũng tính theo cùng hàm để so chất lượng lời giải. BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất; trên 33 màn gốc, hai tiêu chí này cho đường khác nhau ở màn 17 và 23.
 
 ## Màn chơi
 
@@ -126,9 +129,7 @@ UCS và A* dùng hàm chi phí không đồng nhất trong `bloxorz/costs.py` (c
 
 Ký hiệu trong `grid`: `.` ô trống, `#` sàn, `S` vị trí xuất phát (khối đứng), `G` đích, `F` ô dễ vỡ, `b` / `B` cầu đóng / mở lúc đầu, `o` công tắc mềm, `x` công tắc nặng, `@` công tắc tách. Công tắc mềm và nặng có `effect` (`toggle`, `open`, `close`) và `bridges`; công tắc tách có `targets` là hai ô đích của khối con. Công tắc nối nhiều cầu với hiệu ứng khác nhau dùng `links`: `[{"cell": [r, c], "effect": "open"}, …]`. `bloxorz/level.py` kiểm tra file trước khi chạy và báo lỗi rõ ràng nếu file sai.
 
-`levels/gen/` là bộ màn tự sinh cho thực nghiệm (`python -m experiments.gen_levels`, docs/04 §8): S1 sân trống N × N (N từ 10 tới 200), S2 có k công tắc mềm (k từ 0 tới 10), S3 không có lời giải.
-
-Các file `levels/*.json` ngay trong `levels/` (1-1 … 5-3, T1, T2, B1) là 18 màn tự thiết kế của bản demo đầu, giao diện Ursina chưa dùng (đang chờ nhóm chốt giữ làm màn hướng dẫn hay bỏ).
+`levels/gen/` là bộ màn tự sinh cho thực nghiệm (`python -m experiments.gen_levels`): S1 sân trống N × N (N từ 10 tới 200), S2 có k công tắc mềm (k từ 0 tới 10), S3 không có lời giải.
 
 ## Chạy kiểm thử
 
@@ -137,10 +138,10 @@ cd Source
 python -m unittest discover -v
 ```
 
-Bộ test (khoảng 200 test, chạy chừng 30 giây) gồm:
+Bộ test (217 test, chạy khoảng một phút) gồm:
 
 - luật chơi: bảng chuyển tư thế, rơi, thắng, các loại công tắc, tách và ghép khối (`test_rules.py`, `test_spec.py` với mỗi câu luật trích từ đề);
-- màn chơi: bộ nạp màn, 33 màn gốc, bộ màn tự sinh (`test_levels.py`, `test_original_levels.py`, `test_gen_levels.py`);
+- màn chơi: bộ nạp màn, 33 màn gốc, bộ màn tự sinh (`test_original_levels.py`, `test_gen_levels.py`);
 - thuật toán: mê cung mẫu `GridMaze`, BFS đúng số bước tối ưu trên 33 màn, UCS và A* cùng chi phí, hàm chi phí (`test_solvers.py`, `test_bfs.py`, `test_dfs.py`, `test_ucs.py`, `test_astar.py`, `test_costs.py`);
 - module chạy solver ở tiến trình riêng và script thực nghiệm (`test_runner.py`, `test_experiments.py`).
 
@@ -156,12 +157,12 @@ python -m experiments.run --cost unit --out experiments/unit           # chi ph�
 python tools/check_heuristics.py                   # kiểm tra h_M, h_P chấp nhận được và nhất quán (chi phí V13)
 ```
 
-Mỗi lần đo chạy trong một tiến trình riêng, có giới hạn thời gian (mặc định 60 giây). Thời gian là trung vị của 5 lần chạy không bật `tracemalloc`; bộ nhớ đo ở một lần chạy riêng. Kết quả gồm `raw.csv` (mỗi lần chạy một dòng), `summary.csv` (mỗi cặp màn, thuật toán một dòng, cột theo docs/04 §5) và `run_info.json` (cấu hình máy, commit, hàm chi phí). Mặc định không ghi đè kết quả cũ; thêm `--force` nếu chắc chắn.
+Mỗi lần đo chạy trong một tiến trình riêng, có giới hạn thời gian (mặc định 60 giây). Thời gian là trung vị của 5 lần chạy không bật `tracemalloc`; bộ nhớ đo ở một lần chạy riêng. Kết quả gồm `raw.csv` (mỗi lần chạy một dòng), `summary.csv` (mỗi cặp màn, thuật toán một dòng) và `run_info.json` (cấu hình máy, commit, hàm chi phí). Mặc định không ghi đè kết quả cũ; thêm `--force` nếu chắc chắn.
 
 Kiểm tra chéo, vẽ hình và sinh bảng cho chương 5 (cần `matplotlib`; thứ tự chạy chính thức: `experiments/README.md`):
 
 ```bash
-python -m experiments.check_results experiments/summary.csv   # K1–K8 (docs/04 §6)
+python -m experiments.check_results experiments/summary.csv   # kiểm tra chéo K1–K8
 python -m experiments.charts       # đọc experiments/summary.csv, ghi experiments/figures/ (H1–H6, H8, H9)
 python -m experiments.tables       # đọc experiments/summary.csv, ghi experiments/tables.md (T3–T5, Phụ lục A)
 python -m experiments.compare_runs <summary.csv lần 1> <summary.csv lần 2>   # kiểm tra tái lập
@@ -180,7 +181,7 @@ Source/
     problem.py         giao diện bài toán tìm kiếm cho solver
     costs.py           hàm chi phí không đồng nhất (V13)
     maze.py            GridMaze: mê cung nhỏ cùng giao diện Problem, để thử solver
-    serialize.py       chuyển State, Action, Level qua JSON (dùng cho bản demo web)
+    serialize.py       chuyển State, Action, Level sang JSON và ngược lại
   solvers/             thuật toán tìm kiếm, mỗi file một lớp con của Solver (base.py)
     bfs.py dfs.py ucs.py astar.py heuristics.py
     runner.py          chạy solver ở tiến trình riêng: hết giờ, Hủy, So sánh; start_solver()/poll() cho giao diện
@@ -205,10 +206,9 @@ Source/
     check_heuristics.py  kiểm tra h_M, h_P bằng số liệu trên 33 màn: chấp nhận được, nhất quán, cùng chi phí với UCS
     draw_mazes.py      vẽ các mê cung mẫu của GridMaze ra docs/gridmaze/
   tests/               unit test (unittest)
-  server/, web/        bản demo đầu (giao diện web Three.js qua server HTTP), không còn dùng; chờ nhóm đồng ý thì bỏ
 ```
 
-Quy tắc phụ thuộc: `bloxorz/` không import package nào khác của dự án; `solvers/` chỉ import `bloxorz`; `gui/` chỉ dùng `ALGORITHMS` và `runner` của `solvers`, không gọi thẳng thuật toán. Nhờ vậy engine, solver và test chạy được không cần Ursina (chi tiết: `docs/07-kien-truc-gui-ursina.md`).
+Quy tắc phụ thuộc: `bloxorz/` không import package nào khác của dự án; `solvers/` chỉ import `bloxorz`; `gui/` chỉ dùng `ALGORITHMS` và `runner` của `solvers`, không gọi thẳng thuật toán. Nhờ vậy engine, solver và test chạy được không cần Ursina.
 
 ## Nguồn và thư viện bên ngoài
 
@@ -217,6 +217,5 @@ Quy tắc phụ thuộc: `bloxorz/` không import package nào khác của dự 
 - **Ursina 7.0.0** (giấy phép MIT) và **Panda3D 1.10.16** (giấy phép Modified BSD): giao diện 3D. https://www.ursinaengine.org, https://www.panda3d.org
 - **Be Vietnam Pro** (The Be Vietnam Pro Project Authors, giấy phép SIL Open Font License 1.1, `gui/fonts/OFL.txt`): font chữ của giao diện. https://github.com/bettergui/BeVietnamPro
 - **Matplotlib 3.10.9**: biểu đồ thực nghiệm.
-- Bản demo trong `web/` dùng **Three.js r160**, **OrbitControls.js**, **RoundedBoxGeometry.js** (giấy phép MIT, `web/vendor/LICENSE-three.txt`) và phông **Baloo 2**, **Nunito** (SIL Open Font License 1.1, `web/vendor/fonts/OFL-*.txt`).
 
-Danh mục nguồn đầy đủ (kể cả các nguồn chỉ dùng để đối chiếu) nằm ở `docs/06-bao-cao-video.md` mục 3 và `docs/report/tai-lieu-tham-khao.md`.
+Danh mục nguồn đầy đủ (kể cả các nguồn chỉ dùng để đối chiếu) nằm ở mục Tài liệu tham khảo của `Report.pdf`.

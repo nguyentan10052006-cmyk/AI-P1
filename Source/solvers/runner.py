@@ -6,7 +6,7 @@ hoặc người dùng bấm Hủy, tiến trình bị dừng và GUI vẫn phả
 Hai cách dùng (docs/07 §6):
 - Không chặn, cho GUI Ursina: start_solver() hoặc start_compare() trả về ngay; GUI gọi poll()
   trong update() mỗi khung hình cho tới khi có kết quả. Không có callback từ tiến trình con.
-- Chặn, cho server HTTP, test và dòng lệnh: run_solver() chờ tới khi có kết quả.
+- Chặn, cho test và dòng lệnh: run_solver() chờ tới khi có kết quả.
 
 Kết quả là một dict:
 - thành công: {'ok': True, các trường của SearchResult, 'prepare_ms', 'time_ms', 'peak_kb'}
@@ -45,7 +45,7 @@ def _timed_out(timeout_s: float) -> Outcome:
 
 class SolveJob:
     """Một lần giải. Tạo bằng start_solver(), hoặc tạo rỗng rồi truyền vào run_solver(job=...)
-    để một luồng khác có thể cancel() trong lúc run_solver() đang chờ (server HTTP làm vậy)."""
+    để một luồng khác có thể cancel() trong lúc run_solver() đang chờ."""
 
     def __init__(self) -> None:
         self._lock = threading.Lock()
