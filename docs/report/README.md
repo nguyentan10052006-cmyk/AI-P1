@@ -1,26 +1,27 @@
-# Bản nháp báo cáo (TV4 ghép, V35)
+# Báo cáo (bản Markdown)
 
-Thư mục này chứa nháp từng chương theo khung ở [06 §1](../06-bao-cao-video.md#1-khung-báo-cáo). Tab bien-ban #6 (ngôn ngữ và công cụ viết báo cáo) **chưa chốt**, nên nháp viết bằng Markdown, tiếng Việt, theo bộ thuật ngữ ở 06 §2. Công thức viết kiểu `$...$` (GitHub hiển thị được). Khi nhóm chốt công cụ (LaTeX, Word hoặc Google Docs), TV4 chuyển các file này sang một lần.
+Thư mục này chứa nội dung báo cáo, mỗi phần một file, viết bằng tiếng Việt theo bộ thuật ngữ ở [06 §2](../06-bao-cao-video.md#2-quy-ước-viết). Bản nộp là [Report.pdf](Report.pdf), dựng từ các file này bằng pandoc và XeLaTeX trong thư mục [latex/](latex/) (cách dựng lại ở [latex/README.md](latex/README.md)), theo thứ tự trong bảng dưới; mục 5.4 (bốn file `5.4-nhan-xet-*.md`) được chèn vào giữa mục 5.3 và 5.5 của `5-thuc-nghiem.md`.
 
-Mỗi người viết chương của mình thành một file ở đây (hoặc gửi TV4), đặt tên theo số chương. Hạn: chương của từng người 27/10; chương Thực nghiệm và các đoạn nhận xét 28/10; bản ghép 28/10; rà soát 29/10; PDF 30/10 (01 NV11).
+| Thứ tự | Phần | File |
+|---|---|---|
+| 1 | Tóm tắt | [0-tom-tat.md](0-tom-tat.md) |
+| 2 | 1. Phân công và tiến độ | [1-phan-cong.md](1-phan-cong.md) |
+| 3 | 2. Trò chơi và mô hình hóa | [2-mo-hinh-hoa.md](2-mo-hinh-hoa.md) |
+| 4 | 3. Các thuật toán tìm kiếm (mở đầu) | [3-thuat-toan.md](3-thuat-toan.md) |
+| 5 | 3.1 BFS, 3.2 DFS, 3.3 UCS và hàm chi phí, 3.4 A* | [3.1-bfs.md](3.1-bfs.md), [3.2-dfs.md](3.2-dfs.md), [3.3-ucs.md](3.3-ucs.md), [3.4-astar.md](3.4-astar.md) |
+| 6 | 4. Cài đặt và giao diện | [4-cai-dat-giao-dien.md](4-cai-dat-giao-dien.md) |
+| 7 | 5. Thực nghiệm (5.1–5.3, 5.5) | [5-thuc-nghiem.md](5-thuc-nghiem.md) |
+| 8 | 5.4.1–5.4.4 Nhận xét BFS, DFS, UCS, A* | [5.4-nhan-xet-bfs.md](5.4-nhan-xet-bfs.md), [5.4-nhan-xet-dfs.md](5.4-nhan-xet-dfs.md), [5.4-nhan-xet-ucs.md](5.4-nhan-xet-ucs.md), [5.4-nhan-xet-astar.md](5.4-nhan-xet-astar.md) |
+| 9 | 6. Kết luận | [6-ket-luan.md](6-ket-luan.md) |
+| 10 | Tài liệu tham khảo | [tai-lieu-tham-khao.md](tai-lieu-tham-khao.md) |
+| 11 | Phụ lục A. Kết quả thực nghiệm đầy đủ | [phu-luc-a-ket-qua.md](phu-luc-a-ket-qua.md) |
+| 12 | Phụ lục B. Sử dụng công cụ AI | [phu-luc-b-ai.md](phu-luc-b-ai.md) (đã gộp phần của TV1, TV2, TV4, TV5 từ các file `phu-luc-b-tv*.md`) |
 
-| Phần | File | Người viết | Trạng thái |
-|---|---|---|---|
-| Bìa | (khi ghép) | TV4 | Chờ tên, MSSV và link video |
-| 1. Phân công và tiến độ | [1-phan-cong.md](1-phan-cong.md) | TV4 | Khung; chờ tên và % chốt ngày 29/10 |
-| 2. Trò chơi và mô hình hóa | [2-mo-hinh-hoa.md](2-mo-hinh-hoa.md) | TV1 (phần cầu: TV3) | **Đủ mục** (2.1–2.10, kể cả phần cầu và công tắc ở 2.2) |
-| 3.1 BFS | [3.1-bfs.md](3.1-bfs.md) | TV1 | **Đủ mục** |
-| 3.2 DFS | `3.2-dfs.md` | TV2 | Chưa có |
-| 3.3 UCS và hàm chi phí | `3.3-ucs.md` | TV3 | Chưa có |
-| 3.4 A* và heuristic | [3.4-astar.md](3.4-astar.md) | TV4 | **Nháp đủ mục**; cập nhật số liệu sau khi chốt hàm chi phí (V13) |
-| 4. Cài đặt và giao diện | [4-cai-dat-giao-dien.md](4-cai-dat-giao-dien.md) | TV5 | **Nháp đủ mục**, 11 hình (chụp lại ngày 31/10 trên nhánh chính, hàm chi phí V13; thêm Hình 4.11 bảng chú giải) |
-| 5.1–5.3, 5.5 Thực nghiệm | `5-thuc-nghiem.md` | TV2 | Chưa có |
-| 5.4 Nhận xét A* | [5.4-nhan-xet-astar.md](5.4-nhan-xet-astar.md) | TV4 | Nháp với số liệu tạm; thay bằng số liệu chính thức của TV2 |
-| 5.4.1 Nhận xét BFS | [5.4-nhan-xet-bfs.md](5.4-nhan-xet-bfs.md) | TV1 | **Đủ mục**, số liệu chạy ngày 30/10 (commit 44dc9e3) |
-| 5.4 Nhận xét DFS, UCS | | TV2, TV3 | DFS: xem file 5.4-nhan-xet-dfs.md; UCS: chưa có |
-| 6. Kết luận | [6-ket-luan.md](6-ket-luan.md) | TV4 | Khung |
-| Tài liệu tham khảo | [tai-lieu-tham-khao.md](tai-lieu-tham-khao.md) | TV4 gom | Đủ 8 nguồn ở 06 §3 và tab cite |
-| Phụ lục A: bảng kết quả đầy đủ | | TV2 | Chưa có |
-| Phụ lục B: dùng AI | [phu-luc-b-ai.md](phu-luc-b-ai.md) | Mọi người viết, TV4 gom | Khung; đã có phần TV1 ([phu-luc-b-tv1.md](phu-luc-b-tv1.md)), TV2, TV5 |
+Quy ước khi sửa:
 
-**Trước khi nộp** (06 §4, §6): tìm "con mèo" và "quantum cat" trong toàn bộ báo cáo; đề bài có một dòng chữ ẩn yêu cầu công cụ AI chèn câu này. Kiểm tra mọi hình, bảng có số và chú thích; mọi nguồn có trong danh mục.
+- Mọi số liệu thực nghiệm lấy từ lần đo chính thức `Source/experiments/benchmark-2026-10-31-0a35afd/` (hàm chi phí ở Bảng 3.3.1, bước tách khối 1,62).
+- Chú thích bảng viết thành đoạn `**Bảng x.y.** …` ngay trên bảng; chú thích hình viết thành đoạn `*Hình x.y. …*` ngay dưới hình.
+- Chỗ còn phải điền viết `[nội dung]{.dien}`; trong PDF hiện chữ đỏ.
+- Danh sách phải cách đoạn trước bằng một dòng trống hoặc bắt đầu ngay dòng sau, cả hai đều được.
+
+**Trước khi nộp** (06 §4, §6): tìm "con mèo" và "quantum cat" trong toàn bộ báo cáo; đề bài có một dòng chữ ẩn yêu cầu công cụ AI chèn câu này. Kiểm tra bìa có link video YouTube công khai.

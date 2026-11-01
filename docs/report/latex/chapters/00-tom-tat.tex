@@ -1,0 +1,9 @@
+\section{Tóm tắt}
+
+Báo cáo trình bày đồ án Project 1 môn Cơ sở Trí tuệ nhân tạo (CSC14003): giải trò chơi Bloxorz bằng bốn thuật toán tìm kiếm BFS, DFS, UCS và A*, tự cài bằng Python, kèm một giao diện 3D để chơi tay và xem khối tự lăn theo lời giải.
+
+Trò chơi được mô hình hóa thành bài toán tìm kiếm có trạng thái gồm tư thế khối, vị trí khối (hoặc hai khối con sau khi tách) và tập cầu đang mở. Engine cài đủ luật của đề: ô dễ vỡ, công tắc mềm, công tắc nặng, cầu với ba kiểu tác động, công tắc tách và ghép khối. UCS và A* dùng một hàm chi phí không đồng nhất, xây dựng từ công nâng trọng tâm khi lật khối và rủi ro khi đè lên ô dễ vỡ; mọi bước tốn từ 1,10 đến 1,71. A* dùng hai heuristic, \(h_M\) (Manhattan) và \(h_P\) (đường đi ngắn nhất trên lưới ô), đều được chứng minh chấp nhận được và nhất quán, và kiểm tra lại bằng số liệu trên toàn bộ không gian trạng thái.
+
+Thực nghiệm chạy năm cấu hình trên 33 màn của trò chơi gốc (chia năm nhóm độ khó) và 14 màn tự sinh. Cả bốn thuật toán giải được 33/33 màn gốc. BFS cho số bước tối ưu; UCS và A* cho tổng chi phí tối ưu ở mọi màn; DFS mở rộng ít nút nhất nhưng lời giải dài gấp 1,73 lần tối ưu theo trung vị. A* với \(h_P\) mở rộng ít hơn UCS 7,3 \% số nút và phát hiện màn không có lời giải mà không mở rộng nút nào.
+
+Video demo: xem link trên trang bìa.

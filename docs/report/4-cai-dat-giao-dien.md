@@ -1,13 +1,11 @@
 ## 4. Cài đặt và giao diện
 
-> Bản nháp của TV5 (V30), viết bằng tiếng Việt theo thuật ngữ ở docs/06 §2. TV4 chuyển vào bản ghép (V35). Số trích dẫn theo danh mục `tai-lieu-tham-khao.md` của TV4 ([8] nhóm khóa trước, [10] Ursina, [11] Panda3D). Ảnh chụp lại ngày 31/10/2026 trên nhánh chính (sau PR #18: giao diện V21, bộ nạp màn V03, UCS, hàm chi phí V13), cửa sổ 2560 × 1440 thu về 1280 × 720; các bước đi trong ảnh lấy từ lời giải BFS và từ `rules.step()`. Hình 4.6–4.8 (có cột chi phí) chụp lại sau PR #23, khi bước làm khối tách đôi tính 1,62.
-
 ### 4.1. Công nghệ
 
-Toàn bộ chương trình viết bằng **Python 3.11**. Giao diện 3D dùng **Ursina 7.0.0** [10], một engine game chạy trên **Panda3D 1.10.16** [11]. Nhóm chọn Ursina (bien-ban #3) vì ba lý do:
+Toàn bộ chương trình viết bằng **Python 3.11** [9]. Giao diện 3D dùng **Ursina 7.0.0** [10], một engine game chạy trên **Panda3D 1.10.16** [11]. Nhóm chọn Ursina vì ba lý do:
 
 1. Cùng ngôn ngữ với engine và thuật toán, nên giao diện gọi thẳng hàm luật chơi của nhóm, không phải viết lại luật hay dựng thêm một lớp giao tiếp.
-2. Bản demo đầu tiên dùng giao diện web (Three.js) gọi engine qua server HTTP. Cách đó đẹp hơn nhưng phải giữ thêm server, API và mã JavaScript; khi chuyển sang Ursina, phần này được bỏ.
+2. Bản demo đầu tiên dùng giao diện web (Three.js [14], phông chữ Baloo 2 và Nunito [15]) gọi engine qua server HTTP. Cách đó đẹp hơn nhưng phải giữ thêm server, API và mã JavaScript; khi chuyển sang Ursina, nhóm không dùng phần này nữa.
 3. Ursina đủ để dựng bàn 3D có hoạt ảnh lăn, tách, ghép và rơi. Một nhóm khóa trước cùng môn đã dùng Ursina cho đề tài này; nhóm tham khảo danh sách lỗi hay gặp của họ, không dùng lại code [8].
 
 Ursina chạy trên Panda3D, mà Panda3D thường ra bản cho phiên bản Python mới chậm hơn. Vì vậy cả nhóm dùng chung Python 3.11, và `requirements.txt` ghim đúng phiên bản `ursina==7.0.0`, `panda3d==1.10.16` để máy chấm không cài nhầm bản mới hơn.
@@ -60,7 +58,7 @@ cd Source
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install -r requirements.txt
-python main.py          # mở màn 01; python main.py 17 mở thẳng màn 17
+python main.py          # mở trang chủ; python main.py 17 mở thẳng màn 17
 python -m unittest discover -v
 ```
 
@@ -70,7 +68,7 @@ Thuật toán chạy ở tiến trình riêng bằng `multiprocessing` kiểu `s
 
 ### 4.4. Bàn chơi và các loại ô
 
-Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi tên màn, nhóm độ khó, số bước tối ưu tham khảo và số bước đã đi; các nút ở bên phải; dòng dưới cùng tóm tắt các phím hay dùng (F1 mở bảng đầy đủ). Phím G hoặc nút "Chú giải" mở bảng chú giải các loại ô (Hình 4.11). Chữ dùng font Be Vietnam Pro [13], thiết kế cho tiếng Việt nên dấu rõ ở cỡ nhỏ.
+Các ảnh trong chương được chụp ngày 31/10, trước khi thêm trang chủ, nên thanh điều hướng trong ảnh chưa có nút Trang chủ; các phần còn lại giống giao diện hiện tại. Hình 4.1 là màn 23, màn duy nhất trong 33 màn gốc có đủ 9 loại ô. Mỗi loại ô có màu hoặc hình riêng (Bảng 4.1). Góc trên bên trái ghi tên màn, nhóm độ khó, số bước tối ưu tham khảo và số bước đã đi; các nút ở bên phải; dòng dưới cùng tóm tắt các phím hay dùng (F1 mở bảng đầy đủ). Phím G hoặc nút "Chú giải" mở bảng chú giải các loại ô (Hình 4.11). Chữ dùng font Be Vietnam Pro [13], thiết kế cho tiếng Việt nên dấu rõ ở cỡ nhỏ.
 
 ![Hình 4.1](hinh/h4-1-man23-du-loai-o.png)
 
@@ -82,7 +80,7 @@ Bảng chú giải (Hình 4.11) là một lớp phủ giữa màn hình như b�
 
 *Hình 4.11. Bảng chú giải các loại ô (phím G) trên màn 23: cột trái là ô và khối, cột phải là cầu và ba loại công tắc.*
 
-*Bảng 4.1. Cách vẽ từng loại ô.*
+**Bảng 4.1.** Cách vẽ từng loại ô.
 
 | Ô | Ký hiệu trong file màn | Cách vẽ |
 |---|---|---|
@@ -122,11 +120,14 @@ Khối rơi khi chạm ô trống, ra ngoài bàn, vào cầu đóng, hoặc đ�
 
 ### 4.5. Chơi tay
 
+**Trang chủ.** Chạy `python main.py` không kèm số màn thì trang chủ hiện ra: bàn 3D của màn 1 xoay chậm phía sau, bên trái là tên game và bốn nút Chơi ngay, Chọn màn, Cách chơi, Thoát (chọn bằng chuột, hoặc bằng phím mũi tên rồi Enter). Nút Cách chơi mở bảng hướng dẫn bốn trang, mỗi trang có một bàn mô phỏng tự chạy: mục tiêu của màn, cách lăn khối, khi nào thì thua, các ô đặc biệt và cách nhờ thuật toán giải. Trong lúc chơi, nút Trang chủ hoặc phím M đưa về trang chủ. Các phím khi chơi:
+
 | Phím | Tác dụng |
 |---|---|
 | ← ↑ → ↓ hoặc W A S D | Lăn khối |
 | Space | Đổi khối con (khi đã tách) |
 | R | Chơi lại màn |
+| M | Về trang chủ |
 | N / P | Màn sau / màn trước |
 | Q / E, Z / X, T, F, chuột phải, con lăn | Đổi góc nhìn (mục 4.7) |
 | H | Ẩn hoặc hiện khung kết quả (mục 4.7) |
@@ -144,7 +145,7 @@ Khi vào màn, các ô trồi lên lần lượt theo đường chéo rồi kh�
 
 ### 4.6. Giải tự động và So sánh
 
-Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Chú giải (Hình 4.11), Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
+Các nút được nhóm theo việc. Thanh trên cùng bên phải là điều hướng màn: Trang chủ, Chú giải (Hình 4.11), Màn đầu, ‹ Trước, Chọn màn (Hình 4.9), Sau ›, Chơi lại. Hai nút điều khiển cơ bản mà đề yêu cầu là **Màn đầu** (New Game: bắt đầu lại từ màn 1) và **Chơi lại** (Restart: đặt khối, cầu và ô dễ vỡ của màn đang chơi về trạng thái đầu, như phím R). Cột bên phải có hai thẻ: thẻ "Tìm lời giải" gồm lưới 2 × 2 nút giải (Solve) BFS, DFS, UCS, A*, nút So sánh cả 5 thuật toán và nút Hủy; thẻ "Góc nhìn" gồm nhãn góc hiện tại và 6 nút camera. Nút không dùng được lúc đó chuyển sang màu xám (khi chưa chạy thì Hủy xám, khi đang chạy thì các nút giải xám). Trong lúc giải, một khung sáng bao quanh nút của thuật toán đang chạy (khi So sánh, khung trượt dần qua từng nút), và chấm trước dòng đầu của khung kết quả nhấp nháy; xong thì chấm đổi màu theo kết quả.
 
 **Hộp kết thúc màn.** Khi thắng hoặc rơi, sau khi hoạt ảnh gần xong, một hộp hiện giữa vùng bàn (không che khung kết quả và cột nút). Khi thắng, hộp ghi số bước so với số bước tối ưu, và tên thuật toán nếu khối vừa tự lăn theo lời giải; nút chính là Màn tiếp. Khi rơi, hộp ghi lý do (ô dễ vỡ, cầu đóng, hụt khỏi bàn) theo sự kiện của engine; nút chính là Chơi lại. Enter bấm nút chính, Esc đóng hộp; chơi lại hay đổi màn thì hộp tự đóng. Hộp kéo thả được: giữ chuột trái ở chỗ bất kỳ trên hộp (trừ các nút, có dấu tay nắm ở mép trên) rồi kéo; hộp không ra khỏi màn hình, và các lần sau hiện lại ở chỗ đã kéo tới. Bấm Giải hoặc So sánh thì hộp của lượt trước đóng lại.
 
@@ -156,7 +157,7 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 
 *Hình 4.6. Màn 23 sau khi bấm Giải bằng BFS: khối đã tự lăn tới đích sau 75 bước, đúng số bước tối ưu; khung kết quả hiện các chỉ số của lần tìm, bàn thu nhỏ vào phần màn hình còn trống nên không bị che.*
 
-**So sánh** chạy lần lượt năm thuật toán trên màn đang mở: BFS, DFS, UCS, A* với h_P và A* với h_M (bien-ban #15), mỗi thuật toán một tiến trình. Chạy lần lượt chứ không song song để thời gian và bộ nhớ của các thuật toán không ảnh hưởng nhau. Bảng được điền dần khi từng thuật toán xong (Hình 4.7, 4.8); dòng đang chạy ghi số giây đã chạy; thuật toán nào lỗi thì ô ghi "Lỗi" và nội dung lỗi ghi dưới bảng. Cột "Giây" và "MB" ghi số không kèm đơn vị cho bảng gọn.
+**So sánh** chạy lần lượt năm thuật toán trên màn đang mở: BFS, DFS, UCS, A* với h_P và A* với h_M, mỗi thuật toán một tiến trình. Chạy lần lượt chứ không song song để thời gian và bộ nhớ của các thuật toán không ảnh hưởng nhau. Bảng được điền dần khi từng thuật toán xong (Hình 4.7, 4.8); dòng đang chạy ghi số giây đã chạy; thuật toán nào lỗi thì ô ghi "Lỗi" và nội dung lỗi ghi dưới bảng. Cột "Giây" và "MB" ghi số không kèm đơn vị cho bảng gọn.
 
 ![Hình 4.7](hinh/h4-7-so-sanh-dang-chay.png)
 
@@ -166,7 +167,7 @@ Mỗi lần giải có bốn kết quả, mỗi loại một thông báo và mà
 
 *Hình 4.8. Kết quả So sánh trên màn 23: BFS, UCS và A* với cả hai heuristic cùng tìm được lời giải 75 bước; DFS tìm được lời giải dài 1187 bước, đúng với việc DFS không bảo đảm đường ngắn nhất.*
 
-Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (docs/04 §2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 101,58, còn UCS và A* đi 75 bước khác tốn 100,58.
+Nút Giải và So sánh dựng bài toán với hàm chi phí ở mục 3.3, nên cột Chi phí của cả năm thuật toán tính theo cùng một hàm (mục 3.3.2): BFS cho số bước ít nhất, UCS và A* cho tổng chi phí nhỏ nhất. Ở màn 23, BFS đi 75 bước tốn 101,58, còn UCS và A* đi 75 bước khác tốn 100,58.
 
 Thời gian và bộ nhớ trên giao diện chỉ để tham khảo, vì tiến trình con luôn bật `tracemalloc` để đo bộ nhớ, và việc này làm chậm thuật toán. Số liệu ở chương 5 lấy từ script thực nghiệm.
 
@@ -225,6 +226,3 @@ Ngoài unit test của engine và thuật toán (không cần Ursina), giao di�
 - Chưa chỉnh được tốc độ khối tự lăn và chưa tạm dừng được giữa chừng (chỉ dừng hẳn bằng Hủy hoặc R).
 - Menu chọn màn chỉ có 33 màn gốc; bộ màn tự sinh S1–S3 (chương 5) chưa mở được từ giao diện.
 
-#### Nguồn đề xuất thêm vào danh mục tài liệu tham khảo
-
-[13] The Be Vietnam Pro Project Authors, *Be Vietnam Pro*, giấy phép SIL Open Font License 1.1. [Trực tuyến]. Địa chỉ: https://github.com/bettergui/BeVietnamPro
