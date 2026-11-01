@@ -1,52 +1,46 @@
 % Trang bìa. Lớp, giảng viên, link video lấy từ info.tex.
 \begin{titlepage}
-\def\coverclassrow{}\def\coverlecturerrow{}%
-\ifx\classname\empty\else\def\coverclassrow{\textbf{Lớp học phần:} & \classname \\}\fi
-\ifx\lecturer\empty\else\def\coverlecturerrow{\textbf{Giảng viên:} & \lecturer \\}\fi
-\begin{tcolorbox}[
-  enhanced, colback=white, colframe=primary, boxrule=0.9pt, arc=0pt,
-  height=\textheight, valign=top,
-  left=1.25cm,right=1.25cm,top=1.0cm,bottom=1.0cm,
-  borderline west={4pt}{0pt}{secondary}
-]
-\centering
-{\small\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\par}
-\vspace{0.15cm}
-{\large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
-\vspace{0.1cm}
-{\normalsize\bfseries KHOA CÔNG NGHỆ THÔNG TIN\par}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[brand] (current page.north west) rectangle ([xshift=1.35cm]current page.south west);
+  \fill[spark] ([xshift=1.35cm]current page.north west) rectangle ([xshift=1.55cm]current page.south west);
+  \node[anchor=south east,inner sep=0pt] at ([xshift=-1.6cm,yshift=5.6cm]current page.south east) {\isoscene};
+\end{tikzpicture}%
+\sffamily\color{ink}
+\begin{minipage}[c]{2.4cm}\includegraphics[width=2.3cm]{logo-hcmus.png}\end{minipage}%
+\hspace{0.5cm}%
+\begin{minipage}[c]{11cm}
+  {\footnotesize ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\par}
+  {\normalsize\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+  {\footnotesize KHOA CÔNG NGHỆ THÔNG TIN\par}
+\end{minipage}
+\vspace{3.2cm}
+
+{\small\bfseries\color{spark} BÁO CÁO ĐỒ ÁN · MÔN CƠ SỞ TRÍ TUỆ NHÂN TẠO (CSC14003)\par}
+\vspace{0.35cm}
+{\fontsize{42}{46}\selectfont\bfseries\color{brand} Bloxorz Solver\par}
 \vspace{0.3cm}
-{\color{primary}\rule{0.72\linewidth}{1.2pt}\par}
-\vspace{0.4cm}
-\includegraphics[width=3.6cm]{logo-hcmus.png}\par
-\vspace{0.25cm}
-{\Large\bfseries\color{primary} BÁO CÁO ĐỒ ÁN\par}
-\vspace{0.12cm}
-{\normalsize\bfseries\color{darkneutral} MÔN CƠ SỞ TRÍ TUỆ NHÂN TẠO (CSC14003)\par}
-\vspace{0.5cm}
-{\Huge\bfseries\color{secondary} Project 1\par}
-\vspace{0.1cm}
-{\LARGE\bfseries\color{primary} Bloxorz Solver\par}
+{\Large Project 1\par}
 \vspace{0.2cm}
-{\normalsize\color{darkneutral} Giải trò chơi Bloxorz bằng các thuật toán tìm kiếm BFS, DFS, UCS và A*\par}
-\vspace{0.45cm}
-\begin{tcolorbox}[enhanced, colback=lightbg, colframe=codeborder, boxrule=0.5pt, arc=1.5pt,
-  width=0.95\linewidth, left=12pt,right=12pt,top=10pt,bottom=10pt]
-\renewcommand{\arraystretch}{1.3}
-\small
-\begin{tabular}{@{}r >{\raggedright\arraybackslash}p{9.2cm}@{}}
-\textbf{Nhóm:}       & Nhóm 9 \\
-\coverclassrow
-\textbf{Thành viên:} & 24120478 -- Võ Quốc Trung \\
-                     & 24120462 -- Bùi Quang Tiến \\
-                     & 24120476 -- Nguyễn Bảo Trọng \\
-                     & 24120474 -- Trịnh Vỹ Triết \\
-                     & 24120438 -- Trần Nguyên Tân \\
-\coverlecturerrow
-\textbf{Video demo:} & \videourl \\
-\end{tabular}
-\end{tcolorbox}
+{\large\color{muted} Giải trò chơi Bloxorz bằng BFS, DFS, UCS và A*\par}
 \vfill
-{\small\color{darkneutral} TP. HỒ CHÍ MINH, THÁNG 10/2026\par}
-\end{tcolorbox}
+{\color{spark}\rule{2.2cm}{2.5pt}\par}
+\vspace{0.35cm}
+\def\coverclassrow{}\def\coverlecturerrow{}%
+\ifx\classname\empty\else\def\coverclassrow{\multicolumn{2}{@{}l}{\textbf{Lớp học phần:} \classname}\\}\fi
+\ifx\lecturer\empty\else\def\coverlecturerrow{\multicolumn{2}{@{}l}{\textbf{Giảng viên:} \lecturer}\\}\fi
+\renewcommand{\arraystretch}{1.25}%
+\begin{tabular}{@{}l l@{}}
+\multicolumn{2}{@{}l}{\bfseries\color{brand} Nhóm 9}\\[0.15em]
+24120478 & Võ Quốc Trung \\
+24120462 & Bùi Quang Tiến \\
+24120476 & Nguyễn Bảo Trọng \\
+24120474 & Trịnh Vỹ Triết \\
+24120438 & Trần Nguyên Tân \\[0.4em]
+\coverclassrow
+\coverlecturerrow
+\multicolumn{2}{@{}l}{\textbf{Video demo:} \videourl}\\
+\end{tabular}
+\vspace{0.9cm}
+
+{\small\color{muted} TP. Hồ Chí Minh, tháng 10/2026\par}
 \end{titlepage}
